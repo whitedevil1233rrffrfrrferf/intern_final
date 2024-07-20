@@ -1074,21 +1074,7 @@ def complete_registration():
         return redirect(url_for('dashBoard'))
     return render_template('complete_registration.html')
 
-@app.route("/delete_resume/<int:resume_id>", methods=["POST"])
-def delete_resume(resume_id):
-    resume = Resume.query.get_or_404(resume_id)
-    resume_folder = 'static/files'
-    file_path = os.path.join(resume_folder, resume.filename)
 
-    # Delete the resume entry from the database
-    db.session.delete(resume)
-    db.session.commit()
-
-    # Check if the file exists and delete it
-    if os.path.exists(file_path):
-        os.remove(file_path)
-
-    return redirect(url_for('employee'))
 
 
 

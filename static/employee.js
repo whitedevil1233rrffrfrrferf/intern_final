@@ -224,7 +224,7 @@ setTimeout(function(){
         flashMessage.style.display = 'none';
       });
     }, 2000);
-localStorage.clear()
+// localStorage.clear()
 
 function editName(resumeId) {
     var currentName = localStorage.getItem('enteredName' + resumeId);

@@ -527,6 +527,10 @@ def register():
         name=request.form["name"]
         mobile=request.form["mobile"]
         filename=""
+        existing_user = Login.query.filter_by(email=email).first()
+        if existing_user:
+            flash(f"{email} already exists!", "danger")
+            return redirect("/register")
         if 'photo' in request.files:
             photo=request.files['photo']
             if photo.filename!='':
@@ -537,7 +541,8 @@ def register():
         user=Login(email=email,password=password,Role=role,Name=name,MobileNumber=mobile,photo_filename=filename)
         db.session.add(user)
         db.session.commit()
-        return redirect("/")
+        flash(f"Registration successful for {name}!", "success")
+        return redirect("/register")
 
     return render_template("register.html")
 @app.route("/get_employees_list/<employment_status>")

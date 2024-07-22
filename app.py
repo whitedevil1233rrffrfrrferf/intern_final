@@ -19,7 +19,7 @@ from google_auth_oauthlib.flow import Flow
 from google.auth.transport import requests
 import secrets
 from dotenv import load_dotenv
-
+import time
 load_dotenv()
 app = Flask(__name__)
 profile_images_upload_folder = 'static/profile_images'
@@ -53,6 +53,7 @@ CLIENT_ID = os.environ.get('CLIENT_ID')
 CLIENT_SECRET=os.environ.get('CLIENT_SECRET')
 
 REDIRECT_URI = 'https://intern-final-0b4w.onrender.com/google_sign_in'
+
 
 SCOPES = ['openid', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
 
@@ -915,7 +916,7 @@ def get_role():
         user=Login.query.filter_by(email=email).first()
         role=user.Role
         return jsonify({'role': role})
-        
+    return  jsonify({'error': 'Email not in session'}), 400       
 @app.route("/signout")
 def signout():
     session.pop('email', None)   
@@ -1000,7 +1001,7 @@ def google_signin():
     
     credentials = flow.credentials
     request_session = requests.Request()
-
+    time.sleep(1)
     try:
         id_info = id_token.verify_oauth2_token(
             id_token=credentials.id_token,

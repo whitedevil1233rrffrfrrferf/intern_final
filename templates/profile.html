@@ -45,12 +45,22 @@
                 <label for="password">Password:</label>
                 <input  class="form-control" id="password" name="password" value="{{ password }}">
             </div>
+            <div class="mb-3">
+                <label for="role">Role:</label>
+                <select class="form-control" id="role" name="role">
+                    <option value="admin" {% if role == 'admin' %}selected{% endif %}>Admin</option>
+                    <option value="user" {% if role == 'user' %}selected{% endif %}>User</option>
+                    <option value="interviewer" {% if role == 'interviewer' %}selected{% endif %}>Interviewer</option>
+                    <!-- Add more roles as needed -->
+                </select>
+            </div>
             <!-- <div class="mb-3">
                 <input type="checkbox" id="admin" name="role" value="admin" {{ 'checked' if role == 'admin' else '' }}>
                 <label for="admin">Admin</label><br>
                 <input type="checkbox" id="user" name="role" value="user" {{ 'checked' if role == 'user' else '' }}>
                 <label for="user">User</label><br>
             </div> -->
+
             <button type="submit" class="btn btn-primary">Save</button>
             
         </form>

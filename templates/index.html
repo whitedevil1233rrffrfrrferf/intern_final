@@ -36,30 +36,16 @@
               
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 
-                <form class="d-flex col-8 my-2" role="search">
-                  <input class="form-control me-2" type="search" id="search_bar" placeholder="Search by Name" aria-label="Search">
-                  
+                <form class="d-flex col-8 my-2" role="search" method="GET">
+                  <input class="form-control me-2" type="search" id="search_bar" placeholder="Search by Name" name="search" aria-label="Search" value="{{ search_query }}">
+                  <button class="btn btn-primary" type="submit">Search</button>
                 </form>
               </div>
             </div>
           </nav>
         </div>
         <h2 class="filters_title my-3" >Employee's Data</h2>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              {% if category == 'error' %}
-                <div class="alert alert-danger add_flash_message" role="alert" >
-                  {{ message }}
-                </div>
-              {% elif category == 'success' %}
-                <div class="alert alert-success add_flash_message" role="alert" >
-                  {{ message }}
-                </div>
-              {% endif %}
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
+        
       
         <div class="filter_div" style="margin-bottom: 30px;">
           <div class=" filter">
@@ -196,9 +182,9 @@
                 {% for page_num in data.iter_pages(left_edge=1,right_edge=1,left_current=1,right_current=2) %}
                   {% if page_num %}
                     {% if data.page == page_num%}
-                      <a class="btn btn-outline-info mb-4" href="{{url_for('Home',page=page_num,pages=pages)}}" >{{page_num}}</a>
+                      <a class="btn btn-outline-info mb-4" href="{{url_for('Home',page=page_num,pages=pages,search=search_query)}}" >{{page_num}}</a>
                     {% else %}
-                      <a class="btn btn- mb-4" href="{{url_for('Home',page=page_num,pages=pages)}}" >{{page_num}}</a>
+                      <a class="btn btn- mb-4" href="{{url_for('Home',page=page_num,pages=pages,search=search_query)}}" >{{page_num}}</a>
                     {% endif %}
                   {% else%}
                     ...
@@ -234,7 +220,7 @@
             </div>
             
         </div>
-          <div style="display: flex; align-items: center;justify-content: space-between !important; margin-left: 43%; margin-top:rem; margin-bottom: 2rem;">
+          <div style="display: flex; align-items: center;justify-content:space-between!important; margin-left:40%; margin-top:rem; margin-bottom: 2rem;">
             <div style="display: flex; align-items: center; ">
               <div>
                 <a type="button" href="/add" class="btn btn-primary ">Add a new user</a>
@@ -242,14 +228,31 @@
               <div>
                 <a type="button" href="/bulk" class="btn btn-primary mx-3">Bulk add</a>
               </div>
-              
+              <div style="text-align: center;  flex-wrap: wrap;">
+                Page {{ data.page }} of {{ total_pages }} | Total Employees: {{ total_items }}
+              </div>
             </div>
-            
+           
             
           </div>
-          <div style="text-align: center; position: relative; left:auto; flex-wrap: wrap; margin-right: 1rem!important;">
-            Page {{ data.page }} of {{ total_pages }} | Total Employees: {{ total_items }}
+          <div style="width:90%; margin-left: auto; margin-right: auto;" >
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  {% if category == 'error' %}
+                    <div class="alert alert-danger add_flash_message" role="alert" >
+                      {{ message }}
+                    </div>
+                  {% elif category == 'success' %}
+                    <div class="alert alert-success add_flash_message" role="alert" >
+                      {{ message }}
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
           </div>
+          
         
           <!-- <a href="/add" type="button" class="btn btn-primary my-3 mx-3">Add a new user</button>
           <a href="/bulk" type="button" class="btn btn-primary my-3">Bulk add</button>  -->

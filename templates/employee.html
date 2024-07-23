@@ -225,7 +225,9 @@
                     </form>
                 </div>
                 
-                
+                <div style="margin-bottom: 2rem;">
+                    Page {{ resumes.page }} of {{total_pages }} | Total Resumes: {{ total_items }}
+                </div>
                 
                 </div>
                 
@@ -235,9 +237,7 @@
     
                         
     </div>
-    <div style="text-align: center;position: relative;left:auto; flex-wrap: wrap; margin-top: 3rem;">
-                  Page {{ resumes.page }} of {{no_of_pages }} | Total Resumes: {{ total_items }}
-                </div>
+    
     
     <script src="{{ url_for('static', filename='config.js') }}"></script>   
     <script src="{{ url_for('static', filename='employee.js') }}"></script>

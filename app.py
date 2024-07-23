@@ -280,37 +280,90 @@ def dashBoard():
         
         employment_status_counts[stat.Employment_status]=count
     return render_template("dashboard.html",employment_status_counts=employment_status_counts) 
-@app.route("/home",methods=["GET","POST"])
+# @app.route("/home",methods=["GET","POST"])
+# def Home():
+#     default_page_size = 20
+#     page_size_options = [20, 30, 40]
+
+#     # Handle form submission for page size change
+#     if request.method == "POST":
+#         selected_page_size = int(request.form["page_size"])
+#         session['page_size'] = selected_page_size  # Update session variable
+#     else:
+#         selected_page_size = session.get('page_size', default_page_size)    
+#     search_query = request.args.get('search', '')
+    
+#     # Get data based on current page and retrieved/default page size
+#     page = request.args.get('page', 1, type=int)
+#     if search_query:
+#         total_items = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%")).count()
+#         data = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%")).paginate(page=page, per_page=selected_page_size)
+#     else:
+#         total_items = Employee.query.count()
+#         data = Employee.query.paginate(page=page, per_page=selected_page_size)
+
+#     # Retrieve selected page size from session (or default)
+#     selected_page_size = session.get('page_size', default_page_size)
+
+#     if selected_page_size != default_page_size:
+#         new_page_count = total_items // selected_page_size
+#         if total_items % selected_page_size > 0:
+#             new_page_count += 1  # Account for partial last page
+#         page = min(page, new_page_count)
+#     start_index = (page - 1) * selected_page_size
+#     data = Employee.query.paginate(page=page, per_page=selected_page_size)
+
+#     total_pages=data.pages
+
+#     return render_template("index.html", data=data,
+#                                    page_size_options=page_size_options,
+#                                    selected_page_size=selected_page_size,total_items=total_items,total_pages=total_pages,start_index=start_index,search_query=search_query)
+@app.route("/home", methods=["GET", "POST"])
 def Home():
     default_page_size = 20
     page_size_options = [20, 30, 40]
 
     # Handle form submission for page size change
     if request.method == "POST":
-        selected_page_size = int(request.form["page_size"])
-        session['page_size'] = selected_page_size  # Update session variable
+        selected_page_size = int(request.form.get("page_size", default_page_size))
+        session['page_size'] = selected_page_size
+        # Redirect to the same page with updated page size to avoid form resubmission issues
+        return redirect(url_for('Home', page=1, search=request.args.get('search', '')))
+    else:
+        selected_page_size = session.get('page_size', default_page_size)
 
-    # Get data based on current page and retrieved/default page size
+    search_query = request.args.get('search', '')
     page = request.args.get('page', 1, type=int)
-    total_items = Employee.query.count()
 
-    # Retrieve selected page size from session (or default)
-    selected_page_size = session.get('page_size', default_page_size)
+    # Apply search filtering
+    if search_query:
+        total_items = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%")).count()
+        if total_items == 0:
+            flash("No results found for the search query.", "error")
+            return redirect(url_for('Home', page=1, search=""))
+        data = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%")).paginate(page=page, per_page=selected_page_size)
+    else:
+        total_items = Employee.query.count()
+        data = Employee.query.paginate(page=page, per_page=selected_page_size)
 
-    if selected_page_size != default_page_size:
-        new_page_count = total_items // selected_page_size
-        if total_items % selected_page_size > 0:
-            new_page_count += 1  # Account for partial last page
-        page = min(page, new_page_count)
+    # Handle pagination
+    new_page_count = total_items // selected_page_size
+    if total_items % selected_page_size > 0:
+        new_page_count += 1
+
+    # Ensure the current page is within the valid range
+    if page > new_page_count:
+        page = new_page_count
+
     start_index = (page - 1) * selected_page_size
-    data = Employee.query.paginate(page=page, per_page=selected_page_size)
 
-    total_pages=data.pages
+    total_pages = data.pages
 
     return render_template("index.html", data=data,
-                                   page_size_options=page_size_options,
-                                   selected_page_size=selected_page_size,total_items=total_items,total_pages=total_pages,start_index=start_index)
-    
+                           page_size_options=page_size_options,
+                           selected_page_size=selected_page_size,
+                           total_items=total_items, total_pages=total_pages,
+                           start_index=start_index, search_query=search_query)
 @app.route("/add", methods=["GET", "POST"])
 def Add():
     if request.method == "POST":
@@ -578,41 +631,83 @@ def resume():
         return redirect(url_for('resume'))        
     return render_template("resume.html")
 
+# @app.route("/employee_management", methods=["GET", "POST"])
+# def employee():
+#     default_page_size = 10
+#     page_size_options = [10, 20, 30, 40, 50]
+
+#     # Handle form submission for page size change (if applicable)
+#     if request.method == "POST":
+#         # Safely get the page size from form data and convert it
+#         selected_page_size = request.form.get("page_size", default_page_size)
+#         try:
+#             selected_page_size = int(selected_page_size)
+#         except ValueError:
+#             selected_page_size = default_page_size
+#         session['page_size'] = selected_page_size  # Update session variable
+
+#     # Get data based on current page and retrieved/default page size
+#     page = request.args.get('page', 1, type=int)
+#     total_items = Resume.query.count()
+
+#     # Retrieve selected page size from session (or default)
+#     selected_page_size = session.get('page_size', default_page_size)
+#     start_index = (page - 1) * selected_page_size
+#     if selected_page_size != default_page_size:
+#         new_page_count = total_items // selected_page_size
+#         if total_items % selected_page_size > 0:
+#             new_page_count += 1  # Account for partial last page
+#         page = min(page, new_page_count)
+
+#     resumes = Resume.query.paginate(page=page, per_page=selected_page_size)
+#     no_of_pages = resumes.pages
+    
+#     return render_template("employee.html", resumes=resumes,
+#                            page_size_options=page_size_options,
+#                            selected_page_size=selected_page_size,
+#                            total_items=total_items, no_of_pages=no_of_pages,start_index=start_index)
+
 @app.route("/employee_management", methods=["GET", "POST"])
 def employee():
     default_page_size = 10
     page_size_options = [10, 20, 30, 40, 50]
 
-    # Handle form submission for page size change (if applicable)
     if request.method == "POST":
-        # Safely get the page size from form data and convert it
-        selected_page_size = request.form.get("page_size", default_page_size)
-        try:
-            selected_page_size = int(selected_page_size)
-        except ValueError:
-            selected_page_size = default_page_size
-        session['page_size'] = selected_page_size  # Update session variable
+        selected_page_size = int(request.form.get("page_size", default_page_size))
+        session['page_size'] = selected_page_size
+        # Redirect to the same page with updated page size to avoid form resubmission issues
+        return redirect(url_for('employee', page=1))
+    else:
+        selected_page_size = session.get('page_size', default_page_size)
 
-    # Get data based on current page and retrieved/default page size
     page = request.args.get('page', 1, type=int)
     total_items = Resume.query.count()
 
-    # Retrieve selected page size from session (or default)
-    selected_page_size = session.get('page_size', default_page_size)
-    start_index = (page - 1) * selected_page_size
-    if selected_page_size != default_page_size:
+    # Handle case where there are no items
+    if total_items == 0:
+        start_index = 0
+        data = Resume.query.paginate(page=1, per_page=selected_page_size)
+        total_pages = 1
+    else:
+        # Handle pagination
         new_page_count = total_items // selected_page_size
         if total_items % selected_page_size > 0:
-            new_page_count += 1  # Account for partial last page
-        page = min(page, new_page_count)
+            new_page_count += 1
 
-    resumes = Resume.query.paginate(page=page, per_page=selected_page_size)
-    no_of_pages = resumes.pages
-    
-    return render_template("employee.html", resumes=resumes,
+        # Ensure the current page is within the valid range
+        if page > new_page_count:
+            page = new_page_count
+
+        start_index = (page - 1) * selected_page_size
+        data = Resume.query.paginate(page=page, per_page=selected_page_size)
+        total_pages = data.pages
+        
+    return render_template("employee.html", resumes=data,
                            page_size_options=page_size_options,
                            selected_page_size=selected_page_size,
-                           total_items=total_items, no_of_pages=no_of_pages,start_index=start_index)
+                           total_items=total_items, total_pages=total_pages,
+                           start_index=start_index)
+
 
 @app.route("/view_resume/<filename>")
 def view_resume(filename):
@@ -947,7 +1042,7 @@ def update_profile():
         
         user.MobileNumber = request.form["mobile"]
         user.password = request.form["password"]
-        # user.Role = request.form.get("role") 
+        user.Role = request.form.get("role") 
         
         if 'photo' in request.files:
             photo = request.files['photo']

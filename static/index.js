@@ -1,18 +1,50 @@
 const name = document.getElementById("search_bar");
 const tableRows = document.querySelectorAll("tbody tr");
 
-name.addEventListener("keyup", function(e) {
-    const searchValue = e.target.value.toLowerCase();
-    tableRows.forEach(function(row) {
-        const nameCell = row.querySelector("#Name"); // Target the cell with id="Name"
-        const nameValue = nameCell.textContent.toLowerCase();
-        if (nameValue.includes(searchValue)) {
-            row.style.display = "";
-        } else {
-            row.style.display = "none"; // Hide the row
-        }
+document.addEventListener('DOMContentLoaded', () => {
+    const searchQuery = new URLSearchParams(window.location.search).get('search');
+    const pageSizeForm = document.querySelector('form[method="POST"]');
+
+    if (searchQuery) {
+      const hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = 'search';
+      hiddenInput.value = searchQuery;
+      pageSizeForm.appendChild(hiddenInput);
+    }
+  });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const nameInput = document.getElementById("search_bar");
+    const tableRows = document.querySelectorAll("tbody tr");
+
+    // Handle search input changes
+    nameInput.addEventListener("keyup", function(e) {
+        const searchValue = e.target.value.toLowerCase();
+        const queryParams = new URLSearchParams(window.location.search);
+        queryParams.set('search', searchValue);
+        window.history.replaceState({}, '', `${window.location.pathname}?${queryParams}`);
+
+        tableRows.forEach(function(row) {
+            const nameCell = row.querySelector("#Name");
+            if (nameCell) {
+                const nameValue = nameCell.textContent.toLowerCase();
+                if (nameValue.includes(searchValue)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            }
+        });
     });
+
+    // Make sure search query is preserved on page load and page changes
+    const queryParams = new URLSearchParams(window.location.search);
+    const searchQuery = queryParams.get('search') || '';
+    nameInput.value = searchQuery;
 });
+
+
 // const selectedItem=document.getElementById("project")
 // selectedItem.addEventListener("change",function(){
 //     var searchContent=selectedItem.value.toLowerCase()
@@ -353,12 +385,12 @@ populateSelectOptions("status", config.home.statuses);
 populateSelectOptions("location", config.home.locations);
 
 
-setTimeout(function(){
-    var flashMessages =document.querySelectorAll(".add_flash_message")
-    flashMessages.forEach(function(flashMessage) {
-        flashMessage.style.display = 'none';
-      });
-    }, 2000);
+// setTimeout(function(){
+//     var flashMessages =document.querySelectorAll(".add_flash_message")
+//     flashMessages.forEach(function(flashMessage) {
+//         flashMessage.style.display = 'none';
+//       });
+//     }, 2000);
 
 document.getElementById("page").addEventListener('change',function(event){
     

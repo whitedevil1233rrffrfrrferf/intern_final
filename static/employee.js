@@ -114,6 +114,9 @@ function showInput(resumeId){
     document.getElementById('btn_name'+resumeId).style.display="none";
     document.getElementById('name'+resumeId).style.display="block";
     document.getElementById('submitBtn' + resumeId).style.display = 'block';
+    var currentName = document.getElementById('div_name' + resumeId).innerHTML;
+    document.getElementById('nameInput' + resumeId).value = currentName;
+    document.getElementById('div_name' + resumeId).style.display = "none";
 }
 function submitName(resumeId){
     document.getElementById('btn_name'+resumeId).style.display="none";
@@ -192,6 +195,9 @@ function showContactInput(resumeId) {
     document.getElementById('btn_contact' + resumeId).style.display = 'none';
     document.getElementById('contact' + resumeId).style.display = 'block';
     document.getElementById('submitBtnContact' + resumeId).style.display = 'block';
+    var currentContact = localStorage.getItem('enteredContact' + resumeId) || document.getElementById('div_contact' + resumeId).innerHTML;
+    document.getElementById('contactInput' + resumeId).value = currentContact;
+    document.getElementById('div_contact' + resumeId).style.display = "none";
 }
 
 function submitContact(resumeId) {
@@ -230,8 +236,46 @@ function editName(resumeId) {
     var currentName = localStorage.getItem('enteredName' + resumeId);
     if (currentName) {
         document.getElementById('nameInput' + resumeId).value = currentName;
+    } else {
+        // If no value in local storage, set to current div_name value
+        document.getElementById('nameInput' + resumeId).value = document.getElementById('div_name' + resumeId).innerHTML;
     }
     document.getElementById('name' + resumeId).style.display = "block";
     document.getElementById('div_name' + resumeId).style.display = "none";
     document.getElementById('submitBtn' + resumeId).style.display = 'block';
+}
+function editContact(resumeId) {
+    var currentContact = localStorage.getItem('enteredContact' + resumeId) || document.getElementById('div_contact' + resumeId).innerHTML;
+    document.getElementById('contactInput' + resumeId).value = currentContact;
+    document.getElementById('contact' + resumeId).style.display = 'block';
+    document.getElementById('div_contact' + resumeId).style.display = 'none';
+    document.getElementById('submitBtnContact' + resumeId).style.display = 'block';
+}
+function editActualCTC(resumeId) {
+    var currentActualCTC = localStorage.getItem('enteredActualCTC' + resumeId) || document.getElementById('div_actualCTC' + resumeId).innerHTML;
+    document.getElementById('actualCTCInput' + resumeId).value = currentActualCTC;
+    document.getElementById('actualCTC' + resumeId).style.display = 'block';
+    document.getElementById('div_actualCTC' + resumeId).style.display = 'none';
+    document.getElementById('submitBtnActualCTC' + resumeId).style.display = 'block';
+}
+function editExpectedCTC(resumeId) {
+    var currentExpectedCTC = localStorage.getItem('enteredExpectedCTC' + resumeId) || document.getElementById('div_expectedCTC' + resumeId).innerHTML;
+    document.getElementById('expectedCTCInput' + resumeId).value = currentExpectedCTC;
+    document.getElementById('expectedCTC' + resumeId).style.display = 'block';
+    document.getElementById('div_expectedCTC' + resumeId).style.display = 'none';
+    document.getElementById('submitBtnExpectedCTC' + resumeId).style.display = 'block';
+}
+function editRole(resumeId) {
+    var currentRole = localStorage.getItem('enteredRole' + resumeId) || document.getElementById('div_role' + resumeId).innerHTML;
+    document.getElementById('roleInput' + resumeId).value = currentRole;
+    document.getElementById('role' + resumeId).style.display = 'block';
+    document.getElementById('div_role' + resumeId).style.display = 'none';
+    document.getElementById('submitBtnRole' + resumeId).style.display = 'block';
+}
+function editLocation(resumeId) {
+    var currentLocation = localStorage.getItem('enteredLocation' + resumeId) || document.getElementById('div_location' + resumeId).innerHTML;
+    document.getElementById('locationInput' + resumeId).value = currentLocation;
+    document.getElementById('location' + resumeId).style.display = 'block';
+    document.getElementById('div_location' + resumeId).style.display = 'none';
+    document.getElementById('submitBtnLocation' + resumeId).style.display = 'block';
 }

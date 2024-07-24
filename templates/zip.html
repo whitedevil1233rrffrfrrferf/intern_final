@@ -51,7 +51,24 @@
           
       </div>
     </div>
-  </div>
     
+  </div>
+  <div style="width:50%; margin-left: auto; margin-right: auto; margin-top: 3rem;" >
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+            <div class="alert alert-danger add_flash_message" role="alert" >
+              {{ message }}
+            </div>
+          {% elif category == 'success' %}
+            <div class="alert alert-success add_flash_message" role="alert" >
+              {{ message }}
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div> 
 </body>
 </html>

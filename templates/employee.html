@@ -138,7 +138,7 @@
                                         <center><button class="btn btn-primary sub" id="submitBtn{{resume.id}}" onclick="submitName({{resume.id}})">Submit</button></center>
                                     </div>
                                     
-                                    <div id="div_name{{resume.id}}" style="display: none;" onclick="showInput({{resume.id}})"></div></td>
+                                    <div id="div_name{{resume.id}}" style="display: none;" onclick="editName({{resume.id}})"></div></td>
                                     
                                 <td style="margin: auto;">
                                     <button class="btn btn-primary" id="btn_contact{{resume.id}}" onclick="showContactInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
@@ -146,14 +146,14 @@
                                         <input type="text" id="contactInput{{resume.id}}">
                                         <center><button class="btn btn-primary sub" id="submitBtnContact{{resume.id}}" onclick="submitContact({{resume.id}})">Submit</button></center>
                                     </div>
-                                    <div id="div_contact{{resume.id}}" style="display: none;"></div>
+                                    <div id="div_contact{{resume.id}}" style="display: none;" onclick="editContact({{resume.id}})"></div>
                                 </td>
                                 <td><button class="btn btn-primary" id="btn_actualCTC{{resume.id}}" onclick="showActualCTCInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
                                 <div style="display: none;" id="actualCTC{{resume.id}}">
                                     <input type="text" id="actualCTCInput{{resume.id}}">
                                     <center><button class="btn btn-primary sub" id="submitBtnActualCTC{{resume.id}}" onclick="submitActualCTC({{resume.id}})">Submit</button></center>
                                 </div>
-                                <div id="div_actualCTC{{resume.id}}" style="display: none;"></div>
+                                <div id="div_actualCTC{{resume.id}}" style="display: none;" onclick="editActualCTC({{resume.id}})"></div>
                                 </td>
                                 <td>
                                     <button class="btn btn-primary" id="btn_expectedCTC{{resume.id}}" onclick="showExpectedCTCInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
@@ -161,7 +161,7 @@
                                         <input type="text" id="expectedCTCInput{{resume.id}}">
                                         <center><button class="btn btn-primary sub" id="submitBtnExpectedCTC{{resume.id}}" onclick="submitExpectedCTC({{resume.id}})">Submit</button></center>
                                     </div>
-                                    <div id="div_expectedCTC{{resume.id}}" style="display: none;"></div>  
+                                    <div id="div_expectedCTC{{resume.id}}" style="display: none;" onclick="editExpectedCTC({{resume.id}})"></div>  
                                 </td>
                                 <td>
                                     <button class="btn btn-primary" id="btn_role{{resume.id}}" onclick="showRoleInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
@@ -169,7 +169,7 @@
                                         <input type="text" id="roleInput{{resume.id}}">
                                         <center><button class="btn btn-primary sub" id="submitBtnRole{{resume.id}}" onclick="submitRole({{resume.id}})">Submit</button></center>
                                     </div>
-                                    <div id="div_role{{resume.id}}" style="display: none;"></div>  
+                                    <div id="div_role{{resume.id}}" style="display: none;" onclick="editRole({{resume.id}})"></div>  
                                 </td>
                                 <td>
                                     <button class="btn btn-primary" id="btn_location{{resume.id}}" onclick="showLocationInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
@@ -177,7 +177,7 @@
                                         <input type="text" id="locationInput{{resume.id}}">
                                         <center><button class="btn btn-primary sub" id="submitBtnLocation{{resume.id}}" onclick="submitLocation({{resume.id}})">Submit</button></center>
                                     </div>
-                                    <div id="div_location{{resume.id}}" style="display: none;"></div>  
+                                    <div id="div_location{{resume.id}}" style="display: none;" onclick="editLocation({{resume.id}})"></div>  
                                 </td>
                                 <td>
                                     <div>
@@ -190,7 +190,7 @@
                                 </td>
                                <td><a href="{{url_for('resume_details',resume_id=resume.id)}}" class="btn btn-primary mx-1" title="view"><i class="fa-solid fa-eye mx-2" style="color:white;"></i></a></td>
                                <td>
-                                    <form action="{{ url_for('delete_resume', resume_id=resume.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete {{ resume.filename }}?');">
+                                    <form action="{{ url_for('delete_resume', resume_id=resume.id) }}" method="POST" onsubmit="return handleDelete({{resume.id}}, this, '{{ resume.filename }}')">
                                         <button type="submit" class="btn btn-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
                                     </form>
                                 </td>
@@ -285,6 +285,25 @@
             document.getElementById('div_contact{{resume.id}}').style.display = 'block';
         }
         {% endfor %}
+        function handleDelete(resumeId, form, filename) {
+            if (!confirm('Are you sure you want to delete ' + filename + '?')) {
+            return false; // Prevent form submission if user cancels
+        }
+
+        var fields = ['Name', 'Contact', 'Location', 'Role', 'ExpectedCTC', 'ActualCTC'];
+        fields.forEach(function(field) {
+            var itemKey = 'entered' + field + resumeId;
+            var enteredValue = localStorage.getItem(itemKey);
+            if (enteredValue) {
+                // alert('Deleting item: ' + enteredValue);
+                localStorage.removeItem(itemKey);
+            } else {
+                // alert('No item found in local storage for key: ' + itemKey);
+            }
+        });
+
+        return true;
+        }
     </script>
 </body>
 </html>

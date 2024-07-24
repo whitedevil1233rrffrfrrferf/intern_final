@@ -39,7 +39,7 @@
 <body>
     <div class="first_div" >
         {%include 'sidemenu.html'%}
-        <div class="table my-4" style="margin-left:6rem; width: 90%; ">
+        <div class="table my-4" style="margin-left:10rem; width:80%; ">
           <center><h1 style="text-align: center; background-color: #00A9FF; color: white; width:95%; margin-bottom: 3rem;">Employee data</h1></center>
           
           <table class="table highlighted_row">
@@ -66,7 +66,7 @@
             </thead>
             <tbody>
             
-              {% for employee in data.items %}
+              {% for employee in data %}
               <tr {% if employee.employee_status == 'resigned' %}style="background-color: red;"{% endif %}>
                 <th scope="row" >{{loop.index}}</th>
                 <td class="emp_id" class="table-primary">{{employee.Emp_id}}</td>
@@ -92,47 +92,7 @@
               
             </tbody>
           </table>
-            <div style="display: flex; align-items: center; gap: 2rem; margin-right:10rem;margin-top:5rem;" >
-              <div style="margin-left:45%" id="paginationLinks ">
-                {% for page_num in data.iter_pages(left_edge=1,right_edge=1,left_current=1,right_current=2) %}
-                  {% if page_num %}
-                    {% if data.page == page_num%}
-                      <a class="btn btn-outline-info mb-4" href="{{url_for('Home',page=page_num,pages=pages)}}" >{{page_num}}</a>
-                    {% else %}
-                      <a class="btn btn- mb-4" href="{{url_for('Home',page=page_num,pages=pages)}}" >{{page_num}}</a>
-                    {% endif %}
-                  {% else%}
-                    ...
-                  {% endif %}
-                {% endfor %} 
-                
-              </div>
-              <div>
-                <form method="POST" style="margin-bottom: 1rem;">
-                  Select Page Size:
-                  <select name="page_size" style="width: 5rem;">
-                    {% for option in page_size_options %}
-                      <option value="{{ option }}" {% if option == selected_page_size %}selected{% endif %}>{{ option }}</option>
-                    {% endfor %}
-                  </select>
-                  <button type="submit" class="btn btn-primary size_button" style="margin-left:1rem;">Change Page Size</button>
-                </form>
-              </div>
-              
-                <!-- <div style="margin-top:80px; margin-left: 20px;">
-                    <form id="pageForm" action="/home" method="post">
-                      <select id="page" name="page">
-                        <option value="">Select</option>
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                      </select>
-                    </form>
-                    
-                  
-                </div> -->
-              
-            </div>
+           
         </div>
 </body>
 </html>

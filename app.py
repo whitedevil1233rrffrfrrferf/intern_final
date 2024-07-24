@@ -769,7 +769,7 @@ def zip():
         if sucessful_message:
             flash('Resume(s) uploaded successfully!', 'success')
 
-        return redirect(url_for('employee'))            
+        return redirect(url_for('zip'))            
     return render_template("zip.html")
 
 @app.route("/introcall/<int:resume_id>", methods=['GET', 'POST'])
@@ -963,32 +963,11 @@ def get_intro_status(resume_id):
 
 @app.route("/employee_data")
 def employeeData():
-    default_page_size = 20
-    page_size_options = [20, 30, 40]
+    
 
-    # Handle form submission for page size change
-    if request.method == "POST":
-        selected_page_size = int(request.form["page_size"])
-        session['page_size'] = selected_page_size  # Update session variable
+    data = Employee.query.all()
 
-    # Get data based on current page and retrieved/default page size
-    page = request.args.get('page', 1, type=int)
-    total_items = Employee.query.count()
-
-    # Retrieve selected page size from session (or default)
-    selected_page_size = session.get('page_size', default_page_size)
-
-    if selected_page_size != default_page_size:
-        new_page_count = total_items // selected_page_size
-        if total_items % selected_page_size > 0:
-            new_page_count += 1  # Account for partial last page
-        page = min(page, new_page_count)
-
-    data = Employee.query.paginate(page=page, per_page=selected_page_size)
-
-    return render_template("employee_data.html", data=data,
-                                   page_size_options=page_size_options,
-                                   selected_page_size=selected_page_size)
+    return render_template("employee_data.html", data=data)
 
 @app.route("/profile")
 def profile():

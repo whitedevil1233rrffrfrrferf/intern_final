@@ -322,7 +322,7 @@ def dashBoard():
 def Home():
     default_page_size = 20
     page_size_options = [20, 30, 40]
-
+    
     # Handle form submission for page size change
     if request.method == "POST":
         selected_page_size = int(request.form.get("page_size", default_page_size))
@@ -341,10 +341,10 @@ def Home():
         if total_items == 0:
             flash("No results found for the search query.", "error")
             return redirect(url_for('Home', page=1, search=""))
-        data = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%")).paginate(page=page, per_page=selected_page_size)
+        data = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%")).order_by(Employee.Name.asc()).paginate(page=page, per_page=selected_page_size)
     else:
         total_items = Employee.query.count()
-        data = Employee.query.paginate(page=page, per_page=selected_page_size)
+        data = Employee.query.order_by(Employee.Name.asc()).paginate(page=page, per_page=selected_page_size)
 
     # Handle pagination
     new_page_count = total_items // selected_page_size
@@ -508,10 +508,14 @@ def bulk():
                         }
                     records_added = False
                     for row in ws.iter_rows (min_row=2,values_only=True):
+                        if all(cell is None for cell in row):
+                            continue
                         if not all(cell is None for cell in row):
-                            
-                            Emp_id = row[column_mappings['Emp_id']]
+
                             Name = row[column_mappings['Name']]
+                            if not Name:
+                                continue
+                            Emp_id = row[column_mappings['Emp_id']]                           
                             Designation = row[column_mappings['Designation']]
                             Department = row[column_mappings['Department']]
                             Project = row[column_mappings['Project']]
@@ -965,7 +969,7 @@ def get_intro_status(resume_id):
 def employeeData():
     
 
-    data = Employee.query.all()
+    data = Employee.query.order_by(Employee.Name.asc()).all()
 
     return render_template("employee_data.html", data=data)
 

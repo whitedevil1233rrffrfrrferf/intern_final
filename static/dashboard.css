@@ -23,7 +23,7 @@
     padding: 5px;
 }
 .card-text{
-    font-size:18px;
+    font-size:16px;
 }
 .card:hover{
     background-color: grey;
@@ -35,4 +35,17 @@
 }
 .sidemenu{
     
+}
+.card-content > div {
+    flex: 1 1 50%;
+}
+p_t{
+    margin-bottom: 0px;
+}
+.card-body .row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+}
+.card-body .col-6 {
+    margin-bottom: 10px;
 }

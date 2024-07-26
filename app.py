@@ -237,18 +237,28 @@ def dashboard_function():
     
     
     current_year_count = Employee.query.filter(Employee.Joining_date.like(f'%-{current_year}')).count()
-    
-    
+    employment_status_counts = {}
+    project_status_counts = {}
+    status = Employee.query.with_entities(Employee.Employment_status).distinct()
+    project = Employee.query.with_entities(Employee.Project).distinct()
+    for stat in status:
+        count = Employee.query.filter_by(Employment_status=stat.Employment_status).count()
+        employment_status_counts[stat.Employment_status] = count
+
+    for proj in project:
+        count = Employee.query.filter_by(Project=proj.Project).count()
+        project_status_counts[proj.Project] = count
     last_year_count = Employee.query.filter(Employee.Joining_date.like(f'%-{last_year}')).count()
     Chennai_employees_count=Employee.query.filter_by(Location='Chennai').count()
     kollu_employees_count=Employee.query.filter_by(Location='Kollumangudi').count()
     kaup_employees_count=Employee.query.filter_by(Location='Kaup').count()
     tn_palyam_count=Employee.query.filter_by(Location='TN Palayam').count()
-    return total_employees,active_employees,resigned_employees,total_resumes,hr_selected,current_year_count, last_year_count,Chennai_employees_count,kollu_employees_count,kaup_employees_count,tn_palyam_count
+    return(total_employees,active_employees,resigned_employees,total_resumes,hr_selected,current_year_count, last_year_count,Chennai_employees_count,kollu_employees_count,kaup_employees_count,tn_palyam_count,employment_status_counts, project_status_counts)
 @app.context_processor
 def inject_total_employees():
-    total_employees,active_employees,resigned_employees,total_resumes,hr_selected,current_year_count, last_year_count,Chennai_employees_count,kollu_employees_count,kaup_employees_count,tn_palyam_count=dashboard_function()
-    return dict(total_employees=total_employees,active_employees=active_employees,resigned_employees=resigned_employees,total_resumes=total_resumes,hr_selected=hr_selected,current_year_count=current_year_count, last_year_count=last_year_count,Chennai_employees_count=Chennai_employees_count,kollu_employees_count=kollu_employees_count,kaup_employees_count=kaup_employees_count,tn_palyam_count=tn_palyam_count)
+    total_employees,active_employees,resigned_employees,total_resumes,hr_selected,current_year_count, last_year_count,Chennai_employees_count,kollu_employees_count,kaup_employees_count,tn_palyam_count,employment_status_counts, project_status_counts=dashboard_function()
+    return dict(total_employees=total_employees,active_employees=active_employees,resigned_employees=resigned_employees,total_resumes=total_resumes,hr_selected=hr_selected,current_year_count=current_year_count, last_year_count=last_year_count,Chennai_employees_count=Chennai_employees_count,kollu_employees_count=kollu_employees_count,kaup_employees_count=kaup_employees_count,tn_palyam_count=tn_palyam_count,employment_status_counts=employment_status_counts,
+                project_status_counts=project_status_counts)
 @app.route("/",methods=["GET","POST"])
 def signPage():
     correct_user=None
@@ -270,16 +280,16 @@ def signPage():
     return render_template("sign.html",error_message=error_message)   
 @app.route("/dashboard")
 def dashBoard():
-    status=Employee.query.with_entities(Employee.Employment_status).distinct()
+    # status=Employee.query.with_entities(Employee.Employment_status).distinct()
                    
 
     
-    employment_status_counts={}
-    for stat in status:
-        count=Employee.query.filter_by(Employment_status=stat.Employment_status).count()
+    # employment_status_counts={}
+    # for stat in status:
+    #     count=Employee.query.filter_by(Employment_status=stat.Employment_status).count()
         
-        employment_status_counts[stat.Employment_status]=count
-    return render_template("dashboard.html",employment_status_counts=employment_status_counts) 
+    #     employment_status_counts[stat.Employment_status]=count
+    return render_template("dashboard.html") 
 # @app.route("/home",methods=["GET","POST"])
 # def Home():
 #     default_page_size = 20

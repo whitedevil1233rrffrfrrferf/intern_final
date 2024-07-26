@@ -51,7 +51,7 @@
             </div>
           </div>
           <div class="col">
-            <div class="card h-100">
+            <div class="card h-80">
               <div class="card-body">
                 <i class="fa-solid fa-location-dot fa-2x" style="color: black; margin-bottom: 10px;"></i>
                 <p class="card-text">Chennai employees count: {{Chennai_employees_count}}</p>
@@ -61,8 +61,69 @@
               </div>
             </div>
           </div>
+          <div class="col">
+            <div class="card h-80">
+              <div class="card-body">
+                <i class="fa-solid fa-clipboard-list icon fa-2x"></i>
+                <div class="row">
+                  <div class="col-3">
+                    {% for project, count in project_status_counts.items() %}
+                      {% if loop.index % 4 == 1 %}
+                        <p>{{ project }}: {{ count }}</p>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                  <div class="col-3">
+                    {% for project, count in project_status_counts.items() %}
+                      {% if loop.index % 4 == 2 %}
+                        <p>{{ project }}: {{ count }}</p>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                  <div class="col-3">
+                    {% for project, count in project_status_counts.items() %}
+                      {% if loop.index % 4 == 3 %}
+                        <p>{{ project }}: {{ count }}</p>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                  <div class="col-3">
+                    {% for project, count in project_status_counts.items() %}
+                      {% if loop.index % 4 == 0 %}
+                        <p>{{ project }}: {{ count }}</p>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card">
+              <div class="card-body">
+                <i class="fa-solid fa-briefcase icon fa-2x"></i>
+                
+                <div class="row">
+                  <div class="col-6">
+                    {% for status, count in employment_status_counts.items() %}
+                      {% if loop.index % 2 != 0 %}
+                        <p class="card-text">{{ status }}: {{ count }}</p>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                  <div class="col-6">
+                    {% for status, count in employment_status_counts.items() %}
+                      {% if loop.index % 2 == 0 %}
+                        <p class="card-text">{{ status }}: {{ count }}</p>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          </div>
           
-        </div>
       </div>
       </div>
      

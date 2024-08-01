@@ -6,3 +6,14 @@
     background-color:#00A9FF;
     color:white;
 }    
+.btn{
+    width:2rem !important;
+    
+}
+.cng_btn{
+    width:9rem!important;
+    
+}
+.page_num_option{
+    height:2.5rem;
+}

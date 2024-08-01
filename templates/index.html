@@ -36,9 +36,10 @@
               
               <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 
-                <form class="d-flex col-8 my-2" role="search" method="GET">
-                  <input class="form-control me-2" type="search" id="search_bar" placeholder="Search by Name" name="search" aria-label="Search" value="{{ search_query }}">
-                  <button class="btn btn-primary" type="submit">Search</button>
+                <form class="d-flex col-8 my-2" action="{{ url_for('Home') }}" role="search" method="GET">
+                  <input class="form-control me-2" type="search" id="search_bar" placeholder="Search by Name" name="search" aria-label="Search" value="{{ search_query }}" style="margin-right:2rem!important;">
+                  <button class="btn btn-primary" type="submit" >Search</button>
+                  <button type="button" class="btn btn-danger" onclick="clearSearch()" style="margin-left: 2rem;">Clear</button>
                 </form>
               </div>
             </div>
@@ -262,6 +263,13 @@
       </div>
       
     </div>
+    <script>
+      function clearSearch() {
+        const searchInput = document.querySelector('input[name="search"]');
+        searchInput.value = '';
+        searchInput.form.submit();
+    }
+    </script>
     <script src="{{ url_for('static', filename='config.js') }}"></script>
     <script src="{{ url_for('static', filename='index.js') }}"></script>    
     

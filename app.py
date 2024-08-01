@@ -975,13 +975,53 @@ def get_intro_status(resume_id):
         'all_rounds_status': all_rounds_status
     })
 
-@app.route("/employee_data")
+@app.route("/employee_data", methods=["GET", "POST"])
 def employeeData():
+    default_page_size = 20
+    page_size_options = [20, 30, 40]
     
+    # Handle form submission for page size change
+    if request.method == "POST":
+        selected_page_size = int(request.form.get("page_size", default_page_size))
+        session['page_size'] = selected_page_size
+        # Redirect to the same page with updated page size to avoid form resubmission issues
+        return redirect(url_for('Home', page=1, search=request.args.get('search', '')))
+    else:
+        selected_page_size = session.get('page_size', default_page_size)
 
-    data = Employee.query.order_by(Employee.Name.asc()).all()
+    search_query = request.args.get('search', '')
+    page = request.args.get('page', 1, type=int)
 
-    return render_template("employee_data.html", data=data)
+    # Apply search filtering
+    if search_query:
+        total_items = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%")).count()
+        if total_items == 0:
+            flash("No results found for the search query.", "error")
+            return redirect(url_for('Home', page=1, search=""))
+        data = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%")).order_by(Employee.Name.asc()).paginate(page=page, per_page=selected_page_size)
+    else:
+        total_items = Employee.query.count()
+        data = Employee.query.order_by(Employee.Name.asc()).paginate(page=page, per_page=selected_page_size)
+
+    # Handle pagination
+    new_page_count = total_items // selected_page_size
+    if total_items % selected_page_size > 0:
+        new_page_count += 1
+
+    # Ensure the current page is within the valid range
+    if page > new_page_count:
+        page = new_page_count
+
+    start_index = (page - 1) * selected_page_size
+
+    total_pages = data.pages
+
+    return render_template("index.html", data=data,
+                           page_size_options=page_size_options,
+                           selected_page_size=selected_page_size,
+                           total_items=total_items, total_pages=total_pages,
+                           start_index=start_index, search_query=search_query)
+
 
 @app.route("/profile")
 def profile():
@@ -997,7 +1037,9 @@ def profile():
         mobile=user.MobileNumber
         name=user.Name
         pic=session.get('picture')
+        
         picture=pic if pic else ""
+        print(picture)
 
         filename = user.photo_filename
         return render_template("profile.html",emailId=emailId,password=password,role=role,name=name,mobile=mobile,filename=filename,picture=picture)
@@ -1031,12 +1073,21 @@ def update_profile():
     
     if email:
         user = Login.query.filter_by(email=email).first()
-        user.Name = request.form["name"]
         
-        user.MobileNumber = request.form["mobile"]
-        user.password = request.form["password"]
-        user.Role = request.form.get("role") 
-        
+        changes=[]
+        new_name=request.form["name"]
+        if user.Name !=new_name:
+            user.Name=new_name
+            changes.append("Name")
+        new_mobile = request.form["mobile"]    
+        if user.MobileNumber !=new_mobile:
+            user.MobileNumber=new_mobile
+            changes.append("Mobile")
+        new_role = request.form.get("role")
+        if user.Role != new_role:
+            user.Role = new_role
+            changes.append("Role") 
+
         if 'photo' in request.files:
             photo = request.files['photo']
             if photo.filename != '':
@@ -1051,6 +1102,8 @@ def update_profile():
                 photo.save(file_path)
                 user.photo_filename = filename
         db.session.commit()
+        if changes:
+            flash('{} changed!'.format(', '.join(changes)), 'success')
         return redirect("/profile")
          
 @app.route('/update_config', methods=['POST'])

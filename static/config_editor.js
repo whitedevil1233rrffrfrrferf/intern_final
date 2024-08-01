@@ -112,8 +112,53 @@ function saveConfigToServer(config) {
 }
 
 // Populate input fields with existing configuration values when the page loads
-populateInputFields();
 
+document.addEventListener('DOMContentLoaded', function() {
+    populateInputFields();
+    document.getElementById('configForm').addEventListener('input', function(event) {
+        handleFieldChange(event, 'config');
+    });
+    document.getElementById('addForm').addEventListener('input', function(event) {
+        handleFieldChange(event, 'add');
+    });
+    document.getElementById('updateForm').addEventListener('input', function(event) {
+        handleFieldChange(event, 'update');
+    });
+    document.getElementById('uploadResumeForm').addEventListener('input', function(event) {
+        handleFieldChange(event, 'upload');
+    });
+});
+
+let changedFieldsConfig = new Set();
+let changedFieldsAdd = new Set();
+let changedFieldsUpdate = new Set();
+let changedFieldsUpload = new Set();
+
+function handleFieldChange(event, formType) {
+    const fieldName = event.target.name;
+
+    const strippedFieldName = fieldName.replace(/^add|update/, '');
+
+    if (formType === 'config') {
+        changedFieldsConfig.add(strippedFieldName);
+        showFlashMessage('flash-message', Array.from(changedFieldsConfig));
+    } else if (formType === 'add') {
+        changedFieldsAdd.add(strippedFieldName);
+        showFlashMessage('flash-message-add', Array.from(changedFieldsAdd));
+    } else if (formType === 'update') {
+        changedFieldsUpdate.add(strippedFieldName);
+        showFlashMessage('flash-message-update', Array.from(changedFieldsUpdate));
+    } else if (formType === 'upload') {
+        changedFieldsUpload.add(strippedFieldName);
+        showFlashMessage('flash-message-upload', Array.from(changedFieldsUpload));
+    }
+}
+
+
+function showFlashMessage(flashMessageId, changedFields) {
+    const flashMessage = document.getElementById(flashMessageId);
+    flashMessage.style.display = 'block';
+    flashMessage.innerText = `${changedFields.map(field => field.replace(/([A-Z])/g, ' $1')).join(' and ')} changed!`;}
 // Add event listener for form submission
 document.getElementById("configForm").addEventListener("submit", updateConfigValues);
 
@@ -138,3 +183,5 @@ function updateConfigValuesUploadResume(event) {
 }
 
 document.getElementById("uploadResumeForm").addEventListener("submit", updateConfigValuesUploadResume);
+
+

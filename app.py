@@ -344,18 +344,38 @@ def Home():
 
     search_query = request.args.get('search', '')
     page = request.args.get('page', 1, type=int)
-
+    sort_by = request.args.get('sort_by', 'Name')
+    sort_order = request.args.get('sort_order', None)
     # Apply search filtering
+    # if search_query:
+    #     total_items = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%")).count()
+    #     if total_items == 0:
+    #         flash("No results found for the search query.", "error")
+    #         return redirect(url_for('Home', page=1, search=""))
+    #     data = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%")).order_by(Employee.Name.asc()).paginate(page=page, per_page=selected_page_size)
+    # else:
+    #     total_items = Employee.query.count()
+    #     data = Employee.query.order_by(Employee.Name.asc()).paginate(page=page, per_page=selected_page_size)
+
     if search_query:
-        total_items = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%")).count()
+        # Filter based on search query
+        data = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%"))
+        total_items = data.count()
         if total_items == 0:
             flash("No results found for the search query.", "error")
             return redirect(url_for('Home', page=1, search=""))
-        data = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%")).order_by(Employee.Name.asc()).paginate(page=page, per_page=selected_page_size)
     else:
-        total_items = Employee.query.count()
-        data = Employee.query.order_by(Employee.Name.asc()).paginate(page=page, per_page=selected_page_size)
+        # Get total items without search query
+        data = Employee.query
+        total_items = data.count()
 
+    if sort_order:
+        if sort_order == 'asc':
+            data = data.order_by(getattr(Employee, sort_by).asc())
+        else:
+            data = data.order_by(getattr(Employee, sort_by).desc())
+
+    data = data.paginate(page=page, per_page=selected_page_size)
     # Handle pagination
     new_page_count = total_items // selected_page_size
     if total_items % selected_page_size > 0:
@@ -373,7 +393,7 @@ def Home():
                            page_size_options=page_size_options,
                            selected_page_size=selected_page_size,
                            total_items=total_items, total_pages=total_pages,
-                           start_index=start_index, search_query=search_query)
+                           start_index=start_index, search_query=search_query,page=page)
 @app.route("/add", methods=["GET", "POST"])
 def Add():
     if request.method == "POST":

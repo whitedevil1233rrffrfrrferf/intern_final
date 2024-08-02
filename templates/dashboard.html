@@ -102,16 +102,15 @@
             <div class="card">
               <div class="card-body">
                 <i class="fa-solid fa-briefcase icon fa-2x"></i>
-                
-                <div class="row">
-                  <div class="col-6">
+                <div class="row no-gutters" style="margin-top: 10px;">
+                  <div class="col-6 custom-col">
                     {% for status, count in employment_status_counts.items() %}
                       {% if loop.index % 2 != 0 %}
                         <p class="card-text">{{ status }}: {{ count }}</p>
                       {% endif %}
                     {% endfor %}
                   </div>
-                  <div class="col-6">
+                  <div class="col-6 custom-col">
                     {% for status, count in employment_status_counts.items() %}
                       {% if loop.index % 2 == 0 %}
                         <p class="card-text">{{ status }}: {{ count }}</p>

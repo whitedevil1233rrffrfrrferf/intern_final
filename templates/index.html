@@ -133,15 +133,109 @@
               <tr>
                 <th scope="col" class="table_header">Sno</th>
                 <th scope="col" class="table_header" >Emp_id</th>
-                <th scope="col" class="table_header">Name</th>
-                <th scope="col" class="table_header">Designation</th>
-                <th scope="col" class="table_header">Department</th>
-                <th scope="col" class="table_header">Project</th>
-                <th scope="col" class="table_header">Job_role</th>
-                <th scope="col" class="table_header">Employment_status</th>
+                <th scope="col" class="table_header">
+                <div style="display: flex; align-items: center;">
+                  <div>Name</div>
+                  <div>
+                    <div style="display: flex; flex-direction: column; gap:14px; margin-left: 3px;margin-bottom: 4px !important;;">
+                      <a href="{{ url_for('Home', sort_by='Name', sort_order='asc',page=page, search=search_query) }}" style="display: flex; gap: 2px!important;">
+                        <i class="fa fa-chevron-up" style="width:4px; height:4px; color: black;"></i>
+                      </a>
+                      <a href="{{ url_for('Home', sort_by='Name', sort_order='desc',page=page, search=search_query) }}" style="display: flex;">
+                        <i class="fa fa-chevron-down" style="width:4px; height:4px;"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                </th>
+                <th scope="col" class="table_header">
+                  <div style="display: flex; align-items: center;">
+                    <div>Design..</div>
+                    <div>
+                      <div style="display: flex; flex-direction: column; gap:14px; margin-left:2px;margin-bottom: 4px !important;;">
+                        <a href="{{ url_for('Home', sort_by='Designation', sort_order='asc',page=page, search=search_query) }}" style="display: flex; gap: 2px!important;">
+                          <i class="fa fa-chevron-up" style="width:4px; height:4px; color: black;"></i>
+                        </a>
+                        <a href="{{ url_for('Home', sort_by='Designation', sort_order='desc',page=page, search=search_query) }}" style="display: flex;">
+                          <i class="fa fa-chevron-down" style="width:4px; height:4px;"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </div></th>
+                <th scope="col" class="table_header">
+                <div style="display: flex; align-items: center;">
+                  <div>Depar...</div>
+                  <div>
+                    <div style="display: flex; flex-direction: column; gap:14px; margin-left:2px;margin-bottom: 4px !important;;">
+                      <a href="{{ url_for('Home', sort_by='Department', sort_order='asc',page=page, search=search_query) }}" style="display: flex; gap: 2px!important;">
+                        <i class="fa fa-chevron-up" style="width:4px; height:4px; color: black;"></i>
+                      </a>
+                      <a href="{{ url_for('Home', sort_by='Department', sort_order='desc',page=page, search=search_query) }}" style="display: flex;">
+                        <i class="fa fa-chevron-down" style="width:4px; height:4px;"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                </th>
+                <th scope="col" class="table_header">
+                  <div style="display: flex; align-items: center;">
+                    <div>
+                      Project
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap:14px; margin-left:2px;margin-bottom: 4px !important;;">
+                      <a href="{{ url_for('Home', sort_by='Project', sort_order='asc',page=page, search=search_query) }}" style="display: flex; gap: 2px!important;">
+                        <i class="fa fa-chevron-up" style="width:4px; height:4px; color: black;"></i>
+                      </a>
+                      <a href="{{ url_for('Home', sort_by='Project', sort_order='desc',page=page, search=search_query) }}" style="display: flex;">
+                        <i class="fa fa-chevron-down" style="width:4px; height:4px;"></i>
+                      </a>
+                    </div>
+                  </div>
+                  
+                </th>
+                <th scope="col" class="table_header"><div style="display: flex; align-items: center;">
+                  <div>Job_role</div>
+                  <div style="display: flex; flex-direction: column; gap:14px; margin-left:2px;margin-bottom: 4px !important;;">
+                    <a href="{{ url_for('Home', sort_by='Job_role', sort_order='asc',page=page, search=search_query) }}" style="display: flex; gap: 2px!important;">
+                      <i class="fa fa-chevron-up" style="width:4px; height:4px; color: black;"></i>
+                    </a>
+                    <a href="{{ url_for('Home', sort_by='Job_role', sort_order='desc',page=page, search=search_query) }}" style="display: flex;">
+                      <i class="fa fa-chevron-down" style="width:4px; height:4px;"></i>
+                    </a>
+                  </div>
+                </div></th>
+                <th scope="col" class="table_header"><div style="display: flex; align-items: center;">
+                  <div>
+                    Emp stat.
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap:14px; margin-left:2px;margin-bottom: 4px !important;;">
+                    <a href="{{ url_for('Home', sort_by='Employment_status', sort_order='asc',page=page, search=search_query) }}" style="display: flex; gap: 2px!important;">
+                      <i class="fa fa-chevron-up" style="width:4px; height:4px; color: black;"></i>
+                    </a>
+                    <a href="{{ url_for('Home', sort_by='Employment_status', sort_order='desc',page=page, search=search_query) }}" style="display: flex;">
+                      <i class="fa fa-chevron-down" style="width:4px; height:4px;"></i>
+                    </a>
+                  </div>
+                </div>
+                  
+                </th>
                 <th scope="col" class="table_header">Joining_date</th>
                 <th scope="col" class="table_header">Experience</th>
-                <th scope="col" class="table_header">Location</th>
+                <th scope="col" class="table_header">
+                <div style="display: flex; align-items: center;">
+                  <div>Location</div>
+                  <div>
+                    <div style="display: flex; flex-direction: column; gap:14px; margin-left: 3px;margin-bottom: 4px !important;;">
+                      <a href="{{ url_for('Home', sort_by='Location', sort_order='asc',page=page, search=search_query) }}" style="display: flex; gap: 2px!important;">
+                        <i class="fa fa-chevron-up" style="width:4px; height:4px; color: black;"></i>
+                      </a>
+                      <a href="{{ url_for('Home', sort_by='Location', sort_order='desc',page=page, search=search_query) }}" style="display: flex;">
+                        <i class="fa fa-chevron-down" style="width:4px; height:4px;"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                </th>
                 <th scope="col" class="table_header">Last_promoted</th>
                 <th scope="col" class="table_header">Comments</th>
                 <th scope="col" class="table_header">Edit</th>

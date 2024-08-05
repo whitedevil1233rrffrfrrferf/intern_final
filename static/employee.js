@@ -118,13 +118,14 @@ function showInput(resumeId){
     document.getElementById('nameInput' + resumeId).value = currentName;
     document.getElementById('div_name' + resumeId).style.display = "none";
 }
-function submitName(resumeId){
-    document.getElementById('btn_name'+resumeId).style.display="none";
+function submitName(resumeId) {
+    document.getElementById('btn_name' + resumeId).style.display = "none";
     document.getElementById('submitBtn' + resumeId).style.display = 'none';
-    document.getElementById('nameInput'+resumeId).style.display="none";
-    var enteredName=document.getElementById('nameInput'+ resumeId).value;
-    document.getElementById('div_name'+resumeId).style.display="block";
-    document.getElementById('div_name'+resumeId).innerHTML=enteredName;
+    document.getElementById('nameInput' + resumeId).style.display = "none";
+    var enteredName = document.getElementById('nameInput' + resumeId).value;
+    document.getElementById('div_name' + resumeId).innerHTML = enteredName;
+    document.getElementById('div_name' + resumeId).style.display = "block";
+    document.getElementById('name' + resumeId).style.display = "none";
     localStorage.setItem('enteredName' + resumeId, enteredName);
 }
 
@@ -134,6 +135,7 @@ function showActualCTCInput(resumeId) {
     document.getElementById('submitBtnActualCTC' + resumeId).style.display = 'block';
 }
 
+
 function submitActualCTC(resumeId) {
     document.getElementById('btn_actualCTC' + resumeId).style.display = 'none';
     document.getElementById('submitBtnActualCTC' + resumeId).style.display = 'none';
@@ -141,6 +143,7 @@ function submitActualCTC(resumeId) {
     var enteredActualCTC = document.getElementById('actualCTCInput' + resumeId).value;
     document.getElementById('div_actualCTC' + resumeId).style.display = 'block';
     document.getElementById('div_actualCTC' + resumeId).innerHTML = enteredActualCTC;
+    document.getElementById('actualCTC' + resumeId).style.display = 'none';
     localStorage.setItem('enteredActualCTC' + resumeId, enteredActualCTC);
 }
 
@@ -157,8 +160,10 @@ function submitExpectedCTC(resumeId) {
     var enteredExpectedCTC = document.getElementById('expectedCTCInput' + resumeId).value;
     document.getElementById('div_expectedCTC' + resumeId).style.display = 'block';
     document.getElementById('div_expectedCTC' + resumeId).innerHTML = enteredExpectedCTC;
+    document.getElementById('expectedCTC' + resumeId).style.display = 'none'; // Hide the expectedCTC div after submission
     localStorage.setItem('enteredExpectedCTC' + resumeId, enteredExpectedCTC);
 }
+
 
 function showRoleInput(resumeId) {
     document.getElementById('btn_role' + resumeId).style.display = 'none';
@@ -173,6 +178,7 @@ function submitRole(resumeId) {
     var enteredRole = document.getElementById('roleInput' + resumeId).value;
     document.getElementById('div_role' + resumeId).style.display = 'block';
     document.getElementById('div_role' + resumeId).innerHTML = enteredRole;
+    document.getElementById('role' + resumeId).style.display = 'none'; // Hide the role div after submission
     localStorage.setItem('enteredRole' + resumeId, enteredRole);
 }
 
@@ -189,6 +195,7 @@ function submitLocation(resumeId) {
     var enteredLocation = document.getElementById('locationInput' + resumeId).value;
     document.getElementById('div_location' + resumeId).style.display = 'block';
     document.getElementById('div_location' + resumeId).innerHTML = enteredLocation;
+    document.getElementById('location' + resumeId).style.display = 'none'; // Hide the location div after submission
     localStorage.setItem('enteredLocation' + resumeId, enteredLocation);
 }
 function showContactInput(resumeId) {
@@ -207,6 +214,7 @@ function submitContact(resumeId) {
     var enteredContact = document.getElementById('contactInput' + resumeId).value;
     document.getElementById('div_contact' + resumeId).style.display = 'block';
     document.getElementById('div_contact' + resumeId).innerHTML = enteredContact;
+    document.getElementById('contact' + resumeId).style.display = 'none'; // Hide the contact div after submission
     localStorage.setItem('enteredContact' + resumeId, enteredContact);
 }
 function populateSelectOptions(selectId, optionsArray) {
@@ -237,12 +245,12 @@ function editName(resumeId) {
     if (currentName) {
         document.getElementById('nameInput' + resumeId).value = currentName;
     } else {
-        // If no value in local storage, set to current div_name value
         document.getElementById('nameInput' + resumeId).value = document.getElementById('div_name' + resumeId).innerHTML;
     }
     document.getElementById('name' + resumeId).style.display = "block";
     document.getElementById('div_name' + resumeId).style.display = "none";
     document.getElementById('submitBtn' + resumeId).style.display = 'block';
+    document.getElementById('nameInput' + resumeId).style.display = 'block'; // Ensure input is visible
 }
 function editContact(resumeId) {
     var currentContact = localStorage.getItem('enteredContact' + resumeId) || document.getElementById('div_contact' + resumeId).innerHTML;
@@ -250,6 +258,7 @@ function editContact(resumeId) {
     document.getElementById('contact' + resumeId).style.display = 'block';
     document.getElementById('div_contact' + resumeId).style.display = 'none';
     document.getElementById('submitBtnContact' + resumeId).style.display = 'block';
+    document.getElementById('contactInput' + resumeId).style.display = 'block'; // Ensure input is visible
 }
 function editActualCTC(resumeId) {
     var currentActualCTC = localStorage.getItem('enteredActualCTC' + resumeId) || document.getElementById('div_actualCTC' + resumeId).innerHTML;
@@ -257,6 +266,7 @@ function editActualCTC(resumeId) {
     document.getElementById('actualCTC' + resumeId).style.display = 'block';
     document.getElementById('div_actualCTC' + resumeId).style.display = 'none';
     document.getElementById('submitBtnActualCTC' + resumeId).style.display = 'block';
+    document.getElementById('actualCTCInput' + resumeId).style.display = 'block'; // Ensure input is visible
 }
 function editExpectedCTC(resumeId) {
     var currentExpectedCTC = localStorage.getItem('enteredExpectedCTC' + resumeId) || document.getElementById('div_expectedCTC' + resumeId).innerHTML;
@@ -264,6 +274,7 @@ function editExpectedCTC(resumeId) {
     document.getElementById('expectedCTC' + resumeId).style.display = 'block';
     document.getElementById('div_expectedCTC' + resumeId).style.display = 'none';
     document.getElementById('submitBtnExpectedCTC' + resumeId).style.display = 'block';
+    document.getElementById('expectedCTCInput' + resumeId).style.display = 'block'; // Ensure input is visible
 }
 function editRole(resumeId) {
     var currentRole = localStorage.getItem('enteredRole' + resumeId) || document.getElementById('div_role' + resumeId).innerHTML;
@@ -271,6 +282,7 @@ function editRole(resumeId) {
     document.getElementById('role' + resumeId).style.display = 'block';
     document.getElementById('div_role' + resumeId).style.display = 'none';
     document.getElementById('submitBtnRole' + resumeId).style.display = 'block';
+    document.getElementById('roleInput' + resumeId).style.display = 'block'; // Ensure input is visible
 }
 function editLocation(resumeId) {
     var currentLocation = localStorage.getItem('enteredLocation' + resumeId) || document.getElementById('div_location' + resumeId).innerHTML;
@@ -278,4 +290,5 @@ function editLocation(resumeId) {
     document.getElementById('location' + resumeId).style.display = 'block';
     document.getElementById('div_location' + resumeId).style.display = 'none';
     document.getElementById('submitBtnLocation' + resumeId).style.display = 'block';
+    document.getElementById('locationInput' + resumeId).style.display = 'block'; // Ensure input is visible
 }

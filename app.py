@@ -331,11 +331,13 @@ def dashBoard():
 @app.route("/home", methods=["GET", "POST"])
 def Home():
     default_page_size = 20
-    page_size_options = [20, 30, 40]
+    page_size_options = [20, 30, 40,'All']
     
     # Handle form submission for page size change
     if request.method == "POST":
-        selected_page_size = int(request.form.get("page_size", default_page_size))
+        selected_page_size = request.form.get("page_size", default_page_size)
+        if selected_page_size != 'All':
+            selected_page_size = int(selected_page_size)
         session['page_size'] = selected_page_size
         # Redirect to the same page with updated page size to avoid form resubmission issues
         return redirect(url_for('Home', page=1, search=request.args.get('search', '')))
@@ -374,20 +376,25 @@ def Home():
             data = data.order_by(getattr(Employee, sort_by).asc())
         else:
             data = data.order_by(getattr(Employee, sort_by).desc())
-
-    data = data.paginate(page=page, per_page=selected_page_size)
+    if selected_page_size == 'All':
+        data = data.paginate(page=1, per_page=total_items)
+    else:    
+        data = data.paginate(page=page, per_page=selected_page_size)
     # Handle pagination
-    new_page_count = total_items // selected_page_size
-    if total_items % selected_page_size > 0:
-        new_page_count += 1
+    if selected_page_size == 'All':
+        new_page_count = 1
+    else:
+        new_page_count = total_items // selected_page_size
+        if total_items % selected_page_size > 0:
+            new_page_count += 1
 
     # Ensure the current page is within the valid range
     if page > new_page_count:
         page = new_page_count
 
-    start_index = (page - 1) * selected_page_size
+    start_index = (page - 1) * selected_page_size if selected_page_size != 'All' else 0
 
-    total_pages = data.pages
+    total_pages = data.pages if selected_page_size != 'All' else 1
 
     return render_template("index.html", data=data,
                            page_size_options=page_size_options,
@@ -580,7 +587,7 @@ def bulk():
                             employee_status="active"
                             existing_data=Employee.query.filter_by(Name=Name).first()
                             if existing_data:
-                                flash( f'Employee {Name} aldready exists', 'error')
+                                flash( f'Employee {Name} already exists', 'error')
                             if not existing_data:
                                 employee = Employee(Emp_id=Emp_id, Name=Name, Designation=Designation,
                                         Department=Department, Project=Project, Job_role=Job_role,
@@ -659,7 +666,7 @@ def resume():
                     db.session.commit()
                     sucessfully_uploaded=True
                 else:
-                     flash(f'{filename} aldready exists !', 'error')
+                     flash(f'{filename} already exists !', 'error')
         if sucessfully_uploaded:
             flash('Resume(s) uploaded successfully!', 'success')                
         return redirect(url_for('resume'))        
@@ -983,10 +990,10 @@ def get_intro_status(resume_id):
     all_rounds_status = "Cleared"
     
     for status in statuses:
-        if status == "Rejected":
+        if status == "Rejected" or "not conducted" in status:
             all_rounds_status = "Rejected"
             break
-    
+            
     return jsonify({
         'intro_status': intro_status,
         'interview1_status': interview1_status,

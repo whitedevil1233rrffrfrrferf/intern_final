@@ -452,7 +452,7 @@ def Add():
             db.session.add(employee)
             db.session.commit()
             flash(f'Added {name} successfully!', 'success')
-        return redirect("/home")
+        return redirect("/add")
     return render_template("add.html")
 
 @app.route("/update/<int:sno>",methods=["GET","POST"])
@@ -502,7 +502,7 @@ def Update(sno):
         db.session.add(employee)
         db.session.commit()
         flash(f'{name} updated successfully!', 'success')
-        return redirect("/home")
+        return redirect(f"/update/{sno}")
     employee=Employee.query.filter_by(Sno=sno).first()
     return render_template("update.html",employee=employee,selected_date=selected_date)
 
@@ -1005,11 +1005,13 @@ def get_intro_status(resume_id):
 @app.route("/employee_data", methods=["GET", "POST"])
 def employeeData():
     default_page_size = 20
-    page_size_options = [20, 30, 40]
+    page_size_options = [20, 30, 40,'All']
     
     # Handle form submission for page size change
     if request.method == "POST":
-        selected_page_size = int(request.form.get("page_size", default_page_size))
+        selected_page_size = request.form.get("page_size", default_page_size)
+        if selected_page_size != 'All':
+            selected_page_size = int(selected_page_size)
         session['page_size'] = selected_page_size
         # Redirect to the same page with updated page size to avoid form resubmission issues
         return redirect(url_for('Home', page=1, search=request.args.get('search', '')))
@@ -1018,36 +1020,61 @@ def employeeData():
 
     search_query = request.args.get('search', '')
     page = request.args.get('page', 1, type=int)
-
+    sort_by = request.args.get('sort_by', 'Name')
+    sort_order = request.args.get('sort_order', None)
     # Apply search filtering
+    # if search_query:
+    #     total_items = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%")).count()
+    #     if total_items == 0:
+    #         flash("No results found for the search query.", "error")
+    #         return redirect(url_for('Home', page=1, search=""))
+    #     data = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%")).order_by(Employee.Name.asc()).paginate(page=page, per_page=selected_page_size)
+    # else:
+    #     total_items = Employee.query.count()
+    #     data = Employee.query.order_by(Employee.Name.asc()).paginate(page=page, per_page=selected_page_size)
+
     if search_query:
-        total_items = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%")).count()
+        # Filter based on search query
+        data = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%"))
+        total_items = data.count()
         if total_items == 0:
             flash("No results found for the search query.", "error")
             return redirect(url_for('Home', page=1, search=""))
-        data = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%")).order_by(Employee.Name.asc()).paginate(page=page, per_page=selected_page_size)
     else:
-        total_items = Employee.query.count()
-        data = Employee.query.order_by(Employee.Name.asc()).paginate(page=page, per_page=selected_page_size)
+        # Get total items without search query
+        data = Employee.query
+        total_items = data.count()
 
+    if sort_order:
+        if sort_order == 'asc':
+            data = data.order_by(getattr(Employee, sort_by).asc())
+        else:
+            data = data.order_by(getattr(Employee, sort_by).desc())
+    if selected_page_size == 'All':
+        data = data.paginate(page=1, per_page=total_items)
+    else:    
+        data = data.paginate(page=page, per_page=selected_page_size)
     # Handle pagination
-    new_page_count = total_items // selected_page_size
-    if total_items % selected_page_size > 0:
-        new_page_count += 1
+    if selected_page_size == 'All':
+        new_page_count = 1
+    else:
+        new_page_count = total_items // selected_page_size
+        if total_items % selected_page_size > 0:
+            new_page_count += 1
 
     # Ensure the current page is within the valid range
     if page > new_page_count:
         page = new_page_count
 
-    start_index = (page - 1) * selected_page_size
+    start_index = (page - 1) * selected_page_size if selected_page_size != 'All' else 0
 
-    total_pages = data.pages
+    total_pages = data.pages if selected_page_size != 'All' else 1
 
     return render_template("index.html", data=data,
                            page_size_options=page_size_options,
                            selected_page_size=selected_page_size,
                            total_items=total_items, total_pages=total_pages,
-                           start_index=start_index, search_query=search_query)
+                           start_index=start_index, search_query=search_query,page=page)
 
 
 @app.route("/profile")

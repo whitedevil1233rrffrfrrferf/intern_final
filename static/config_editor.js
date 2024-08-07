@@ -127,6 +127,26 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('uploadResumeForm').addEventListener('input', function(event) {
         handleFieldChange(event, 'upload');
     });
+    document.getElementById("configForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent default form submission
+        showFlashMessage('flash-message', Array.from(changedFieldsConfig)); // Show flash message with changed fields
+        updateConfigValues(); // Update config values
+    });
+    document.getElementById("addForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent default form submission
+        showFlashMessage('flash-message-add', Array.from(changedFieldsAdd)); // Show flash message with changed fields
+        updateConfigValuesAdd(); // Update config values
+    });
+    document.getElementById("updateForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent default form submission
+        showFlashMessage('flash-message-update', Array.from(changedFieldsUpdate)); // Show flash message with changed fields
+        updateConfigValuesUpdate(); // Update config values
+    });
+    document.getElementById("uploadResumeForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent default form submission
+        showFlashMessage('flash-message-upload', Array.from(changedFieldsUpload)); // Show flash message with changed fields
+        updateConfigValuesUploadResume(); // Update config values
+    });
 });
 
 let changedFieldsConfig = new Set();
@@ -141,16 +161,16 @@ function handleFieldChange(event, formType) {
 
     if (formType === 'config') {
         changedFieldsConfig.add(strippedFieldName);
-        showFlashMessage('flash-message', Array.from(changedFieldsConfig));
+        
     } else if (formType === 'add') {
         changedFieldsAdd.add(strippedFieldName);
-        showFlashMessage('flash-message-add', Array.from(changedFieldsAdd));
+        
     } else if (formType === 'update') {
         changedFieldsUpdate.add(strippedFieldName);
-        showFlashMessage('flash-message-update', Array.from(changedFieldsUpdate));
+        
     } else if (formType === 'upload') {
         changedFieldsUpload.add(strippedFieldName);
-        showFlashMessage('flash-message-upload', Array.from(changedFieldsUpload));
+        
     }
 }
 
@@ -158,7 +178,7 @@ function handleFieldChange(event, formType) {
 function showFlashMessage(flashMessageId, changedFields) {
     const flashMessage = document.getElementById(flashMessageId);
     flashMessage.style.display = 'block';
-    flashMessage.innerText = `${changedFields.map(field => field.replace(/([A-Z])/g, ' $1')).join(' and ')} changed!`;}
+    flashMessage.innerText = `${changedFields.map(field => field.replace(/([A-Z])/g, ' $1')).join(',')} changed.`;}
 // Add event listener for form submission
 document.getElementById("configForm").addEventListener("submit", updateConfigValues);
 

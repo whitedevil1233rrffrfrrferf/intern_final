@@ -1141,7 +1141,7 @@ def update_profile():
         if user.Role != new_role:
             user.Role = new_role
             changes.append("Role") 
-
+        photo_updated = False
         if 'photo' in request.files:
             photo = request.files['photo']
             if photo.filename != '':
@@ -1155,9 +1155,12 @@ def update_profile():
                 file_path = os.path.join(app.config['PROFILE_IMAGE_UPLOAD_FOLDER'], filename)
                 photo.save(file_path)
                 user.photo_filename = filename
+                photo_updated = True
         db.session.commit()
+        if photo_updated:
+                changes.append("Profile Picture")
         if changes:
-            flash('{} changed!'.format(', '.join(changes)), 'success')
+            flash('{} changed.'.format(', '.join(changes)), 'success')
         return redirect("/profile")
          
 @app.route('/update_config', methods=['POST'])

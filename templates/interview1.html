@@ -70,7 +70,7 @@
                     <label for="status"  style="font-size:20px; color:#1AACAC; margin-top: 20px;">Status</label>
                     <i class="fa-solid fa-star" style="font-size:8px;position: relative;bottom:10px; color: red;"></i>
                     <select id="status" name="status" required>
-                      <option value="">Select</option>
+                      
                       <option value="Rejected" {{ 'selected' if status1 == 'Rejected' else '' }}>Rejected</option>
                       <option value="Move to Interview 2" {{ 'selected' if status1 == 'Move to Interview 2' else '' }}>Move to Interview 2</option>
                     </select>
@@ -102,7 +102,20 @@
                 </div>
               </form>
         </div>
-        
+        <div style="margin-top: 20px;text-align: center; width: 75%; margin-left:15%;">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-messages">
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+        </div>
       </div>
     </div>
     

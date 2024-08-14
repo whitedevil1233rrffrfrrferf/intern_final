@@ -13,7 +13,7 @@
       <div>
         <h1 class="heading"><center>Register</center></h1>
     <div class="container sign_div">
-      <form action="/register" method="post" class="form_div container" enctype="multipart/form-data" style="padding: 10px;margin-left: 3rem;">
+      <form action="/register" method="post" class="form_div container" enctype="multipart/form-data" style="padding: 10px;margin-left: 3rem;" onsubmit="return validateForm(event)">
           <div class="mb-3 my-3">
               <label for="exampleInputEmail1" class="form-label">Email address</label>
               <input type="email" class="form-control form-input" id="exampleInputEmail1" name="email" aria-describedby="emailHelp">
@@ -24,11 +24,13 @@
           </div>
           <div class="mb-3">
               <label for="name" class="form-label">Name</label>
-              <input type="text" class="form-control form-input" id="name" name="name">
+              <input type="text" class="form-control form-input" id="name" name="name" oninput="validateName()">
+              <p id="nameError" class="error-message" style="color: red;font-size: 0.875em;"></p>
           </div>
           <div class="mb-3">
               <label for="mobile" class="form-label">Mobile Number</label>
-              <input type="text" class="form-control form-input" id="mobile" name="mobile">
+              <input type="text" class="form-control form-input" id="mobile" name="mobile" oninput="restrictToDigits(event); validateMobileNumber()">
+              <p id="mobileError" class="error-message" style="color: red;font-size: 0.875em;"></p>
           </div>
           <div class="mb-3" style="margin-bottom:2rem !important;">
               <label for="role" class="form-label">Role</label>
@@ -80,6 +82,67 @@
     
   
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-    
+    <script>
+      function restrictToDigits(event) {
+          const input = event.target;
+          input.value = input.value.replace(/\D/g, ''); // Remove any non-digit characters
+      }
+      function validateName() {
+          const nameInput = document.getElementById('name');
+          const errorMessage = document.getElementById('nameError');
+          const value = nameInput.value;
+
+          
+          if (value.length >50) {
+              errorMessage.textContent = 'Name cannot exceed 50 characters.';
+          } else {
+              errorMessage.textContent = '';
+          }
+      }
+      function validateMobileNumber() {
+          const mobileInput = document.getElementById('mobile');
+          const errorMessage = document.getElementById('mobileError');
+          const value = mobileInput.value;
+
+          // Check if the mobile number is exactly 10 digits
+          if (value.length !== 10) {
+              errorMessage.textContent = 'Mobile number must be exactly 10 digits.';
+          } else {
+              errorMessage.textContent = '';
+          }
+      }
+      function validateForm(event) {
+            const mobileInput = document.getElementById('mobile');
+            const nameInput = document.getElementById('name');
+            const mobileError = document.getElementById('mobileError');
+            const nameError = document.getElementById('nameError');
+            const mobileValue = mobileInput.value;
+            const nameValue = nameInput.value;
+
+            let valid = true;
+
+            // Validate mobile number
+            if (mobileValue.length !== 10) {
+                mobileError.textContent = 'Mobile number must be exactly 10 digits.';
+                valid = false;
+            } else {
+                mobileError.textContent = '';
+            }
+
+            // Validate name length
+            if (nameValue.length > 50) {
+                nameError.textContent = 'Name cannot exceed 50 characters.';
+                valid = false;
+            } else {
+                nameError.textContent = '';
+            }
+
+            if (!valid) {
+                event.preventDefault(); // Prevent form submission if not valid
+            }
+
+            return valid; // Allow form submission if valid
+        }
+  </script>
   </body>
 </html>

@@ -726,8 +726,8 @@ def employee():
 
     # Handle case where there are no items
     if total_items == 0:
-        start_index = 0
         data = Resume.query.paginate(page=1, per_page=selected_page_size)
+        start_index = 0
         total_pages = 1
     else:
         # Handle pagination
@@ -848,6 +848,12 @@ def introCall(resume_id):
             comments1=comments
 
         db.session.commit()
+        if status == "Rejected":
+            flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
+        elif status == "Move to Interview 1":
+            flash("Candidate Moved to Interview 1", "success")  # Using 'success' for a green flash message
+
+        return redirect(url_for('introCall', resume_id=resume.id))
     return render_template("intro.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel)
 
 @app.route("/interview1")
@@ -906,6 +912,12 @@ def interview1v(resume_id):
             status1=status
             comments1=comments
         db.session.commit()
+        if status == "Rejected":
+            flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
+        elif status == "Move to Interview 2":
+            flash("Candidate Moved to Interview 2", "success")  # Using 'success' for a green flash message
+
+        return redirect(url_for('interview1v', resume_id=resume.id))
     resume = Resume.query.get(resume_id)
     return render_template("interview1.html", resume=resume,status1=status1,comments1=comments1,selected_panel=selected_panel)
 
@@ -941,6 +953,12 @@ def interview2v(resume_id):
             status1=status
             comments1=comments
         db.session.commit()
+        if status == "Rejected":
+            flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
+        elif status == "Move to HR Round":
+            flash("Candidate Moved to HR Round", "success")  # Using 'success' for a green flash message
+
+        return redirect(url_for('interview2v', resume_id=resume.id))
     return render_template("interview2.html",resume=resume,status1=status1,comments1=comments1,selected_panel=selected_panel)
 
 @app.route("/hr/<int:resume_id>",methods=["GET", "POST"])
@@ -974,6 +992,12 @@ def hr(resume_id):
             status1=status
             comments1=comments
         db.session.commit()
+        if status == "Rejected":
+            flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
+        elif status == "Move to HR Process":
+            flash("Candidate Moved to HR Process", "success")  # Using 'success' for a green flash message
+
+        return redirect(url_for('hr', resume_id=resume.id))
     return render_template("hr.html",resume=resume,status1=status1,comments1=comments1,selected_panel=selected_panel)
 
 @app.route("/get_interview_status/<int:resume_id>")

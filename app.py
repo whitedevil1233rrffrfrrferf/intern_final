@@ -38,21 +38,21 @@ app.config['SQLALCHEMY_BINDS']={'login':"sqlite:///login.db",
                                 'interview1':"sqlite:///interview1.db",
                                 'interview2':"sqlite:///interview2.db",
                                 'hr':"sqlite:///hr.db",
-                                
+                                'dmax_team_leads':"sqlite:///dmax_tl.db"
                                 }
-
+                                  
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['UPLOAD_FOLDER']=general_upload_folder
 app.config['PROFILE_IMAGE_UPLOAD_FOLDER'] = 'static/profile_images'
 app.secret_key = os.environ.get('SECRET_KEY')
 
 
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '0'
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 CLIENT_ID = os.environ.get('CLIENT_ID')
 CLIENT_SECRET=os.environ.get('CLIENT_SECRET')
 
-REDIRECT_URI = 'https://intern-final-0b4w.onrender.com/google_sign_in'
+REDIRECT_URI = 'http://localhost:5000/google_sign_in'
 
 
 SCOPES = ['openid', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
@@ -144,8 +144,23 @@ class Hr(db.Model):
     resumeId=db.Column(db.Integer)  
     SelectedPanel=db.Column(db.String(200)) 
           
-
-
+class Dmax_tl(db.Model):
+    __bind_key__="dmax_team_leads"
+    id = db.Column(db.Integer, primary_key=True)
+    Centre = db.Column(db.String(100))
+    EmployeeName = db.Column(db.String(100))
+    EmpID = db.Column(db.String(50))
+    Designation = db.Column(db.String(100))
+    Project = db.Column(db.String(200))
+    Month = db.Column(db.String(50))
+    Target = db.Column(db.Integer)
+    Actual = db.Column(db.Float)
+    Production = db.Column(db.Float)  
+    Quality = db.Column(db.Float)  
+    Attrition = db.Column(db.Float)  
+    Skill = db.Column(db.Float)  
+    DmaxSharing = db.Column(db.Float)
+    OverallDmaxScore = db.Column(db.Float) 
 def extract_data_from_excel():
     wb = load_workbook("employee_data 1.xlsx")
     ws = wb.active
@@ -1319,8 +1334,112 @@ def delete_resume(resume_id):
     return redirect(url_for('employee'))
 
 
+@app.route('/dmax_upload', methods=['GET', 'POST'])
+def dmax_upload():
+    if request.method == 'POST':
+        file = request.files['file']
+        if file and file.filename.endswith('.xlsx'):
+            wb = load_workbook(file)
+            ws = wb.active
+            column_mappings = {
+                    'S.No': 0,
+                    'Centre': 1,
+                    'Name of the Employee': 2,
+                    'Emp ID': 3,
+                    'Designation': 4,
+                    'Project (s)': 5,
+                    'Month': 6,
+                    'Target': 7,
+                    'Actual': 8,
+                    'Production (40%)': 9,
+                    'Quality% (40%)': 10,
+                    'Attrition(10%)': 11,
+                    'Skill(10%)': 12,
+                    'Dmax Sharing': 13,
+                    'Overall Dmax Score': 14
+                }
+            records_added = False
+            for row in ws.iter_rows(min_row=3, values_only=True):
+                if all(cell is None for cell in row):
+                    continue
+                    
+                    # Extract data based on the mapped columns
+                centre = row[column_mappings['Centre']]
+                name = row[column_mappings['Name of the Employee']]
+                emp_id = row[column_mappings['Emp ID']]
+                designation = row[column_mappings['Designation']]
+                project = row[column_mappings['Project (s)']]
+                month = row[column_mappings['Month']]
+                target = row[column_mappings['Target']]
+                actual = row[column_mappings['Actual']]
+                production = row[column_mappings['Production (40%)']]
+                quality = row[column_mappings['Quality% (40%)']]
+                attrition = row[column_mappings['Attrition(10%)']]
+                skill = row[column_mappings['Skill(10%)']]
+                dmax_sharing = row[column_mappings['Dmax Sharing']]
+                overall_dmax_score = row[column_mappings['Overall Dmax Score']]   
+                def format_percentage(value):
+                    if isinstance(value, str):
+                        value = value.replace('%', '').strip()
+                        try:
+                            value=float(value)
+                        except ValueError:
+                            print(f"Error converting string value: {value}")
+                            return None
+                    elif isinstance(value, (int, float)):
+                        value=float(value)
+                    else:
+                        print(f"Unexpected type: {type(value)}")
+                        return None
+                    return round(value * 100, 2)
+                production = format_percentage(production)
+                quality = format_percentage(quality)
+                attrition = format_percentage(attrition)
+                skill = format_percentage(skill)
+                dmax_sharing=format_percentage(dmax_sharing)
+                overall_dmax_score=format_percentage(overall_dmax_score)
+                existing_employee = Dmax_tl.query.filter_by(EmpID=emp_id).first()
+                if not existing_employee:
+                        # Insert data into the database
+                        new_employee = Dmax_tl(
+                            Centre=centre,
+                            EmployeeName=name,
+                            EmpID=emp_id,
+                            Designation=designation,
+                            Project=project,
+                            Month=month,
+                            Target=target,
+                            Actual=actual,
+                            Production=production,
+                            Quality=quality,
+                            Attrition=attrition,
+                            Skill=skill,
+                            DmaxSharing=dmax_sharing,
+                            OverallDmaxScore=overall_dmax_score
+                            
+                        )
+                        db.session.add(new_employee)
+                        records_added = True
+            if records_added:
+                db.session.commit()
+                flash("Data successfully uploaded!", "success")
+            else:
+                flash("No new records to add.", "info")    
 
+            render_template('dmax_upload.html')
+            
 
+    return render_template('dmax_upload.html')
+
+@app.route('/dmax_view')
+def dmax_view():
+    
+    
+    # Query all records
+    data = Dmax_tl.query
+    
+    
+    return render_template('dmax_view.html', data=data)
 if __name__ == "__main__":
     app.run(debug=True)
 

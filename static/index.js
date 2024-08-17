@@ -166,10 +166,10 @@ function filterTable() {
         const employmentStatusCell = row.querySelector("#employment_status").textContent.toLowerCase();
         const employeeStatusCell = row.querySelector("#employee_status").textContent.toLowerCase();
 
-        const projectMatch = !projectSearchContent || projectCell.includes(projectSearchContent);
-        const designationMatch = !designationSearchContent || designationCell.includes(designationSearchContent);
-        const employmentStatusMatch = !employmentStatusSearchContent || employmentStatusCell.includes(employmentStatusSearchContent);
-        const employeeStatusMatch = !employeeStatusSearchContent || employeeStatusCell.includes(employeeStatusSearchContent);
+        const projectMatch = !projectSearchContent || projectCell === projectSearchContent;
+        const designationMatch = !designationSearchContent || designationCell === designationSearchContent;
+        const employmentStatusMatch = !employmentStatusSearchContent || employmentStatusCell === employmentStatusSearchContent;
+        const employeeStatusMatch = !employeeStatusSearchContent || employeeStatusCell === employeeStatusSearchContent;
 
         if (
             (projectMatch && designationMatch && employmentStatusMatch && employeeStatusMatch) ||

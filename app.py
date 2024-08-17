@@ -38,7 +38,11 @@ app.config['SQLALCHEMY_BINDS']={'login':"sqlite:///login.db",
                                 'interview1':"sqlite:///interview1.db",
                                 'interview2':"sqlite:///interview2.db",
                                 'hr':"sqlite:///hr.db",
-                                'dmax_team_leads':"sqlite:///dmax_tl.db"
+                                'dmax_team_leads':"sqlite:///dmax_tl.db",
+                                'dmax_interns':"sqlite:///dmax_intrn.db",
+                                'dmax_jrqaeng':"sqlite:///dmax_jrqaeg.db",
+                                'dmax_qaeng':"sqlite:///dmax_qaeg.db",
+                                'dmax_srqaeng':"sqlite:///dmax_srqaeg.db"
                                 }
                                   
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -51,7 +55,7 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '0'
 
 CLIENT_ID = os.environ.get('CLIENT_ID')
 CLIENT_SECRET=os.environ.get('CLIENT_SECRET')
-
+# REDIRECT_URI='http://localhost:5000/google_sign_in'
 REDIRECT_URI = 'https://intern-final-0b4w.onrender.com/google_sign_in'
 
 
@@ -161,6 +165,72 @@ class Dmax_tl(db.Model):
     Skill = db.Column(db.Float)  
     DmaxSharing = db.Column(db.Float)
     OverallDmaxScore = db.Column(db.Float) 
+class Dmax_intern(db.Model):
+    __bind_key__="dmax_interns"
+    id = db.Column(db.Integer, primary_key=True)
+    Centre = db.Column(db.String(100))
+    EmployeeName = db.Column(db.String(100))
+    EmpID = db.Column(db.String(50))
+    Designation = db.Column(db.String(100))
+    Project = db.Column(db.String(200))
+    Month = db.Column(db.String(50))
+    Target = db.Column(db.Integer)
+    Actual = db.Column(db.Float)
+    Production = db.Column(db.Float)  
+    Quality = db.Column(db.Float)  
+    Attendance = db.Column(db.Float)  
+    Skill = db.Column(db.Float)  
+    OverallDmaxScore = db.Column(db.Float) 
+class Dmax_jr_qa_eng(db.Model):
+    __bind_key__="dmax_jrqaeng"
+    id = db.Column(db.Integer, primary_key=True)
+    Centre = db.Column(db.String(100))
+    EmployeeName = db.Column(db.String(100))
+    EmpID = db.Column(db.String(50))
+    Designation = db.Column(db.String(100))
+    Project = db.Column(db.String(200))
+    Month = db.Column(db.String(50))
+    Target = db.Column(db.Integer)
+    Actual = db.Column(db.Float)
+    Production = db.Column(db.Float)  
+    Quality = db.Column(db.Float)  
+    Attendance = db.Column(db.Float)  
+    Skill = db.Column(db.Float)  
+    OverallDmaxScore = db.Column(db.Float)
+class Dmax_qa_eng(db.Model):
+    __bind_key__="dmax_qaeng"
+    id = db.Column(db.Integer, primary_key=True)
+    Centre = db.Column(db.String(100))
+    EmployeeName = db.Column(db.String(100))
+    EmpID = db.Column(db.String(50))
+    Designation = db.Column(db.String(100))
+    Project = db.Column(db.String(200))
+    Month = db.Column(db.String(50))
+    Target = db.Column(db.Integer)
+    Actual = db.Column(db.Float)
+    Production = db.Column(db.Float)  
+    Quality = db.Column(db.Float)  
+    Attendance = db.Column(db.Float)  
+    Skill = db.Column(db.Float)
+    New_initiatives= db.Column(db.Float) 
+    OverallDmaxScore = db.Column(db.Float)    
+class Dmax_sr_qa_eng(db.Model):
+    __bind_key__="dmax_srqaeng"
+    id = db.Column(db.Integer, primary_key=True)
+    Centre = db.Column(db.String(100))
+    EmployeeName = db.Column(db.String(100))
+    EmpID = db.Column(db.String(50))
+    Designation = db.Column(db.String(100))
+    Project = db.Column(db.String(200))
+    Month = db.Column(db.String(50))
+    Target = db.Column(db.Integer)
+    Actual = db.Column(db.Float)
+    Production = db.Column(db.Float)  
+    Quality = db.Column(db.Float)  
+    Attendance = db.Column(db.Float)  
+    Skill = db.Column(db.Float)
+    New_initiatives= db.Column(db.Float) 
+    OverallDmaxScore = db.Column(db.Float)               
 def extract_data_from_excel():
     wb = load_workbook("employee_data 1.xlsx")
     ws = wb.active
@@ -240,6 +310,21 @@ def allowed_file(filename):
 
 def allowed_files(filename):
     return "." in filename and filename.rsplit(".",1)[1].lower() in ["pdf","doc","docx"]
+
+def format_percentage(value):
+    if isinstance(value, str):
+        value = value.replace('%', '').strip()
+        try:
+            value=float(value)
+        except ValueError:
+            print(f"Error converting string value: {value}")
+            return None
+    elif isinstance(value, (int, float)):
+        value=float(value)
+    else:
+        print(f"Unexpected type: {type(value)}")
+        return None
+    return round(value * 100, 2)
 
 def dashboard_function():
     total_employees=Employee.query.count()
@@ -1338,10 +1423,81 @@ def delete_resume(resume_id):
 def dmax_upload():
     if request.method == 'POST':
         file = request.files['file']
+        role = request.form['tag']
         if file and file.filename.endswith('.xlsx'):
             wb = load_workbook(file)
             ws = wb.active
-            column_mappings = {
+            records_added = False
+            if role == 'team leads':
+                column_mappings = {
+                        'S.No': 0,
+                        'Centre': 1,
+                        'Name of the Employee': 2,
+                        'Emp ID': 3,
+                        'Designation': 4,
+                        'Project (s)': 5,
+                        'Month': 6,
+                        'Target': 7,
+                        'Actual': 8,
+                        'Production (40%)': 9,
+                        'Quality% (40%)': 10,
+                        'Attrition(10%)': 11,
+                        'Skill(10%)': 12,
+                        'Dmax Sharing': 13,
+                        'Overall Dmax Score': 14
+                    }
+                records_added = False
+                for row in ws.iter_rows(min_row=3, values_only=True):
+                    if all(cell is None for cell in row):
+                        continue
+                        
+                        # Extract data based on the mapped columns
+                    centre = row[column_mappings['Centre']]
+                    name = row[column_mappings['Name of the Employee']]
+                    emp_id = row[column_mappings['Emp ID']]
+                    designation = row[column_mappings['Designation']]
+                    project = row[column_mappings['Project (s)']]
+                    month = row[column_mappings['Month']]
+                    target = row[column_mappings['Target']]
+                    actual = row[column_mappings['Actual']]
+                    production = row[column_mappings['Production (40%)']]
+                    quality = row[column_mappings['Quality% (40%)']]
+                    attrition = row[column_mappings['Attrition(10%)']]
+                    skill = row[column_mappings['Skill(10%)']]
+                    dmax_sharing = row[column_mappings['Dmax Sharing']]
+                    overall_dmax_score = row[column_mappings['Overall Dmax Score']]   
+                    
+                    production = format_percentage(production)
+                    quality = format_percentage(quality)
+                    attrition = format_percentage(attrition)
+                    skill = format_percentage(skill)
+                    dmax_sharing=format_percentage(dmax_sharing)
+                    overall_dmax_score=format_percentage(overall_dmax_score)
+                    existing_employee = Dmax_tl.query.filter_by(EmpID=emp_id).first()
+                    if not existing_employee:
+                            # Insert data into the database
+                            new_employee = Dmax_tl(
+                                Centre=centre,
+                                EmployeeName=name,
+                                EmpID=emp_id,
+                                Designation=designation,
+                                Project=project,
+                                Month=month,
+                                Target=target,
+                                Actual=actual,
+                                Production=production,
+                                Quality=quality,
+                                Attrition=attrition,
+                                Skill=skill,
+                                DmaxSharing=dmax_sharing,
+                                OverallDmaxScore=overall_dmax_score
+                                
+                            )
+                            db.session.add(new_employee)
+                            records_added = True
+            
+            elif role == 'intern':
+                column_mappings = {
                     'S.No': 0,
                     'Centre': 1,
                     'Name of the Employee': 2,
@@ -1351,57 +1507,34 @@ def dmax_upload():
                     'Month': 6,
                     'Target': 7,
                     'Actual': 8,
-                    'Production (40%)': 9,
+                    'Production %': 9,
                     'Quality% (40%)': 10,
-                    'Attrition(10%)': 11,
+                    'Attendance(10%)': 11,
                     'Skill(10%)': 12,
-                    'Dmax Sharing': 13,
-                    'Overall Dmax Score': 14
+                    'Overall Dmax Score': 13
                 }
-            records_added = False
-            for row in ws.iter_rows(min_row=3, values_only=True):
-                if all(cell is None for cell in row):
-                    continue
-                    
+                for row in ws.iter_rows(min_row=3, values_only=True):
+                    if all(cell is None for cell in row):
+                        continue
+
                     # Extract data based on the mapped columns
-                centre = row[column_mappings['Centre']]
-                name = row[column_mappings['Name of the Employee']]
-                emp_id = row[column_mappings['Emp ID']]
-                designation = row[column_mappings['Designation']]
-                project = row[column_mappings['Project (s)']]
-                month = row[column_mappings['Month']]
-                target = row[column_mappings['Target']]
-                actual = row[column_mappings['Actual']]
-                production = row[column_mappings['Production (40%)']]
-                quality = row[column_mappings['Quality% (40%)']]
-                attrition = row[column_mappings['Attrition(10%)']]
-                skill = row[column_mappings['Skill(10%)']]
-                dmax_sharing = row[column_mappings['Dmax Sharing']]
-                overall_dmax_score = row[column_mappings['Overall Dmax Score']]   
-                def format_percentage(value):
-                    if isinstance(value, str):
-                        value = value.replace('%', '').strip()
-                        try:
-                            value=float(value)
-                        except ValueError:
-                            print(f"Error converting string value: {value}")
-                            return None
-                    elif isinstance(value, (int, float)):
-                        value=float(value)
-                    else:
-                        print(f"Unexpected type: {type(value)}")
-                        return None
-                    return round(value * 100, 2)
-                production = format_percentage(production)
-                quality = format_percentage(quality)
-                attrition = format_percentage(attrition)
-                skill = format_percentage(skill)
-                dmax_sharing=format_percentage(dmax_sharing)
-                overall_dmax_score=format_percentage(overall_dmax_score)
-                existing_employee = Dmax_tl.query.filter_by(EmpID=emp_id).first()
-                if not existing_employee:
+                    centre = row[column_mappings['Centre']]
+                    name = row[column_mappings['Name of the Employee']]
+                    emp_id = row[column_mappings['Emp ID']]
+                    designation = row[column_mappings['Designation']]
+                    project = row[column_mappings['Project (s)']]
+                    month = row[column_mappings['Month']]
+                    target = row[column_mappings['Target']]
+                    actual = row[column_mappings['Actual']]
+                    production = format_percentage(row[column_mappings['Production %']])
+                    quality = format_percentage(row[column_mappings['Quality% (40%)']])
+                    attendance = format_percentage(row[column_mappings['Attendance(10%)']])
+                    skill = format_percentage(row[column_mappings['Skill(10%)']])
+                    overall_dmax_score = format_percentage(row[column_mappings['Overall Dmax Score']])
+                    existing_employee = Dmax_intern.query.filter_by(EmpID=emp_id).first()
+                    if not existing_employee:
                         # Insert data into the database
-                        new_employee = Dmax_tl(
+                        new_employee = Dmax_intern(
                             Centre=centre,
                             EmployeeName=name,
                             EmpID=emp_id,
@@ -1412,14 +1545,188 @@ def dmax_upload():
                             Actual=actual,
                             Production=production,
                             Quality=quality,
-                            Attrition=attrition,
+                            Attendance=attendance,
                             Skill=skill,
-                            DmaxSharing=dmax_sharing,
                             OverallDmaxScore=overall_dmax_score
-                            
                         )
                         db.session.add(new_employee)
                         records_added = True
+            
+            elif role == 'jr_qa_eng':
+                column_mappings = {
+                    'S.No': 0,
+                    'Centre': 1,
+                    'Name of the Employee': 2,
+                    'Emp ID': 3,
+                    'Designation': 4,
+                    'Project (s)': 5,
+                    'Month': 6,
+                    'Target': 7,
+                    'Actual': 8,
+                    'Production %': 9,
+                    'Quality% (40%)': 10,
+                    'Attendance(10%)': 11,
+                    'Skill(10%)': 12,
+                    'Overall Dmax Score': 13
+                }
+                for row in ws.iter_rows(min_row=3, values_only=True):
+                    if all(cell is None for cell in row):
+                        continue
+
+                    # Extract data based on the mapped columns
+                    centre = row[column_mappings['Centre']]
+                    name = row[column_mappings['Name of the Employee']]
+                    emp_id = row[column_mappings['Emp ID']]
+                    designation = row[column_mappings['Designation']]
+                    project = row[column_mappings['Project (s)']]
+                    month = row[column_mappings['Month']]
+                    target = row[column_mappings['Target']]
+                    actual = row[column_mappings['Actual']]
+                    production = format_percentage(row[column_mappings['Production %']])
+                    quality = format_percentage(row[column_mappings['Quality% (40%)']])
+                    attendance = format_percentage(row[column_mappings['Attendance(10%)']])
+                    skill = format_percentage(row[column_mappings['Skill(10%)']])
+                    overall_dmax_score = format_percentage(row[column_mappings['Overall Dmax Score']])
+                    existing_employee = Dmax_jr_qa_eng.query.filter_by(EmpID=emp_id).first()
+                    if not existing_employee:
+                        # Insert data into the database
+                        new_employee = Dmax_jr_qa_eng(
+                            Centre=centre,
+                            EmployeeName=name,
+                            EmpID=emp_id,
+                            Designation=designation,
+                            Project=project,
+                            Month=month,
+                            Target=target,
+                            Actual=actual,
+                            Production=production,
+                            Quality=quality,
+                            Attendance=attendance,
+                            Skill=skill,
+                            OverallDmaxScore=overall_dmax_score
+                        )
+                        db.session.add(new_employee)
+                        records_added = True
+
+            elif role == 'qa_eng':
+                column_mappings = {
+                    'S.No': 0,
+                    'Centre': 1,
+                    'Name of the Employee': 2,
+                    'Emp ID': 3,
+                    'Designation': 4,
+                    'Project (s)': 5,
+                    'Month': 6,
+                    'Target': 7,
+                    'Actual': 8,
+                    'Production %': 9,
+                    'Quality% (40%)': 10,
+                    'Attendance(10%)': 11,
+                    'Skill(10%)': 12,
+                    'New initiatives (10%)':13,
+                    'Overall Dmax Score': 14
+                }
+                for row in ws.iter_rows(min_row=3, values_only=True):
+                    if all(cell is None for cell in row):
+                        continue
+
+                    # Extract data based on the mapped columns
+                    centre = row[column_mappings['Centre']]
+                    name = row[column_mappings['Name of the Employee']]
+                    emp_id = row[column_mappings['Emp ID']]
+                    designation = row[column_mappings['Designation']]
+                    project = row[column_mappings['Project (s)']]
+                    month = row[column_mappings['Month']]
+                    target = row[column_mappings['Target']]
+                    actual = row[column_mappings['Actual']]
+                    production = format_percentage(row[column_mappings['Production %']])
+                    quality = format_percentage(row[column_mappings['Quality% (40%)']])
+                    attendance = format_percentage(row[column_mappings['Attendance(10%)']])
+                    skill = format_percentage(row[column_mappings['Skill(10%)']])
+                    initiatives=format_percentage(row[column_mappings['New initiatives (10%)']])
+                    overall_dmax_score = format_percentage(row[column_mappings['Overall Dmax Score']])
+                    existing_employee = Dmax_qa_eng.query.filter_by(EmpID=emp_id).first()
+                    if not existing_employee:
+                        # Insert data into the database
+                        new_employee =Dmax_qa_eng(
+                            Centre=centre,
+                            EmployeeName=name,
+                            EmpID=emp_id,
+                            Designation=designation,
+                            Project=project,
+                            Month=month,
+                            Target=target,
+                            Actual=actual,
+                            Production=production,
+                            Quality=quality,
+                            Attendance=attendance,
+                            Skill=skill,
+                            New_initiatives=initiatives,
+                            OverallDmaxScore=overall_dmax_score
+                        )
+                        db.session.add(new_employee)
+                        records_added = True
+
+            elif role == 'sr_qa_eng':
+                column_mappings = {
+                    'S.No': 0,
+                    'Centre': 1,
+                    'Name of the Employee': 2,
+                    'Emp ID': 3,
+                    'Designation': 4,
+                    'Project (s)': 5,
+                    'Month': 6,
+                    'Target': 7,
+                    'Actual': 8,
+                    'Production %': 9,
+                    'Quality% (40%)': 10,
+                    'Attendance(10%)': 11,
+                    'Skill(10%)': 12,
+                    'New initiatives (10%)':13,
+                    'Overall Dmax Score': 14
+                }
+                for row in ws.iter_rows(min_row=3, values_only=True):
+                    if all(cell is None for cell in row):
+                        continue
+
+                    # Extract data based on the mapped columns
+                    centre = row[column_mappings['Centre']]
+                    name = row[column_mappings['Name of the Employee']]
+                    emp_id = row[column_mappings['Emp ID']]
+                    designation = row[column_mappings['Designation']]
+                    project = row[column_mappings['Project (s)']]
+                    month = row[column_mappings['Month']]
+                    target = row[column_mappings['Target']]
+                    actual = row[column_mappings['Actual']]
+                    production = format_percentage(row[column_mappings['Production %']])
+                    quality = format_percentage(row[column_mappings['Quality% (40%)']])
+                    attendance = format_percentage(row[column_mappings['Attendance(10%)']])
+                    skill = format_percentage(row[column_mappings['Skill(10%)']])
+                    initiatives=format_percentage(row[column_mappings['New initiatives (10%)']])
+                    overall_dmax_score = format_percentage(row[column_mappings['Overall Dmax Score']])
+                    existing_employee = Dmax_sr_qa_eng.query.filter_by(EmpID=emp_id).first()
+                    if not existing_employee:
+                        # Insert data into the database
+                        new_employee =Dmax_sr_qa_eng(
+                            Centre=centre,
+                            EmployeeName=name,
+                            EmpID=emp_id,
+                            Designation=designation,
+                            Project=project,
+                            Month=month,
+                            Target=target,
+                            Actual=actual,
+                            Production=production,
+                            Quality=quality,
+                            Attendance=attendance,
+                            Skill=skill,
+                            New_initiatives=initiatives,
+                            OverallDmaxScore=overall_dmax_score
+                        )
+                        db.session.add(new_employee)
+                        records_added = True
+
+
             if records_added:
                 db.session.commit()
                 flash("Data successfully uploaded!", "success")
@@ -1437,9 +1744,11 @@ def dmax_view():
     
     # Query all records
     data = Dmax_tl.query
-    
-    
-    return render_template('dmax_view.html', data=data)
+    intern_data=Dmax_intern.query
+    jr_qa_data=Dmax_jr_qa_eng.query
+    qa_data=Dmax_qa_eng.query
+    sr_qa_data=Dmax_sr_qa_eng.query
+    return render_template('dmax_view.html', data=data,intern_data=intern_data,jr_qa_data=jr_qa_data,qa_data=qa_data,sr_qa_data=sr_qa_data)
 if __name__ == "__main__":
     app.run(debug=True)
 

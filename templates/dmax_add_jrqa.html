@@ -16,12 +16,23 @@
       <div class="container my-3" style="width:60%;">
         <h1 class="title"><center>Add a new Employee</center></h1>
         
-        <form action="/add" method="post" id="form_id"  >
+        <form action="/dmax_add_jrqaeng" method="post" id="form_id">
             <div class="mb-3 label">
               <label for="emp_id" class="form-label">Emp_id <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
               <input type="text" class="form-control" id="emp_id" name="emp_id" aria-describedby="emailHelp" required>
               
             </div>
+            <div class="mb-3 label">
+                <label for="location" class="form-label">Centre <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+                <select name="location" data-target="otherLocationField" class="form-select toggle-dropdown" id="location" required>
+                  <option value="">Select</option>
+                  <option value="Kollu">Kollu</option>
+                  <option value="Kaup">Kaup</option>
+                  <option value="Chennai">Chennai</option>
+                  <option value="TN palayam">TN palayam</option>
+                  
+                </select>
+            </div> 
             <div class="mb-3 label">
               <label for="name" class="form-label">Name: <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
               <input type="text" class="form-control" name="name" id="name" required>
@@ -37,64 +48,72 @@
                  
               </select>
             </div>
-            <div class="mb-3 label">
-                <label for="department" class="form-label">Department:</label>
-                <input type="text" class="form-control" name="department" id="department">
-            </div>  
-            <!-- <div class="mb-3">
-                <label for="project" class="form-label">Project:</label>
-                <input type="text" class="form-control" name="project" id="project">
-            </div>    -->
+            
             <div class="mb-3 label">
               <label for="project" class="form-label">Project <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
               <select name="project" data-target="otherProjectField" class="form-select toggle-dropdown" id="project" required>
                 <option value="">Select</option>
               </select>
             </div>
+               
             <div class="mb-3 label">
-                <label for="job_role" class="form-label">Job_role:</label>
-                <input type="text" class="form-control" name="job_role" id="job_role">
-            </div>    
-            <!-- <div class="mb-3">
-                <label for="employment_status" class="form-label">Employment_status:</label>
-                <input type="text" class="form-control" name="employment_status" id="employment_status">
-            </div>  -->
-            <div class="mb-3 label">
-              <label for="employment_status" class="form-label">Employment status<i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
-              <select name="employment_status" data-target="otherProjectField" class="form-select toggle-dropdown" id="employment_status" required>
-                <option value="">Select</option>
-              </select>
+                <label for="month" class="form-label">Month: <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+                <select id="month" name="month" class="form-select" required>
+                    <option value="">Select</option>
+                    <option value="january" class="month_value">January</option>
+                    <option value="february" class="month_value">February</option>
+                    <option value="march" class="month_value">March</option>
+                    <option value="april" class="month_value">April</option>
+                    <option value="may" class="month_value">May</option>
+                    <option value="june" class="month_value">June</option>
+                    <option value="july" class="month_value">July</option>
+                    <option value="august" class="month_value">August</option>
+                    <option value="september" class="month_value">September</option>
+                    <option value="october" class="month_value">October</option>
+                    <option value="november" class="month_value">November</option>
+                    <option value="december" class="month_value">December</option>
+                </select>
             </div>
             <div class="mb-3 label">
-                <label for="joining_date" class="form-label">Joining_date: <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
-                <input type="date" class="form-control"  name="joining_date" id="joining_date" required>
-            </div> 
-            <!-- <div class="mb-3">
-                <label for="experience" class="form-label">Experience:</label>
-                <input type="text" class="form-control" name="experience" id="experience">
-            </div>  -->
+                <label for="target" class="form-label">Target <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+                <input type="text" class="form-control" id="target" name="target" aria-describedby="emailHelp" required>
+                
+            </div>
             <div class="mb-3 label">
-                <label for="location" class="form-label">Location <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
-                <select name="location" data-target="otherLocationField" class="form-select toggle-dropdown" id="location" required>
-                  <option value="">Select</option>
-                </select>
-            </div> 
+                <label for="actual" class="form-label">Actual <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+                <input type="text" class="form-control" id="actual" name="actual" aria-describedby="emailHelp" required>
+                
+            </div>
+            <div class="mb-3 label">
+                <label for="production" class="form-label">Production <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+                <input type="text" class="form-control" id="production" name="production" aria-describedby="emailHelp" required>
+                
+            </div>
+            <div class="mb-3 label">
+                <label for="quality" class="form-label">Quality <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+                <input type="text" class="form-control" id="quality" name="quality" aria-describedby="emailHelp" required>
+                
+            </div>
+            <div class="mb-3 label" id="attendance">
+                <label for="attendance" class="form-label" id="attrition">Attendance <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+                <input type="text" class="form-control" id="attendance" name="attendance" aria-describedby="emailHelp" required>
+                
+            </div>
             
             <div class="mb-3 label">
-                <label for="last_promoted" class="form-label">Last_promoted:</label>
-                <input type="text" class="form-control" name="last_promoted" id="last_promoted">
-            </div> 
-            <div class="mb-3 label">
-                <label for="comments" class="form-label">Comments:</label>
-                <input type="text" class="form-control" name="comments" id="comments">
-            </div> 
-            <div class="mb-3 label">
-              <label for="status" class="form-label">Status <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
-              <select name="status" data-target="otherStatusField" class="form-select toggle-dropdown" id="status" required>
-                <option value="">Select</option>
+                <label for="skill" class="form-label">Skill <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+                <input type="text" class="form-control" id="skill" name="skill" aria-describedby="emailHelp" required>
                 
-            </select>
-          </div> 
+            </div>
+            
+            
+            
+            <div class="mb-3 label">
+                <label for="odsharing" class="form-label">Overall Dmax sharing <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+                <input type="text" class="form-control" id="odsharing" name="odsharing" aria-describedby="emailHelp" required>
+                
+            </div>
+
             <div style="display: flex; align-items: center; justify-content:center;margin-top: 3rem;">
               <button type="submit" class="btn btn-primary" style="width:6rem;height:3rem; margin-right: 3rem;">Submit</button>
               <a class="btn btn-outline-secondary" href="/home" style=" padding:10px ;width:6rem; height:3rem;"><div style="display: flex; justify-content: space-between; padding:5px;">

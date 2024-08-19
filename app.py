@@ -51,12 +51,12 @@ app.config['PROFILE_IMAGE_UPLOAD_FOLDER'] = 'static/profile_images'
 app.secret_key = os.environ.get('SECRET_KEY')
 
 
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '0'
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 CLIENT_ID = os.environ.get('CLIENT_ID')
 CLIENT_SECRET=os.environ.get('CLIENT_SECRET')
-# REDIRECT_URI='http://localhost:5000/google_sign_in'
-REDIRECT_URI = 'https://intern-final-0b4w.onrender.com/google_sign_in'
+REDIRECT_URI='http://localhost:5000/google_sign_in'
+# REDIRECT_URI = 'https://intern-final-0b4w.onrender.com/google_sign_in'
 
 
 SCOPES = ['openid', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
@@ -1749,6 +1749,253 @@ def dmax_view():
     qa_data=Dmax_qa_eng.query
     sr_qa_data=Dmax_sr_qa_eng.query
     return render_template('dmax_view.html', data=data,intern_data=intern_data,jr_qa_data=jr_qa_data,qa_data=qa_data,sr_qa_data=sr_qa_data)
+
+@app.route('/dmax_add', methods=['GET', 'POST'])
+def dmax_add():
+    return render_template("dmax_add.html")
+
+@app.route("/dmax_add_teamlead", methods=['GET', 'POST'])
+def Teamlead():
+    if request.method == 'POST':
+        emp_name = request.form.get('name')
+        emp_id = request.form.get('emp_id')
+        centre = request.form.get('location')
+        designation = request.form.get('designation')
+        project = request.form.get('project')
+        month = request.form.get('month')
+        target = request.form.get('target')
+        actual = request.form.get('actual')
+        production = request.form.get('production')
+        quality = request.form.get('quality')
+        location=request.form.get('location')          
+        attrition=request.form.get('attrition')
+        skill = request.form.get('skill')
+        Dmaxsharing=request.form.get('dsharing')
+        overall_dmax = request.form.get('odsharing')
+        existing_employee = Dmax_tl.query.filter_by(EmployeeName=emp_name).first()
+        if existing_employee:
+                    flash(f"Employee {emp_name} already exists!", "error")
+                    return redirect('/dmax_add')
+        else:
+            # If employee doesn't exist, create a new record
+                new_intern = Dmax_tl(
+                        Centre=location,
+                        EmployeeName=emp_name,
+                        EmpID=emp_id,
+                        Designation=designation,
+                        Project=project,
+                        Month=month,
+                        Target=target,
+                        Actual=actual,
+                        Attrition=attrition,
+                        Production=production,
+                        
+                        Quality=quality,
+                        Skill=skill,
+                        DmaxSharing=Dmaxsharing,
+                        OverallDmaxScore=overall_dmax 
+                    )
+                    
+                    
+                db.session.add(new_intern)
+                db.session.commit()
+                flash("Employee added successfully!", "success")
+    return render_template("dmax_add_teamlead.html")  
+
+@app.route("/dmax_add_intern", methods=['GET', 'POST'])
+def Intern():
+    if request.method == 'POST':
+        emp_name = request.form.get('name')
+        emp_id = request.form.get('emp_id')
+        centre = request.form.get('location')
+        designation = request.form.get('designation')
+        project = request.form.get('project')
+        month = request.form.get('month')
+        target = request.form.get('target')
+        actual = request.form.get('actual')
+        production = request.form.get('production')
+        quality = request.form.get('quality')
+        location=request.form.get('location')        
+        attendance=request.form.get('attendance')
+        skill = request.form.get('skill')
+        
+        overall_dmax = request.form.get('odsharing')
+        existing_employee = Dmax_intern.query.filter_by(EmployeeName=emp_name).first()
+        if existing_employee:
+                    flash(f"Employee {emp_name} already exists!", "error")
+                    return redirect('/dmax_add')
+        else:
+            # If employee doesn't exist, create a new record
+                new_intern = Dmax_intern(
+                        Centre=location,
+                        EmployeeName=emp_name,
+                        EmpID=emp_id,
+                        Designation=designation,
+                        Project=project,
+                        Month=month,
+                        Target=target,
+                        Actual=actual,
+                        Attendance=attendance,
+                        Production=production,
+                        Quality=quality,
+                        Skill=skill,
+                        
+                        OverallDmaxScore=overall_dmax 
+                    )
+                    
+                    
+                db.session.add(new_intern)
+                db.session.commit()
+                flash("Employee added successfully!", "success")
+    return render_template("dmax_add_intern.html")  
+
+
+@app.route("/dmax_add_jrqaeng", methods=['GET', 'POST'])
+def jrqa():
+    if request.method == 'POST':
+        emp_name = request.form.get('name')
+        emp_id = request.form.get('emp_id')
+        centre = request.form.get('location')
+        designation = request.form.get('designation')
+        project = request.form.get('project')
+        month = request.form.get('month')
+        target = request.form.get('target')
+        actual = request.form.get('actual')
+        production = request.form.get('production')
+        quality = request.form.get('quality')
+        location=request.form.get('location')        
+        attendance=request.form.get('attendance')
+        skill = request.form.get('skill')
+        
+        overall_dmax = request.form.get('odsharing')
+        existing_employee = Dmax_jr_qa_eng.query.filter_by(EmployeeName=emp_name).first()
+        if existing_employee:
+                    flash(f"Employee {emp_name} already exists!", "error")
+                    return redirect('/dmax_add')
+        else:
+            # If employee doesn't exist, create a new record
+                new_intern = Dmax_jr_qa_eng(
+                        Centre=location,
+                        EmployeeName=emp_name,
+                        EmpID=emp_id,
+                        Designation=designation,
+                        Project=project,
+                        Month=month,
+                        Target=target,
+                        Actual=actual,
+                        Attendance=attendance,
+                        Production=production,
+                        Quality=quality,
+                        Skill=skill,
+                        OverallDmaxScore=overall_dmax 
+                    )
+                    
+                    
+                db.session.add(new_intern)
+                db.session.commit()
+                flash("Employee added successfully!", "success")
+    return render_template("dmax_add_jrqa.html")
+
+@app.route("/dmax_add_qaeng", methods=['GET', 'POST'])
+def qaeng():
+    if request.method == 'POST':
+        emp_name = request.form.get('name')
+        emp_id = request.form.get('emp_id')
+        centre = request.form.get('location')
+        designation = request.form.get('designation')
+        project = request.form.get('project')
+        month = request.form.get('month')
+        target = request.form.get('target')
+        actual = request.form.get('actual')
+        production = request.form.get('production')
+        quality = request.form.get('quality')
+        location=request.form.get('location') 
+        new_initiatives=request.form.get("")       
+        attendance=request.form.get('attendance')
+        skill = request.form.get('skill')
+        
+        overall_dmax = request.form.get('odsharing')
+        existing_employee = Dmax_qa_eng.query.filter_by(EmployeeName=emp_name).first()
+        if existing_employee:
+                    flash(f"Employee {emp_name} already exists!", "error")
+                    return redirect('/dmax_add')
+        else:
+            # If employee doesn't exist, create a new record
+                new_intern = Dmax_qa_eng(
+                        Centre=location,
+                        EmployeeName=emp_name,
+                        EmpID=emp_id,
+                        Designation=designation,
+                        Project=project,
+                        Month=month,
+                        Target=target,
+                        Actual=actual,
+                        Attendance=attendance,
+                        Production=production,
+                        New_initiatives=new_initiatives,
+                        Quality=quality,
+                        Skill=skill,
+                        OverallDmaxScore=overall_dmax 
+                    )
+                    
+                    
+                db.session.add(new_intern)
+                db.session.commit()
+                flash("Employee added successfully!", "success")
+    
+    return render_template("dmax_add_qa.html")
+
+
+@app.route("/dmax_add_srqaeng", methods=['GET', 'POST'])
+def srqaeng():
+    if request.method == 'POST':
+        emp_name = request.form.get('name')
+        emp_id = request.form.get('emp_id')
+        centre = request.form.get('location')
+        designation = request.form.get('designation')
+        project = request.form.get('project')
+        month = request.form.get('month')
+        target = request.form.get('target')
+        actual = request.form.get('actual')
+        production = request.form.get('production')
+        quality = request.form.get('quality')
+        location=request.form.get('location') 
+        new_initiatives=request.form.get("")       
+        attendance=request.form.get('attendance')
+        skill = request.form.get('skill')
+        
+        overall_dmax = request.form.get('odsharing')
+        existing_employee = Dmax_sr_qa_eng.query.filter_by(EmployeeName=emp_name).first()
+        if existing_employee:
+                    flash(f"Employee {emp_name} already exists!", "error")
+                    return redirect('/dmax_add')
+        else:
+            # If employee doesn't exist, create a new record
+                new_intern = Dmax_sr_qa_eng(
+                        Centre=location,
+                        EmployeeName=emp_name,
+                        EmpID=emp_id,
+                        Designation=designation,
+                        Project=project,
+                        Month=month,
+                        Target=target,
+                        Actual=actual,
+                        Attendance=attendance,
+                        Production=production,
+                        New_initiatives=new_initiatives,
+                        Quality=quality,
+                        Skill=skill,
+                        OverallDmaxScore=overall_dmax 
+                    )
+                    
+                    
+                db.session.add(new_intern)
+                db.session.commit()
+                flash("Employee added successfully!", "success")
+    
+    return render_template("dmax_add_sr_qa.html")
+ 
+
 if __name__ == "__main__":
     app.run(debug=True)
 

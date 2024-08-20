@@ -579,8 +579,7 @@ def Update(sno):
                 experience="Less than 1 year"
         else:
             formatted_date = None 
-            experience=None  
-        print(formatted_date)              
+            experience=None            
         
         location = request.form.get("location")
         last_promoted = request.form.get("last_promoted")
@@ -923,10 +922,12 @@ def introCall(resume_id):
         status1 = existing_entry.Status
         comments1 = existing_entry.Comments
         selected_panel = existing_entry.SelectedPanel
+        date = existing_entry.Date
     else:
         status1 = None
         comments1 = None
         selected_panel = None
+        date = None
     if request.method == 'POST':
         
         
@@ -955,7 +956,7 @@ def introCall(resume_id):
             flash("Candidate Moved to Interview 1", "success")  # Using 'success' for a green flash message
 
         return redirect(url_for('introCall', resume_id=resume.id))
-    return render_template("intro.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel)
+    return render_template("intro.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date)
 
 @app.route("/interview1")
 def interview1():
@@ -987,10 +988,12 @@ def interview1v(resume_id):
         status1 = existing_entry.Status
         comments1 = existing_entry.Comments
         selected_panel=existing_entry.SelectedPanel
+        date = existing_entry.Date
     else:
         status1 = None
         comments1 = None
         selected_panel=None
+        date = None
     if request.method=="POST":
         date=request.form["date"]
         comments=request.form["comments"]
@@ -1020,7 +1023,7 @@ def interview1v(resume_id):
 
         return redirect(url_for('interview1v', resume_id=resume.id))
     resume = Resume.query.get(resume_id)
-    return render_template("interview1.html", resume=resume,status1=status1,comments1=comments1,selected_panel=selected_panel)
+    return render_template("interview1.html", resume=resume,status1=status1,comments1=comments1,selected_panel=selected_panel,date=date)
 
 @app.route("/interview2v/<int:resume_id>",methods=["GET", "POST"])
 def interview2v(resume_id):
@@ -1030,10 +1033,12 @@ def interview2v(resume_id):
         status1 = existing_entry.Status
         comments1 = existing_entry.Comments
         selected_panel=existing_entry.SelectedPanel
+        date = existing_entry.Date
     else:
         status1 = None
         comments1 = None
         selected_panel=None
+        date=None
     if request.method=="POST":
         
         date=request.form["date"]
@@ -1060,7 +1065,7 @@ def interview2v(resume_id):
             flash("Candidate Moved to HR Round", "success")  # Using 'success' for a green flash message
 
         return redirect(url_for('interview2v', resume_id=resume.id))
-    return render_template("interview2.html",resume=resume,status1=status1,comments1=comments1,selected_panel=selected_panel)
+    return render_template("interview2.html",resume=resume,status1=status1,comments1=comments1,selected_panel=selected_panel,date=date)
 
 @app.route("/hr/<int:resume_id>",methods=["GET", "POST"])
 def hr(resume_id):
@@ -1070,10 +1075,12 @@ def hr(resume_id):
         status1 = existing_entry.Status
         comments1 = existing_entry.Comments
         selected_panel=existing_entry.SelectedPanel
+        date = existing_entry.Date
     else:
         status1 = None
         comments1 = None
         selected_panel=None
+        date=None
     if request.method=="POST":
         date=request.form["date"]
         comments=request.form["comments"]
@@ -1099,7 +1106,7 @@ def hr(resume_id):
             flash("Candidate Moved to HR Process", "success")  # Using 'success' for a green flash message
 
         return redirect(url_for('hr', resume_id=resume.id))
-    return render_template("hr.html",resume=resume,status1=status1,comments1=comments1,selected_panel=selected_panel)
+    return render_template("hr.html",resume=resume,status1=status1,comments1=comments1,selected_panel=selected_panel,date=date)
 
 @app.route("/get_interview_status/<int:resume_id>")
 def get_intro_status(resume_id):

@@ -248,3 +248,18 @@ function filterByMonth(){
     }
 }
 
+document.getElementById('readMoreBtn').addEventListener('click', function() {
+    var col3 = document.getElementById('col3');
+    var col4 = document.getElementById('col4');
+    var button = this;
+    
+    if (col3.classList.contains('d-none') && col4.classList.contains('d-none')) {
+      col3.classList.remove('d-none');
+      col4.classList.remove('d-none');
+      button.innerHTML = '<i class="fa-solid fa-chevron-up"></i> Read Less';
+    } else {
+      col3.classList.add('d-none');
+      col4.classList.add('d-none');
+      button.innerHTML = '<i class="fa-solid fa-chevron-down"></i> Read More';
+    }
+  });

@@ -10,21 +10,56 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='view.css') }}">
   </head>
   <style>
-    .table {
-          width: 95%;
-          table-layout: fixed; /* Fix the table layout */
-          margin-left: auto;
-          margin-right: auto;
+   .table {
+        width:95%;
+        table-layout: fixed; /* Fix the table layout */
+        margin-left: auto;
+        margin-right: auto;
       }
-
+      .table td{
+        width:600px!important;
+      }
       .table td,
       .table th {
-           /* Adjust padding as needed */
-          font-size: 14px; /* Adjust font size as needed */
-          white-space: nowrap; /* Prevent text wrapping */
-          overflow: hidden; /* Hide any overflowing content */
-          text-overflow: ellipsis; /* Show ellipsis for overflow */
+        font-size: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 10px; 
       }
+      .icon:hover {
+        transform: scale(1.4); /* Increases size slightly */
+        color: #007bff; /* Changes color on hover */
+      }
+      th, td {
+  padding:4px;
+  border: 1px solid #ddd;
+}
+.truncate {
+  /* Adjust the width as needed */
+  width: 2px!important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap;
+}
+
+td.truncate:hover {
+  overflow: visible;
+  background-color: #f9f9f9;
+  position: relative;
+}
+
+td.truncate:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 0;
+  top: 100%;
+  background: #333;
+  color: #fff;
+  padding: 5px;
+  white-space: nowrap;
+  z-index: 10;
+}
   </style>
   <body>
     <div class="first_div">
@@ -127,120 +162,122 @@
        
         
           
-        <div class="table my-4" >
+        <div class="table my-6" >
           <table class="table highlighted_row">
             <thead>
               <tr>
-                <th scope="col" class="table_header" style="margin-bottom: 200px!important;"><div style="display: flex; align-items: center;margin-bottom: 3px;">Sno
+                <th scope="col" class="table_header" style="margin-bottom: 200px!important;"><div style="display: flex; align-items: center;margin-bottom: 3px;"> <span style="text-align: center; margin-left:12px !important;">S.no.</span>
 
                 </div></th>
-                <th scope="col" class="table_header" >
+                <th scope="col" class="table_header" style="align-items: center;">
                   <div style="display: flex; align-items: center;margin-bottom: 3px;">Emp_id</div></th>
                 <th scope="col" class="table_header">
                 <div style="display: flex; align-items: center;justify-content:center">
-                  <span>Name</span>
+                  <span style="text-align: center; margin-left:12px !important;">Name</span>
                   <div>
                     <div style="display: flex; flex-direction: column; gap:1px; margin-left: 8px;align-items: center !important;">
                       <a href="{{ url_for('Home', sort_by='Name', sort_order='asc',page=page, search=search_query) }}" style="display: flex; ">
-                        <i class="fa fa-chevron-up" style="font-size:13px; color: black;"></i>
+                        
+                        <i class="fa-solid fa-sort-up icon" style="font-size:13px; color:white;transition: transform 0.3s ease, color 0.3s ease !important;" title="ascending"></i>
                       </a>
                       <a href="{{ url_for('Home', sort_by='Name', sort_order='desc',page=page, search=search_query) }}" style="display: flex;">
-                        <i class="fa fa-chevron-down" style="font-size: 13px;"></i>
+                        
+                        <i class="fa-solid fa-sort-down icon" style="font-size: 13px; color:black;" title="descending"></i>
                       </a>
                     </div>
                   </div>
                 </div>
                 </th>
-                <th scope="col" class="table_header">
+                <th scope="col" class="table_header" title="Designation">
                   <div style="display: flex;align-items: center;">
-                    <div>Design..</div>
+                    <div>Desig..</div>
                     <div>
                       <div style="display: flex; flex-direction: column; gap:1px; margin-left: 8px;align-items: center !important;">
                         <a href="{{ url_for('Home', sort_by='Designation', sort_order='asc',page=page, search=search_query) }}" style="display: flex; gap: 2px!important;">
-                          <i class="fa fa-chevron-up" style="font-size: 13px; color: black;"></i>
+                          <i class="fa-solid fa-sort-up icon" style="font-size:13px; color:white;" title="ascending"></i>
                         </a>
                         <a href="{{ url_for('Home', sort_by='Designation', sort_order='desc',page=page, search=search_query) }}" style="display: flex;">
-                          <i class="fa fa-chevron-down" style="font-size: 13px;"></i>
+                          <i class="fa-solid fa-sort-down icon" style="font-size: 13px; color:black;" title="descending"></i>
                         </a>
                       </div>
                     </div>
                   </div></th>
-                <th scope="col" class="table_header">
+                <th scope="col" class="table_header" title="Department">
                 <div style="display: flex; align-items: center;">
                   <div>Depar...</div>
                   <div>
                     <div style="display: flex; flex-direction: column; gap:1px; margin-left: 8px;align-items: center !important;">
                       <a href="{{ url_for('Home', sort_by='Department', sort_order='asc',page=page, search=search_query) }}" style="display: flex;">
-                        <i class="fa fa-chevron-up" style="font-size: 13px; color: black;"></i>
+                        <i class="fa-solid fa-sort-up icon" style="font-size:13px; color:white;" title="ascending"></i>
                       </a>
                       <a href="{{ url_for('Home', sort_by='Department', sort_order='desc',page=page, search=search_query) }}" style="display: flex;">
-                        <i class="fa fa-chevron-down" style="font-size: 13px;"></i>
+                        <i class="fa-solid fa-sort-down icon" style="font-size: 13px; color:black;" title="descending"></i>
                       </a>
                     </div>
                   </div>
                 </div>
                 </th>
-                <th scope="col" class="table_header">
+                <th scope="col" class="table_header" title="Project">
                   <div style="display: flex; align-items: center;">
                     <div>
-                      Project
+                      Proje...
                     </div>
                     <div style="display: flex; flex-direction: column; gap:1px; margin-left: 8px;align-items: center !important;">
                       <a href="{{ url_for('Home', sort_by='Project', sort_order='asc',page=page, search=search_query) }}" style="display: flex;">
-                        <i class="fa fa-chevron-up" style="font-size: 13px; color: black;"></i>
+                        <i class="fa-solid fa-sort-up icon" style="font-size:13px; color:white;" title="ascending"></i>
                       </a>
                       <a href="{{ url_for('Home', sort_by='Project', sort_order='desc',page=page, search=search_query) }}" style="display: flex;">
-                        <i class="fa fa-chevron-down" style="font-size: 13px;"></i>
+                        <i class="fa-solid fa-sort-down icon" style="font-size: 13px; color:black;" title="descending"></i>
                       </a>
                     </div>
                   </div>
                   
                 </th>
-                <th scope="col" class="table_header"><div style="display: flex; align-items: center;">
-                  <div>Job_role</div>
+                <th scope="col" class="table_header"><div style="display: flex; align-items: center;" title="Job Role">
+                  <div>Jb_rol.</div>
                   <div style="display: flex; flex-direction: column; gap:1px; margin-left: 8px;align-items: center !important;">
                     <a href="{{ url_for('Home', sort_by='Job_role', sort_order='asc',page=page, search=search_query) }}" style="display: flex;">
-                      <i class="fa fa-chevron-up" style="font-size:13px; color: black;"></i>
+                      <i class="fa-solid fa-sort-up icon" style="font-size:13px; color:white;" title="ascending"></i>
                     </a>
                     <a href="{{ url_for('Home', sort_by='Job_role', sort_order='desc',page=page, search=search_query) }}" style="display: flex;">
-                      <i class="fa fa-chevron-down" style="font-size: 13px;"></i>
+                      <i class="fa-solid fa-sort-down icon" style="font-size: 13px; color:black;" title="descending"></i>
                     </a>
                   </div>
                 </div></th>
-                <th scope="col" class="table_header"><div style="display: flex; align-items: center;">
+                <th scope="col" class="table_header"><div style="display: flex; align-items: center;" title="Employment Status">
                   <div>
-                    Emp stat.
+                    Em stat.
                   </div>
                   <div style="display: flex; flex-direction: column; gap:1px; margin-left:6px;align-items: center !important;">
                     <a href="{{ url_for('Home', sort_by='Employment_status', sort_order='asc',page=page, search=search_query) }}" style="display: flex;">
-                      <i class="fa fa-chevron-up" style="font-size:13px; color: black;"></i>
+                      <i class="fa-solid fa-sort-up icon" style="font-size:13px; color:white;" title="ascending"></i>
                     </a>
                     <a href="{{ url_for('Home', sort_by='Employment_status', sort_order='desc',page=page, search=search_query) }}" style="display: flex;">
-                      <i class="fa fa-chevron-down" style="font-size: 13px;"></i>
+                      <i class="fa-solid fa-sort-down icon" style="font-size: 13px; color:black;" title="descending"></i>
                     </a>
                   </div>
                 </div>
                   
                 </th>
-                <th scope="col" class="table_header"><div style="display: flex; align-items: center;margin-bottom: 3px;">Joining_date</div></th>
-                <th scope="col" class="table_header"><div style="display: flex; align-items: center;margin-bottom: 3px;">Experience</div></th>
-                <th scope="col" class="table_header">
+                <th scope="col" class="table_header" title="Joining Date"><div style="display: flex; align-items: center;margin-bottom: 3px;">Join_date</div></th>
+                <th scope="col" class="table_header" title="Experience"><div style="display: flex; align-items: center;margin-bottom: 3px;">Exper..</div></th>
+                <th scope="col" class="table_header" title="Location">
                 <div style="display: flex; align-items: center;">
-                  <div>Location</div>
+                  <div>Loc..</div>
                   <div>
                     <div style="display: flex; flex-direction: column; gap:1px; margin-left: 8px;align-items: center !important;">
                       <a href="{{ url_for('Home', sort_by='Location', sort_order='asc',page=page, search=search_query) }}" style="display: flex; gap: 2px!important;">
-                        <i class="fa fa-chevron-up" style="font-size:13px; color: black;"></i>
+                        <i class="fa-solid fa-sort-up icon" style="font-size:13px; color:white;" title="ascending"></i>
                       </a>
                       <a href="{{ url_for('Home', sort_by='Location', sort_order='desc',page=page, search=search_query) }}" style="display: flex;">
-                        <i class="fa fa-chevron-down" style="font-size: 13px;"></i>
+                        <i class="fa-solid fa-sort-down icon" style="font-size: 13px; color:black;" title="descending"></i>
                       </a>
                     </div>
                   </div>
                 </div>
                 </th>
-                <th scope="col" class="table_header"><div style="display: flex; align-items: center;margin-bottom: 3px;">Last_promoted</div></th>
-                <th scope="col" class="table_header"><div style="display: flex; align-items: center;margin-bottom: 3px;">Comments</div></th>
+                <th scope="col" class="table_header" title="Last Promoted"><div style="display: flex; align-items: center;margin-bottom: 3px;" title="Last_promoted">L_prom..</div></th>
+                <th scope="col" class="table_header" title="Comments"><div style="display: flex; align-items: center;margin-bottom: 3px;">Comen..</div></th>
                 <th scope="col" class="table_header"><div style="display: flex; align-items: center;margin-bottom: 3px;">Edit</div></th>
                 <!-- <th scope="col" class="table_header">Delete</th> -->
                 <th scope="col" class="table_header"><div style="display: flex; align-items: center;margin-bottom: 3px;">View</div></th>
@@ -251,12 +288,12 @@
             
               {% for employee in data.items %}
               <tr {% if employee.employee_status == 'resigned' %}style="background-color: red;"{% endif %}>
-                <th scope="row" >{{ start_index + loop.index }}</th>
+                <th scope="row" style="text-align: center;">{{ start_index + loop.index }}</th>
                 <td class="emp_id" class="table-primary">{{employee.Emp_id}}</td>
-                <td id="Name">{{employee.Name}}</td>
+                <td  id="Name">{{employee.Name}}</td>
                 <td id="Designation">{{employee.Designation}}</td>
                 <td>{{employee.Department}}</td>
-                <td id="Project">{{employee.Project}}</td>
+                <td  id="Project">{{employee.Project}}</td>
                 <td>{{employee.Job_role}}</td>
                 <td id="employment_status">{{employee.Employment_status}}</td>
                 <td id="joining_date">{{employee.Joining_date}}</td>

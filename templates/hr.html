@@ -13,7 +13,7 @@
       var status1="{{status1}}"
       var comments1="{{comments1}}"
       var selected_panel="{{selected_panel}}"
-      
+      var date="{{date}}"
     </script>
     <div>
       {% include 'sidemenu.html'%}
@@ -63,7 +63,7 @@
                 <div class="mb-3">
                   <label for="date" class="form-label"  style="font-size:20px; color:#1AACAC;">Date</label>
                   <i class="fa-solid fa-star" style="font-size:8px;position: relative;bottom:10px; color: red;"></i>
-                  <input type="date" class="form-control" name="date" id="date" required>
+                  <input type="date" class="form-control" name="date" id="date" value="{{ date or '' }}" required>
                 </div>
                 <div class="mb-3">
                     <label for="status"  style="font-size:20px; color:#1AACAC; margin-top: 20px;">Status</label>

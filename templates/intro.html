@@ -8,13 +8,19 @@
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='intro.css') }}">
+    <style>
+      .accordion-body {
+          max-height: 200px; /* Adjust as needed */
+          overflow: auto;
+        }
+    </style>
   </head>
 <body>
   <script>
     var status1="{{status1}}"
     var comments1="{{comments1}}"
     var selected_panel="{{selected_panel}}"
-    
+    var date="{{date}}"
   </script>
   <div style="display: flex;">
     {% include 'sidemenu.html'%}
@@ -65,7 +71,7 @@
                 <div class="mb-3">
                     <label for="date" class="form-label" style="font-size:20px; color:#1AACAC;">Date</label>
                     <i class="fa-solid fa-star" style="font-size:8px;position: relative;bottom:10px; color: red;"></i>
-                    <input type="date" class="form-control" id="date" name="date" required>
+                    <input type="date" class="form-control" id="date" name="date" value="{{ date or '' }}" required>
                 </div>
                 <div class="mb-3">
                     <label for="status" style="font-size:20px; color:#1AACAC; margin-top: 20px;">Status</label>

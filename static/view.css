@@ -54,8 +54,8 @@ a{
 tbody tr.resigned-row {
     background-color: red;
   }
-/* Add this to your CSS file */
-.table-container {
+Add this to your CSS file */
+/* .table-container {
     margin: 20px;
     border-collapse: separate;
     border-spacing: 0 10px;
@@ -133,3 +133,4 @@ a:hover {
 select{
     width:90px;
 }
+

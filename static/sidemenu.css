@@ -54,3 +54,10 @@
 i{
     font-size:1.1rem;
 }
+.nav-item a img {
+    display: block;
+    margin: 0 !important; /* Remove the auto margin to align to the left */
+    max-width: 100%;
+    border: 0;
+    
+}

@@ -119,6 +119,15 @@ function showInput(resumeId){
     document.getElementById('div_name' + resumeId).style.display = "none";
 }
 function submitName(resumeId) {
+    var nameInput = document.getElementById('nameInput' + resumeId);
+    var enteredName = nameInput.value.trim();  // Trim to remove extra spaces
+    
+    // Check if the input is empty
+    if (enteredName === "") {
+          // Show an alert if empty
+        nameInput.focus();  // Focus back on the input
+        return;  // Stop the function from submitting
+    }
     document.getElementById('btn_name' + resumeId).style.display = "none";
     document.getElementById('submitBtn' + resumeId).style.display = 'none';
     document.getElementById('nameInput' + resumeId).style.display = "none";
@@ -137,6 +146,15 @@ function showActualCTCInput(resumeId) {
 
 
 function submitActualCTC(resumeId) {
+    var actualCTCInput = document.getElementById('actualCTCInput' + resumeId);
+    var enteredActualCTC = actualCTCInput.value.trim(); // Trim the value to remove extra spaces
+
+    // Check if the input is empty
+    if (enteredActualCTC === "") {
+        
+        actualCTCInput.focus(); // Focus back on the input field
+        return; // Stop the function from proceeding
+    }
     document.getElementById('btn_actualCTC' + resumeId).style.display = 'none';
     document.getElementById('submitBtnActualCTC' + resumeId).style.display = 'none';
     document.getElementById('actualCTCInput' + resumeId).style.display = 'none';
@@ -154,6 +172,15 @@ function showExpectedCTCInput(resumeId) {
 }
 
 function submitExpectedCTC(resumeId) {
+    var expectedCTCInput = document.getElementById('expectedCTCInput' + resumeId);
+    var enteredExpectedCTC = expectedCTCInput.value.trim(); // Trim to remove any extra spaces
+
+    // Check if the input is empty
+    if (enteredExpectedCTC === "") {
+        
+        expectedCTCInput.focus(); // Focus back on the input field
+        return; // Stop the function from proceeding
+    }
     document.getElementById('btn_expectedCTC' + resumeId).style.display = 'none';
     document.getElementById('submitBtnExpectedCTC' + resumeId).style.display = 'none';
     document.getElementById('expectedCTCInput' + resumeId).style.display = 'none';
@@ -172,6 +199,15 @@ function showRoleInput(resumeId) {
 }
 
 function submitRole(resumeId) {
+    var roleInput = document.getElementById('roleInput' + resumeId);
+    var enteredRole = roleInput.value.trim(); // Trim to remove any extra spaces
+
+    // Check if the input is empty
+    if (enteredRole === "") {
+        
+        roleInput.focus(); // Focus back on the input field
+        return; // Stop the function from proceeding
+    }
     document.getElementById('btn_role' + resumeId).style.display = 'none';
     document.getElementById('submitBtnRole' + resumeId).style.display = 'none';
     document.getElementById('roleInput' + resumeId).style.display = 'none';
@@ -189,6 +225,15 @@ function showLocationInput(resumeId) {
 }
 
 function submitLocation(resumeId) {
+    var locationInput = document.getElementById('locationInput' + resumeId);
+    var enteredLocation = locationInput.value.trim(); // Trim to remove any extra spaces
+
+    // Check if the input is empty
+    if (enteredLocation === "") {
+        
+        locationInput.focus(); // Focus back on the input field
+        return; // Stop the function from proceeding
+    }
     document.getElementById('btn_location' + resumeId).style.display = 'none';
     document.getElementById('submitBtnLocation' + resumeId).style.display = 'none';
     document.getElementById('locationInput' + resumeId).style.display = 'none';
@@ -208,6 +253,16 @@ function showContactInput(resumeId) {
 }
 
 function submitContact(resumeId) {
+    var contactInput = document.getElementById('contactInput' + resumeId);
+    var enteredContact = contactInput.value.trim(); // Trim to remove extra spaces
+
+    // Check if the input is numeric and exactly 10 characters long
+    var contactPattern = /^[0-9]{10}$/; // Regex for exactly 10 digits
+    if (!contactPattern.test(enteredContact)) {
+        alert("Please enter a valid 10-digit contact number.");
+        contactInput.focus(); // Focus back on the input field
+        return; // Stop the function from proceeding
+    }
     document.getElementById('btn_contact' + resumeId).style.display = 'none';
     document.getElementById('submitBtnContact' + resumeId).style.display = 'none';
     document.getElementById('contactInput' + resumeId).style.display = 'none';

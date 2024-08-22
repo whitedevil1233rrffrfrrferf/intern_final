@@ -8,6 +8,7 @@
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='view.css') }}">
+    
     <style>
         .table {
           width: 95%;
@@ -25,38 +26,44 @@
           text-overflow: ellipsis; /* Show ellipsis for overflow */
       }
     </style>
+    
 </head>
 <body>
     <div class="first_div">
         {% include 'sidemenu.html'%}
         <div style="margin-left:100px;">
-          <div class="filter_div" style="margin-bottom: 30px;">
-            <div class=" filter">
+          <h1 class="filters_title" style="margin-bottom: 2rem;"><center>Employee Dmax metrics</center></h1>
+          <div class="dmax_view_filter_div"  >
+
+            <div class=" filter" style=" display: flex; justify-content:space-around; gap: 3rem;">
               <div>
               
         
                 <label for="role" class="label">Role:</label>
-                <select name="role" id="role" onchange=" showRoleDiv();filterTable();">
-                  <option value="">Select</option>
-                  <option value="intern">Intern</option>
-                  <option value="team_lead">Team lead</option>
-                  <option value="jr_qa_eng">Jr.QA engineer</option>
-                  <option value="qa_eng">QA engineer</option>
-                  <option value="sr_qa_eng">Sr.QA engineer</option>
+                <select name="role" id="role" onchange=" handleFilters();">
+                  <option value="" {% if role == "" or role is none %}selected{% endif %}>Select</option>
+                  <option value="intern" {% if role == "intern" %}selected{% endif %}>Intern</option>
+                  <option value="team_lead" {% if role == "team_lead" %}selected{% endif %}>Team lead</option>
+                  <option value="jr_qa_eng" {% if role == "jr_qa_eng" %}selected{% endif %}>Jr.QA engineer</option>
+                  <option value="qa_eng" {% if role == "qa_eng" %}selected{% endif %}>QA engineer</option>
+                  <option value="sr_qa_eng" {% if role == "sr_qa_eng" %}selected{% endif %}>Sr.QA engineer</option>
                 </select>
               </div>
               <div>
               
         
-                <label for="location" class="label">Centre:</label>
-                <select name="location" id="location" onchange="filterTable();">
-                  <option value="">Select</option>
-                  
+                <label for="loc" class="label">Centre:</label>
+                <select name="loc" id="loc" onchange=" handleFilters();">
+                  <option value="" {% if location == "" or location is none %}selected{% endif %}>Select</option>
+                  <option value="Chennai" {% if location == "Chennai" %}selected{% endif %}>Chennai</option>
+                  <option value="TNP" {% if location == "TNP" %}selected{% endif %}>TN palyam</option>
+                  <option value="Kollumangudi" {% if location == "Kollumangudi" %}selected{% endif %}>Kollumangudi</option>
+                  <option value="Kaup" {% if location == "Kaup" %}selected{% endif %}>Kaup</option>
                 </select>
               </div>
               <div >
                 <label for="project" class="label">Project:</label>
-                <select name="project" id="project" class="select_project">
+                <select name="project" id="project" class="select_project" onchange=" handleFilters();">
                     <option value="">Select</option>
                 </select>
                 
@@ -64,58 +71,35 @@
               
               <div>
                 <label for="designation" class="label">Designation:</label>
-                <select name="designation" id="designation">
+                <select name="designation" id="designation" onchange=" handleFilters();">
                   <option value="">Select</option>
                 </select>
                 
               </div>
               
-              <div>
-                <label for="employment_status" class="label">Employment Status:</label>
-                <select name="employment_status" id="employment_status">
-                  <option value="">Select</option>
-                  
-                </select>
-                
-              </div>
-              <div>
-                <label for="status" class="label">Status:</label>
-                <select name="status" id="status">
-                  <option value="">Select</option>
-                  
-                </select>
-              </div>
               
               
         
               <div>
-                <label for="month_active_filter" class="select_month label" style="color: #00A9FF;">Date of Joining:</label>
-                <select name="month_active" id="month_active_filter" class="select_month_value" onchange="filterByMonth('active')">
-                  <option value="">Select</option>
-                  <option value="january" class="month_value">January</option>
-                  <option value="february" class="month_value">February</option>
-                  <option value="march" class="month_value">March</option>
-                  <option value="april" class="month_value">April</option>
-                  <option value="may" class="month_value">May</option>
-                  <option value="june" class="month_value">June</option>
-                  <option value="july" class="month_value">July</option>
-                  <option value="august" class="month_value">August</option>
-                  <option value="september" class="month_value">September</option>
-                  <option value="october" class="month_value">October</option>
-                  <option value="november" class="month_value">November</option>
-                  <option value="december" class="month_value">December</option>
+                <label for="month" class="select_month label" style="color: #00A9FF;">Date of Joining:</label>
+                <select name="month" id="month" class="select_month_value" onchange="handleFilters()">
+                  <option value="" {% if month == "" or month is none %}selected{% endif %}>Select</option>
+                  <option value="January" class="month_value" {% if month == "January"%}selected{% endif %}>January</option>
+                  <option value="February" class="month_value" {% if month == "February"%}selected{% endif %}>February</option>
+                  <option value="March" class="month_value" {% if month == "March"%}selected{% endif %}>March</option>
+                  <option value="April" class="month_value" {% if month == "April"%}selected{% endif %}>April</option>
+                  <option value="May" class="month_value" {% if month == "May"%}selected{% endif %}>May</option>
+                  <option value="June" class="month_value" {% if month == "June"%}selected{% endif %}>June</option>
+                  <option value="July" class="month_value" {% if month == "July"%}selected{% endif %}>July</option>
+                  <option value="August" class="month_value" {% if month == "August"%}selected{% endif %}>August</option>
+                  <option value="September" class="month_value" {% if month == "September"%}selected{% endif %}>September</option>
+                  <option value="October" class="month_value" {% if month == "October"%}selected{% endif %}>October</option>
+                  <option value="November" class="month_value" {% if month == "November"%}selected{% endif %}>November</option>
+                  <option value="December" class="month_value" {% if month == "December"%}selected{% endif %}>December</option>
                   </select>
               </div>
               
-              <div>
-                <label for="month_active" class="label" >Month + active</label>
-                <input type="date" id="month_active_datepicker" oninput="filter('active')">
-              </div>
-        
-              <div>
-                <label for="month_resigned"   class="label">Month + Resigned</label>
-                <input type="date" id="month_resigned_datepicker" oninput="filters('resigned')">
-              </div>
+              
             </div>
             
   
@@ -854,9 +838,30 @@
           <a class="btn btn-primary" style="margin-left:45%;" href="/dmax_add">Add a new user</a>
         </div>
     </div>
+    <script>
+      var project="{{project}}"
+      var designation="{{designation}}"
+      if (designation=="Jr QA Engineer"){
+        designation="" 
+      }
+         
+    if (designation=="QA Eng"){
+      designation="QA Engineer" 
+    }
+        
+    if (designation=="Sr. QA Eng"){
+      designation="Sr. QA Engineer" 
+    }
+    if (designation=="Jr. QA Eng"){
+      designation="Jr QA Engineer" 
+    }
+        
+         
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <script src="{{ url_for('static', filename='config.js') }}"></script>
     <script src="{{ url_for('static', filename='add.js') }}"></script> 
     <script src="{{ url_for('static', filename='dmax_v.js') }}"></script>
+    
 </body>
 </html>

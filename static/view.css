@@ -133,4 +133,9 @@ a:hover {
 select{
     width:90px;
 }
-
+.dmax_view_filter_div{
+    
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}

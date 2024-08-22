@@ -51,12 +51,12 @@ app.config['PROFILE_IMAGE_UPLOAD_FOLDER'] = 'static/profile_images'
 app.secret_key = os.environ.get('SECRET_KEY')
 
 
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '0'
 
 CLIENT_ID = os.environ.get('CLIENT_ID')
 CLIENT_SECRET=os.environ.get('CLIENT_SECRET')
-REDIRECT_URI='http://localhost:5000/google_sign_in'
-# REDIRECT_URI = 'https://intern-final-0b4w.onrender.com/google_sign_in'
+# REDIRECT_URI='http://localhost:5000/google_sign_in'
+REDIRECT_URI = 'https://intern-final-0b4w.onrender.com/google_sign_in'
 
 
 SCOPES = ['openid', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
@@ -1749,6 +1749,27 @@ def dmax_upload():
 @app.route('/dmax_view')
 def dmax_view():
     
+    role = request.args.get('role') or ''
+    location = request.args.get('location') or ''
+    designation=request.args.get('designation') or''
+    project=request.args.get('project') or ''
+    month=request.args.get('month') or ''
+    
+    if location == "" or location is None:
+        location = None
+    if role== "" or role is None:
+        role=None    
+    if designation =="" or designation is None:
+        designation=None   
+    if project =="" or project is None:
+        project=None
+    if designation=="Jr QA Engineer":
+        designation="Jr. QA Eng"  
+    if designation=="QA Engineer":
+        designation="QA Eng" 
+    if designation=="Sr. QA Engineer":
+        
+        designation="Sr. QA Eng"               
     
     # Query all records
     data = Dmax_tl.query
@@ -1756,8 +1777,72 @@ def dmax_view():
     jr_qa_data=Dmax_jr_qa_eng.query
     qa_data=Dmax_qa_eng.query
     sr_qa_data=Dmax_sr_qa_eng.query
-    return render_template('dmax_view.html', data=data,intern_data=intern_data,jr_qa_data=jr_qa_data,qa_data=qa_data,sr_qa_data=sr_qa_data)
-
+    if role:
+        if role == 'intern':
+            if location:
+                intern_data = intern_data.filter_by(Centre=location)
+            if project:
+                intern_data = intern_data.filter_by(Project=project)    
+            if designation:
+                intern_data = intern_data.filter_by(Designation=designation)
+            if month:
+                intern_data=intern_data.filter_by(Month=month)
+            intern_data=intern_data.all()    
+            # Set other roles' data to empty lists since we are only showing interns
+            data=jr_qa_data = qa_data = sr_qa_data = []
+        elif role == 'jr_qa_eng':
+            
+            
+            if designation:
+                jr_qa_data = jr_qa_data.filter_by(Designation=designation)
+            if project:
+                jr_qa_data = jr_qa_data.filter_by(Project=project)    
+            if location:
+                jr_qa_data = jr_qa_data.filter_by(Centre=location)
+            if month:
+                jr_qa_data=jr_qa_data.filter_by(Month=month)
+            jr_qa_data = jr_qa_data.all()
+            # Set other roles' data to empty lists
+            data=intern_data = qa_data = sr_qa_data = []
+        elif role == 'qa_eng':
+            if designation:
+                qa_data = qa_data.filter_by(Designation=designation)
+            if location:
+                qa_data = qa_data.filter_by(Centre=location)
+            if project:
+                qa_data = qa_data.filter_by(Project=project)    
+            if month:
+                qa_data=qa_data.filter_by(Month=month)
+            
+            qa_data = qa_data.all()
+            # Set other roles' data to empty lists
+            data=intern_data = jr_qa_data = sr_qa_data = []
+        elif role == 'sr_qa_eng':
+            if location:
+                sr_qa_data = sr_qa_data.filter_by(Centre=location)
+            if project:
+                sr_qa_data = sr_qa_data.filter_by(Project=project)    
+            if designation:
+                sr_qa_data = sr_qa_data.filter_by(Designation=designation)
+            if month:
+                sr_qa_data=sr_qa_data.filter_by(Month=month)
+            sr_qa_data = sr_qa_data.all()
+            # Set other roles' data to empty lists
+            data=intern_data = jr_qa_data = qa_data = []
+        elif role == 'team_lead':
+            if location:
+                data=data.filter_by(Centre=location)
+            if project:
+                data = data.filter_by(Project=project)    
+            if designation:
+                data=data.filter_by(Designation=designation) 
+            if month:
+                data=data.filter_by(Month=month)     
+            data=data.all()      
+            # Set other roles' data to empty lists
+            intern_data = jr_qa_data = qa_data = sr_qa_data = []
+    return render_template('dmax_view.html', data=data,intern_data=intern_data,jr_qa_data=jr_qa_data,qa_data=qa_data,sr_qa_data=sr_qa_data,location=location,role=role,project=project,designation=designation,month=month)
+    
 @app.route('/dmax_add', methods=['GET', 'POST'])
 def dmax_add():
     return render_template("dmax_add.html")

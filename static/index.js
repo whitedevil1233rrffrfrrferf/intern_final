@@ -143,47 +143,118 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // }
 
+//# Combining filters
+// const selectedProject = document.getElementById("project");
+// const selectedDesignation = document.getElementById("designation");
+// const selectedEmploymentStatus = document.getElementById("employment_status");
+// const selectedEmployeeStatus = document.getElementById("status");
 
-const selectedProject = document.getElementById("project");
-const selectedDesignation = document.getElementById("designation");
-const selectedEmploymentStatus = document.getElementById("employment_status");
-const selectedEmployeeStatus = document.getElementById("status");
+// selectedProject.addEventListener("change", filterTable);
+// selectedDesignation.addEventListener("change", filterTable);
+// selectedEmploymentStatus.addEventListener("change", filterTable);
+// selectedEmployeeStatus.addEventListener("change", filterTable);
 
-selectedProject.addEventListener("change", filterTable);
-selectedDesignation.addEventListener("change", filterTable);
-selectedEmploymentStatus.addEventListener("change", filterTable);
-selectedEmployeeStatus.addEventListener("change", filterTable);
+// function filterTable() {
+//     const projectSearchContent = selectedProject.value.toLowerCase();
+//     const designationSearchContent = selectedDesignation.value.toLowerCase();
+//     const employmentStatusSearchContent = selectedEmploymentStatus.value.toLowerCase();
+//     const employeeStatusSearchContent = selectedEmployeeStatus.value.toLowerCase();
 
-function filterTable() {
-    const projectSearchContent = selectedProject.value.toLowerCase();
-    const designationSearchContent = selectedDesignation.value.toLowerCase();
-    const employmentStatusSearchContent = selectedEmploymentStatus.value.toLowerCase();
-    const employeeStatusSearchContent = selectedEmployeeStatus.value.toLowerCase();
+//     tableRows.forEach(function (row) {
+//         const projectCell = row.querySelector("#Project").textContent.toLowerCase();
+//         const designationCell = row.querySelector("#Designation").textContent.toLowerCase();
+//         const employmentStatusCell = row.querySelector("#employment_status").textContent.toLowerCase();
+//         const employeeStatusCell = row.querySelector("#employee_status").textContent.toLowerCase();
 
-    tableRows.forEach(function (row) {
-        const projectCell = row.querySelector("#Project").textContent.toLowerCase();
-        const designationCell = row.querySelector("#Designation").textContent.toLowerCase();
-        const employmentStatusCell = row.querySelector("#employment_status").textContent.toLowerCase();
-        const employeeStatusCell = row.querySelector("#employee_status").textContent.toLowerCase();
+//         const projectMatch = !projectSearchContent || projectCell === projectSearchContent;
+//         const designationMatch = !designationSearchContent || designationCell === designationSearchContent;
+//         const employmentStatusMatch = !employmentStatusSearchContent || employmentStatusCell === employmentStatusSearchContent;
+//         const employeeStatusMatch = !employeeStatusSearchContent || employeeStatusCell === employeeStatusSearchContent;
 
-        const projectMatch = !projectSearchContent || projectCell === projectSearchContent;
-        const designationMatch = !designationSearchContent || designationCell === designationSearchContent;
-        const employmentStatusMatch = !employmentStatusSearchContent || employmentStatusCell === employmentStatusSearchContent;
-        const employeeStatusMatch = !employeeStatusSearchContent || employeeStatusCell === employeeStatusSearchContent;
+//         if (
+//             (projectMatch && designationMatch && employmentStatusMatch && employeeStatusMatch) ||
+//             (projectMatch && !designationSearchContent && !employmentStatusSearchContent && !employeeStatusSearchContent) ||
+//             (!projectSearchContent && designationMatch && !employmentStatusSearchContent && !employeeStatusSearchContent) ||
+//             (!projectSearchContent && !designationSearchContent && employmentStatusMatch && !employeeStatusSearchContent) ||
+//             (!projectSearchContent && !designationSearchContent && !employmentStatusSearchContent && employeeStatusMatch)
+//         ) {
+//             row.style.display = "";
+//         } else {
+//             row.style.display = "none";
+//         }
+//     });
+// }
+var monthMapping = {
+    january: '01',
+    february: '02',
+    march: '03',
+    april: '04',
+    may: '05',
+    june: '06',
+    july: '07',
+    august: '08',
+    september: '09',
+    october: '10',
+    november: '11',
+    december: '12',
+  };
 
-        if (
-            (projectMatch && designationMatch && employmentStatusMatch && employeeStatusMatch) ||
-            (projectMatch && !designationSearchContent && !employmentStatusSearchContent && !employeeStatusSearchContent) ||
-            (!projectSearchContent && designationMatch && !employmentStatusSearchContent && !employeeStatusSearchContent) ||
-            (!projectSearchContent && !designationSearchContent && employmentStatusMatch && !employeeStatusSearchContent) ||
-            (!projectSearchContent && !designationSearchContent && !employmentStatusSearchContent && employeeStatusMatch)
-        ) {
-            row.style.display = "";
-        } else {
-            row.style.display = "none";
-        }
-    });
-}
+function handleFilters() {
+    // Get the selected filter values
+    const project = document.getElementById('project').value;
+    const designation = document.getElementById('designation').value;
+    const employmentStatus = document.getElementById('employment_status').value;
+    const status=document.getElementById('status').value;
+    const location = document.getElementById('location').value;
+    const month = document.getElementById('month').value;
+    
+    // Get existing URL parameters to preserve page, sort_by, and sort_order
+    const urlParams = new URLSearchParams(window.location.search);
+  
+    // Preserve existing page, sort_by, and sort_order
+    const page = urlParams.get('page') || 1; // Default to 1 if not present
+    const sortBy = urlParams.get('sort_by') || 'Name'; // Default to 'Name'
+    const sortOrder = urlParams.get('sort_order') || 'asc'; // Default to 'asc'
+  
+    // Set or delete the filter parameters
+    if (project) {
+      urlParams.set('project', project);
+    } else {
+      urlParams.delete('project');
+    }
+  
+    if (designation) {
+      urlParams.set('designation', designation);
+    } else {
+      urlParams.delete('designation');
+    }
+  
+    if (employmentStatus) {
+      urlParams.set('employment_status', employmentStatus);
+    } else {
+      urlParams.delete('employment_status');
+    }
+    if (status) {
+        urlParams.set('status', status);
+      } else {
+        urlParams.delete('status');
+      }
+  
+    if (location) {
+      urlParams.set('location', location);
+    } else {
+        urlParams.delete('location');
+      }
+  
+    if (month) {
+      urlParams.set('month', monthMapping[month]);
+    } else {
+      urlParams.delete('month');
+    }
+  
+    // Update the window location, including page, sort_by, and sort_order
+    window.location.href = `/home?page=${page}&sort_by=${sortBy}&sort_order=${sortOrder}&${urlParams.toString()}`;
+  }
 
 
 
@@ -199,20 +270,7 @@ tableRows.forEach(function(row) {
 
 
   function filterByMonth(status) {
-    var monthMapping = {
-      january: '01',
-      february: '02',
-      march: '03',
-      april: '04',
-      may: '05',
-      june: '06',
-      july: '07',
-      august: '08',
-      september: '09',
-      october: '10',
-      november: '11',
-      december: '12',
-    };
+    
     var selectedMonth
     var selectedStatus=status
     if (selectedStatus==="active"){
@@ -321,20 +379,20 @@ function filter(status){
 //         }
 //     })
 // }
-const selectedLocation=document.getElementById("location")
-selectedLocation.addEventListener("change",function(){
-        const selectedLocationValue=selectedLocation.value.toLowerCase()     
-        tableRows.forEach(function(row){
-            const locationCell=row.querySelector("#employee_location")
-            const locationValue=locationCell.textContent.toLowerCase()
-            if (locationValue.includes(selectedLocationValue)){
-                row.style.display=""
-            }
-            else{
-                row.style.display="none"
-            }
-        })    
-})
+// const selectedLocation=document.getElementById("location")
+// selectedLocation.addEventListener("change",function(){
+//         const selectedLocationValue=selectedLocation.value.toLowerCase()     
+//         tableRows.forEach(function(row){
+//             const locationCell=row.querySelector("#employee_location")
+//             const locationValue=locationCell.textContent.toLowerCase()
+//             if (locationValue.includes(selectedLocationValue)){
+//                 row.style.display=""
+//             }
+//             else{
+//                 row.style.display="none"
+//             }
+//         })    
+// })
 function parseCustomDateString(dateString) {
     const [day, month, year] = dateString.split('-').map(Number);
     return new Date(year, month-1 , day);
@@ -368,21 +426,30 @@ function filters(status) {
         }
     });
 }
+var locationMapping = {
+    "Kollu": "Kollumangudi",
+    "TN Palyam": "TN Palyam"
+  };
 
-function populateSelectOptions(selectId, optionsArray){
+function populateSelectOptions(selectId, optionsArray,currentValue){
     var selectElement=document.getElementById(selectId);
+    var mappedValue = locationMapping[currentValue] || currentValue;
     optionsArray.forEach(function(option){
         var optionElement=document.createElement("option")
         optionElement.value=option;
         optionElement.textContent=option;
+        if(option === currentValue){
+            
+            optionElement.selected = true;
+        }
         selectElement.appendChild(optionElement)
     });
 }
-populateSelectOptions("project", config.home.projects);
-populateSelectOptions("designation", config.home.designations);
-populateSelectOptions("employment_status", config.home.employment_statuses);
-populateSelectOptions("status", config.home.statuses);
-populateSelectOptions("location", config.home.locations);
+populateSelectOptions("project", config.home.projects,project);
+populateSelectOptions("designation", config.home.designations,designation);
+populateSelectOptions("employment_status", config.home.employment_statuses,employment_status);
+populateSelectOptions("status", config.home.statuses,stats);
+populateSelectOptions("location", config.home.locations,loc);
 
 
 // setTimeout(function(){

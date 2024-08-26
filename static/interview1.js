@@ -2,6 +2,8 @@ const selectBtn=document.querySelector(".select-btn")
    items=document.querySelectorAll(".items");
    let selectedPanel=[];
 
+const btnText = document.querySelector(".btn-text");   
+
 selectBtn.addEventListener("click",()=>{
     selectBtn.classList.toggle("open")
 })   
@@ -40,9 +42,18 @@ items.forEach(item => {
 // }
 
 function updateSelectedPanelInput(){
-    const selectedPanelInput=document.getElementById("selectedPanel")
-    selectedPanelInput.value = selectedPanel.join(', ');
-    console.log(selectedPanelInput.value)
+    const checked = document.querySelectorAll(".checked");
+    const btnText = document.querySelector(".btn-text");
+    selectedPanel = Array.from(checked).map((item) => item.innerText);
+
+    if (checked && checked.length > 0) {
+        btnText.innerText = selectedPanel.join(", ");
+    } else {
+        btnText.innerText = "Select panel";
+    }
+
+    const selectedPanelInput = document.getElementById("selectedPanel");
+    selectedPanelInput.value = selectedPanel.join(", ");
 }
 function highlightSelectedPanels() {
     var selectedPanelInput = document.getElementById("selectedPanel").value;
@@ -58,5 +69,10 @@ function highlightSelectedPanels() {
                 item.classList.add("checked");
             }
         });
+        if (selectedPanels.length > 0) {
+            btnText.innerText = selectedPanels.join(", ");
+        } else {
+            btnText.innerText = "Select panel";
+        }
     }
-}
+    }

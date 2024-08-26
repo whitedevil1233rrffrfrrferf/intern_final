@@ -1,6 +1,7 @@
 const selectBtn = document.querySelector(".select-btn");
 let items = document.querySelectorAll(".items");
 let selectedPanel = [];
+const btnText = document.querySelector(".btn-text");
 
 selectBtn.addEventListener("click", () => {
     selectBtn.classList.toggle("open");
@@ -26,7 +27,7 @@ function updateSelectedPanel() {
     selectedPanel = Array.from(checked).map((item) => item.innerText);
 
     if (checked && checked.length > 0) {
-        btnText.innerText = `${checked.length}`;
+        btnText.innerText = selectedPanel.join(", ");
     } else {
         btnText.innerText = "Select panel";
     }
@@ -131,5 +132,15 @@ function highlightSelectedPanels() {
                 item.classList.add("checked");
             }
         });
+        if (selectedPanels.length > 0) {
+            btnText.innerText = selectedPanels.join(", ");
+        } else {
+            btnText.innerText = "Select panel";
+        }
+    } else {
+        btnText.innerText = "Select panel";
     }
+        
+    
+    
 }

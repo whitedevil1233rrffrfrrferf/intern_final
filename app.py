@@ -230,7 +230,10 @@ class Dmax_sr_qa_eng(db.Model):
     Attendance = db.Column(db.Float)  
     Skill = db.Column(db.Float)
     New_initiatives= db.Column(db.Float) 
-    OverallDmaxScore = db.Column(db.Float)               
+    OverallDmaxScore = db.Column(db.Float)    
+def get_month_from_date(date_str):
+    """Extracts month from 'yyyy-mm-dd' format date string."""
+    return date_str.split('-')[1] if date_str else None               
 def extract_data_from_excel():
     wb = load_workbook("employee_data 1.xlsx")
     ws = wb.active
@@ -444,6 +447,18 @@ def Home():
     else:
         selected_page_size = session.get('page_size', default_page_size)
 
+    project = request.args.get('project')
+    designation = request.args.get('designation')
+    employment_status = request.args.get('employment_status')
+    status = request.args.get('status')
+    
+    loc = request.args.get('location')
+    if loc=="TN palayam":
+        loc="TN Palayam"
+    if loc=="Kollu":
+        loc="Kollumangudi"  
+    month=request.args.get('month') 
+        
     search_query = request.args.get('search', '')
     page = request.args.get('page', 1, type=int)
     sort_by = request.args.get('sort_by', 'Name')
@@ -471,6 +486,26 @@ def Home():
         data = Employee.query
         total_items = data.count()
 
+    if project:
+        data = data.filter(Employee.Project == project)
+
+    if designation:
+        data = data.filter(Employee.Designation == designation)
+
+    if employment_status:
+        data = data.filter(Employee.Employment_status == employment_status)
+
+    if status:
+        data = data.filter(Employee.employee_status == status)
+
+    if loc:
+        data = data.filter(Employee.Location == loc)  
+    if month:
+        
+        # Extract the month part of the date
+        data = data.filter(Employee.Joining_date != None )
+        data = data.filter(func.substr(Employee.Joining_date, 4, 2) == month)
+        
     if sort_order:
         if sort_order == 'asc':
             data = data.order_by(getattr(Employee, sort_by).asc())
@@ -500,7 +535,7 @@ def Home():
                            page_size_options=page_size_options,
                            selected_page_size=selected_page_size,
                            total_items=total_items, total_pages=total_pages,
-                           start_index=start_index, search_query=search_query,page=page)
+                           start_index=start_index, search_query=search_query,page=page,project=project,designation=designation,employment_status=employment_status,status=status,loc=loc,month=month)
 @app.route("/add", methods=["GET", "POST"])
 def Add():
     if request.method == "POST":

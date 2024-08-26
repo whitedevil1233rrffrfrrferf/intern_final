@@ -8,6 +8,16 @@
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='view.css') }}">
+    <script>
+      var project="{{project}}"
+      var designation="{{designation}}"
+      var employment_status="{{employment_status}}"
+      var stats="{{status}}"
+      var loc="{{loc}}"
+      
+      var month="{{month}}"
+      
+    </script>
   </head>
   <style>
    .table {
@@ -87,7 +97,7 @@ td.truncate:hover::after {
           <div class=" filter">
             <div >
               <label for="project" class="label">Project:</label>
-              <select name="project" id="project" class="select_project">
+              <select name="project" id="project" class="select_project" onchange="handleFilters()">
                   <option value="">Select</option>
               </select>
               
@@ -95,7 +105,7 @@ td.truncate:hover::after {
             
             <div>
               <label for="designation" class="label">Designation:</label>
-              <select name="designation" id="designation">
+              <select name="designation" id="designation" onchange="handleFilters()">
                 <option value="">Select</option>
               </select>
               
@@ -103,7 +113,7 @@ td.truncate:hover::after {
             
             <div>
               <label for="employment_status" class="label">Employment Status:</label>
-              <select name="employment_status" id="employment_status">
+              <select name="employment_status" id="employment_status" onchange="handleFilters()">
                 <option value="">Select</option>
                 
               </select>
@@ -111,7 +121,7 @@ td.truncate:hover::after {
             </div>
             <div>
               <label for="status" class="label">Status:</label>
-              <select name="status" id="status">
+              <select name="status" id="status" onchange="handleFilters()">
                 <option value="">Select</option>
                 
               </select>
@@ -121,28 +131,28 @@ td.truncate:hover::after {
             
       
               <label for="location" class="label">Location:</label>
-              <select name="location" id="location">
+              <select name="location" id="location" onchange="handleFilters()">
                 <option value="">Select</option>
                 
               </select>
             </div>
       
             <div>
-              <label for="month_active_filter" class="select_month label" style="color: #00A9FF;">Date of joining:</label>
-              <select name="month_active" id="month_active_filter" class="select_month_value" onchange="filterByMonth('active')">
+              <label for="month" class="select_month label" style="color: #00A9FF;">Date of joining:</label>
+              <select name="month" id="month" class="select_month_value" onchange="handleFilters()">
                 <option value="">Select</option>
-                <option value="january" class="month_value">January</option>
-                <option value="february" class="month_value">February</option>
-                <option value="march" class="month_value">March</option>
-                <option value="april" class="month_value">April</option>
-                <option value="may" class="month_value">May</option>
-                <option value="june" class="month_value">June</option>
-                <option value="july" class="month_value">July</option>
-                <option value="august" class="month_value">August</option>
-                <option value="september" class="month_value">September</option>
-                <option value="october" class="month_value">October</option>
-                <option value="november" class="month_value">November</option>
-                <option value="december" class="month_value">December</option>
+                <option value="january" class="month_value" {% if month == "01"%}selected{% endif %}>January</option>
+                <option value="february" class="month_value" {% if month == "02"%}selected{% endif %}>February</option>
+                <option value="march" class="month_value" {% if month == "03"%}selected{% endif %}>March</option>
+                <option value="april" class="month_value" {% if month == "04"%}selected{% endif %}>April</option>
+                <option value="may" class="month_value" {% if month == "05"%}selected{% endif %}>May</option>
+                <option value="june" class="month_value" {% if month == "06"%}selected{% endif %}>June</option>
+                <option value="july" class="month_value" {% if month == "07"%}selected{% endif %}>July</option>
+                <option value="august" class="month_value" {% if month == "08"%}selected{% endif %}>August</option>
+                <option value="september" class="month_value" {% if month == "09"%}selected{% endif %}>September</option>
+                <option value="october" class="month_value" {% if month == "10"%}selected{% endif %}>October</option>
+                <option value="november" class="month_value" {% if month == "11"%}selected{% endif %}>November</option>
+                <option value="december" class="month_value" {% if month == "12"%}selected{% endif %}>December</option>
                 </select>
             </div>
             
@@ -317,9 +327,9 @@ td.truncate:hover::after {
                 {% for page_num in data.iter_pages(left_edge=1,right_edge=1,left_current=1,right_current=2) %}
                   {% if page_num %}
                     {% if data.page == page_num%}
-                      <a class="btn btn-outline-info mb-4" href="{{url_for('Home',page=page_num,pages=pages,search=search_query)}}" >{{page_num}}</a>
+                      <a class="btn btn-outline-info mb-4" href="{{url_for('Home',page=page_num,pages=pages,search=search_query,project=project,designation=designation,employment_status=employment_status,location=loc,status=status,month=month)}}" >{{page_num}}</a>
                     {% else %}
-                      <a class="btn btn- mb-4" href="{{url_for('Home',page=page_num,pages=pages,search=search_query)}}" >{{page_num}}</a>
+                      <a class="btn btn- mb-4" href="{{url_for('Home',page=page_num,pages=pages,search=search_query,project=project,designation=designation,employment_status=employment_status,location=loc,status=status,month=month)}}" >{{page_num}}</a>
                     {% endif %}
                   {% else%}
                     ...

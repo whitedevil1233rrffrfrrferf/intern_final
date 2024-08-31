@@ -139,3 +139,23 @@ select{
     margin-left: auto;
     margin-right: auto;
 }
+.table-container {
+    width: 100%;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    margin-left: auto;
+    margin-right: auto;
+  }
+.tables {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    border-collapse: collapse; /* Ensure no gaps between cells */
+}
+.tables td,
+.tables th {
+  padding: 10px; /* Adjust padding as needed */
+  font-size: 14px; /* Adjust font size as needed */
+  white-space: nowrap; /* Prevent text wrapping */
+  overflow: hidden; /* Hide any overflowing content */
+  text-overflow: ellipsis; /* Show ellipsis for overflow */
+}

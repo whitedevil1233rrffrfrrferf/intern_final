@@ -18,17 +18,7 @@
        
         <div>
           <form action="/dmax_upload" enctype="multipart/form-data" method="POST" style="margin-left:6rem;">
-            <div class="filter" style="margin-bottom:2rem;">
-              <label for="tag"  style="font-size:25px;" class="label">Select Role:</label>
-              <select id="tag" name="tag">
-                <option value="">Select</option>
-                <option value="team leads">TEAM LEADS</option>
-                <option value="intern">Interns</option>
-                <option value="jr_qa_eng">JR. QA ENGG</option>
-                <option value="qa_eng">QA ENGG</option>  
-                <option value="sr_qa_eng">SR. QA ENGG</option>						  						
-              </select>
-            </div>
+            
             <label for="file" class="label">Upload a File:</label>
             <input type="file" id="file" name="file" class="file-input" accept=".xlsx" required multiple style="width:40%;">
             <button type="submit" class="btn btn-primary submit" style="margin-left: 0px;">Upload</button>

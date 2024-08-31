@@ -84,18 +84,18 @@
                 <label for="month" class="select_month label" style="color: #00A9FF;">Date of Joining:</label>
                 <select name="month" id="month" class="select_month_value" onchange="handleFilters()">
                   <option value="" {% if month == "" or month is none %}selected{% endif %}>Select</option>
-                  <option value="January" class="month_value" {% if month == "January"%}selected{% endif %}>January</option>
-                  <option value="February" class="month_value" {% if month == "February"%}selected{% endif %}>February</option>
-                  <option value="March" class="month_value" {% if month == "March"%}selected{% endif %}>March</option>
-                  <option value="April" class="month_value" {% if month == "April"%}selected{% endif %}>April</option>
+                  <option value="Jan" class="month_value" {% if month == "Jan"%}selected{% endif %}>January</option>
+                  <option value="Feb" class="month_value" {% if month == "Feb"%}selected{% endif %}>February</option>
+                  <option value="Mar" class="month_value" {% if month == "Mar"%}selected{% endif %}>March</option>
+                  <option value="Apr" class="month_value" {% if month == "Apr"%}selected{% endif %}>April</option>
                   <option value="May" class="month_value" {% if month == "May"%}selected{% endif %}>May</option>
                   <option value="June" class="month_value" {% if month == "June"%}selected{% endif %}>June</option>
                   <option value="July" class="month_value" {% if month == "July"%}selected{% endif %}>July</option>
-                  <option value="August" class="month_value" {% if month == "August"%}selected{% endif %}>August</option>
-                  <option value="September" class="month_value" {% if month == "September"%}selected{% endif %}>September</option>
-                  <option value="October" class="month_value" {% if month == "October"%}selected{% endif %}>October</option>
-                  <option value="November" class="month_value" {% if month == "November"%}selected{% endif %}>November</option>
-                  <option value="December" class="month_value" {% if month == "December"%}selected{% endif %}>December</option>
+                  <option value="Aug" class="month_value" {% if month == "Aug"%}selected{% endif %}>August</option>
+                  <option value="Sep" class="month_value" {% if month == "Sep"%}selected{% endif %}>September</option>
+                  <option value="Oct" class="month_value" {% if month == "Oct"%}selected{% endif %}>October</option>
+                  <option value="Nov" class="month_value" {% if month == "Nov"%}selected{% endif %}>November</option>
+                  <option value="Dec" class="month_value" {% if month == "Dec"%}selected{% endif %}>December</option>
                   </select>
               </div>
               
@@ -832,6 +832,46 @@
                     </tbody>
                   </table>
                   </div>
+                  <!-- <div class="table-container">
+                    <table class="tables highlighted_row">
+                      <thead>
+                        <th scope="col" colspan="3" class="table_header" style="text-align: center;">Production</th>
+                        <th scope="col" class="table_header">SNO</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+                        <th scope="col" class="table_header">Designation</th>
+
+                        <tr>
+                          <th scope="col" >Production</th>
+                          <th scope="col" >Quality</th>
+                          <th scope="col" >Attrition</th>
+                        </tr>
+                        
+                      </thead>
+                      
+                    </table>
+                  </div> -->
             </div>
             
         </div>

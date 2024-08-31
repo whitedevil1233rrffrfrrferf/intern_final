@@ -15,6 +15,7 @@ function getInterviewStatus(event,resumeId){
 
 
 function filterTableByIntroStatus(){
+    
     const selectedStatus = introFilter.value.toLowerCase();
     const tableRows=document.querySelectorAll("tbody tr")
     tableRows.forEach(function(row){
@@ -109,6 +110,7 @@ function filterTableByAllRoundsStatus(){
 //     const div=document.querySelector(".main_div")
 //     div.style.display="none"
 // }
+
 
 function showInput(resumeId){
     document.getElementById('btn_name'+resumeId).style.display="none";

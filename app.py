@@ -310,6 +310,7 @@ def extract_data_from_excel():
     db.session.commit()
 
 def process_and_insert_data(row, designation):
+    
     if designation == 'intern':
         column_mappings = {
                     'S.No': 0,
@@ -341,9 +342,8 @@ def process_and_insert_data(row, designation):
         skill = format_percentage(row[column_mappings['Skill(10%)']])
         overall_dmax_score = format_percentage(row[column_mappings['Overall Dmax Score']])
         
-        existing_employee = Dmax_intern.query.filter_by(EmpID=emp_id).first()
-        if not existing_employee:
-            new_employee = Dmax_intern(
+        
+        new_employee = Dmax_intern(
                             Centre=centre,
                             EmployeeName=name,
                             EmpID=emp_id,
@@ -358,8 +358,8 @@ def process_and_insert_data(row, designation):
                             Skill=skill,
                             OverallDmaxScore=overall_dmax_score
                         )
-            db.session.add(new_employee)
-            records_added = True
+        db.session.add(new_employee)
+        records_added = True
     if designation == 'jr. qa eng' or designation =="qa automation engineer":
         column_mappings = {
                     'S.No': 0,
@@ -390,10 +390,7 @@ def process_and_insert_data(row, designation):
         attendance = format_percentage(row[column_mappings['Attendance(10%)']])
         skill = format_percentage(row[column_mappings['Skill(10%)']])
         overall_dmax_score = format_percentage(row[column_mappings['Overall Dmax Score']])
-        existing_employee = Dmax_jr_qa_eng.query.filter_by(EmpID=emp_id).first()
-        if not existing_employee:
-                        # Insert data into the database
-                    new_employee = Dmax_jr_qa_eng(
+        new_employee = Dmax_jr_qa_eng(
                             Centre=centre,
                             EmployeeName=name,
                             EmpID=emp_id,
@@ -408,8 +405,8 @@ def process_and_insert_data(row, designation):
                             Skill=skill,
                             OverallDmaxScore=overall_dmax_score
                         )
-                    db.session.add(new_employee)
-                    records_added = True
+        db.session.add(new_employee)
+        records_added = True
 
 
     if designation == 'sr. qa eng':
@@ -446,10 +443,7 @@ def process_and_insert_data(row, designation):
         skill = format_percentage(row[column_mappings['Skill(10%)']])
         initiatives=format_percentage(row[column_mappings['New initiatives (10%)']])
         overall_dmax_score = format_percentage(row[column_mappings['Overall Dmax Score']])
-        existing_employee = Dmax_sr_qa_eng.query.filter_by(EmpID=emp_id).first()
-        if not existing_employee:
-            # Insert data into the database
-            new_employee =Dmax_sr_qa_eng(
+        new_employee =Dmax_sr_qa_eng(
                             Centre=centre,
                             EmployeeName=name,
                             EmpID=emp_id,
@@ -465,8 +459,8 @@ def process_and_insert_data(row, designation):
                             New_initiatives=initiatives,
                             OverallDmaxScore=overall_dmax_score
                         )
-            db.session.add(new_employee)
-            records_added = True
+        db.session.add(new_employee)
+        records_added = True
 
     if designation == 'qa eng':
         column_mappings = {
@@ -501,10 +495,7 @@ def process_and_insert_data(row, designation):
         skill = format_percentage(row[column_mappings['Skill(10%)']])
         initiatives=format_percentage(row[column_mappings['New initiatives (10%)']])
         overall_dmax_score = format_percentage(row[column_mappings['Overall Dmax Score']])
-        existing_employee = Dmax_qa_eng.query.filter_by(EmpID=emp_id).first()
-        if not existing_employee:
-            # Insert data into the database
-            new_employee =Dmax_qa_eng(
+        new_employee =Dmax_qa_eng(
                             Centre=centre,
                             EmployeeName=name,
                             EmpID=emp_id,
@@ -520,8 +511,8 @@ def process_and_insert_data(row, designation):
                             New_initiatives=initiatives,
                             OverallDmaxScore=overall_dmax_score
                         )
-            db.session.add(new_employee)
-            records_added = True
+        db.session.add(new_employee)
+        records_added = True
 
     if designation == 'adm' or designation== 'qa lead':
             column_mappings = {
@@ -563,10 +554,7 @@ def process_and_insert_data(row, designation):
             skill = format_percentage(skill)
             dmax_sharing=format_percentage(dmax_sharing)
             overall_dmax_score=format_percentage(overall_dmax_score)
-            existing_employee = Dmax_tl.query.filter_by(EmpID=emp_id).first()
-            if not existing_employee:
-                # Insert data into the database
-                new_employee = Dmax_tl(
+            new_employee = Dmax_tl(
                                 Centre=centre,
                                 EmployeeName=name,
                                 EmpID=emp_id,
@@ -583,12 +571,14 @@ def process_and_insert_data(row, designation):
                                 OverallDmaxScore=overall_dmax_score
                                 
                             )
-                db.session.add(new_employee)
-                records_added = True
+            db.session.add(new_employee)
+            records_added = True
+    db.session.commit()        
+    return records_added        
 
 
 
-    db.session.commit()
+    
 
 
 
@@ -1751,12 +1741,24 @@ def delete_resume(resume_id):
 def dmax_upload():
     if request.method == 'POST':
         file = request.files['file']
-        
+        selected_month = request.form.get('month')
         if file and file.filename.endswith('.xlsx'):
             wb = load_workbook(file)
-            ws = wb.active
-            records_added = False
+            sheet_names = wb.sheetnames
             
+            matching_sheet = None
+            for sheet_name in sheet_names:
+                if sheet_name.lower().startswith(selected_month.lower()):
+                    matching_sheet = sheet_name
+                    break
+            if matching_sheet:
+                ws = wb[matching_sheet]
+            else:
+                flash(f"No sheet found for the selected month: {selected_month}!", "error")
+                return render_template('dmax_upload.html')    
+            
+            records_added = False
+
             for row in ws.iter_rows(min_row=3, values_only=True):
                 if all(cell is None for cell in row):
                     continue
@@ -1773,7 +1775,11 @@ def dmax_upload():
                     if designation=="qa eng":
                         process_and_insert_data(row, designation) 
                     if designation == 'adm' or designation== 'qa lead':
-                        process_and_insert_data(row, designation)           
+                        process_and_insert_data(row, designation)  
+            
+                
+            flash("Data successfully uploaded!", "success")
+                    
             render_template('dmax_upload.html')
             
 

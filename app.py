@@ -55,6 +55,10 @@ os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '0'
 
 CLIENT_ID = os.environ.get('CLIENT_ID')
 CLIENT_SECRET=os.environ.get('CLIENT_SECRET')
+PUBLIC_KEY=os.environ.get('EMAILJS_PUBLIC_KEY')
+SERVICE_ID=os.environ.get('EMAILJS_SERVICE_ID')
+TEMPLATE_ID=os.environ.get('EMAILJS_TEMPLATE_ID')
+
 # REDIRECT_URI='http://localhost:5000/google_sign_in'
 REDIRECT_URI = 'https://intern-final-0b4w.onrender.com/google_sign_in'
 
@@ -2128,6 +2132,22 @@ def srqaeng():
                 flash("Employee added successfully!", "success")
     
     return render_template("dmax_add_sr_qa.html")
+
+@app.route("/qa_requirements", methods=['GET', 'POST'])
+def qareq():
+    public_key=os.environ.get('EMAILJS_PUBLIC_KEY')
+    service_id=os.environ.get('EMAILJS_SERVICE_ID')
+    template_id=os.environ.get('EMAILJS_TEMPLATE_ID')
+    email = session.get('email')  
+            
+    if request.method == 'POST':
+        
+        target = request.form.get('target_date')
+        role=request.form.get('role')
+        Assign=request.form.get('assign')
+        Req=request.form.get('req')
+        
+    return render_template("qareq.html",public_key=public_key,service_id=service_id,template_id=template_id,email=email)
  
 
 if __name__ == "__main__":

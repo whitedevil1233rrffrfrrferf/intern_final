@@ -63,6 +63,7 @@ TEMPLATE_ID=os.environ.get('EMAILJS_TEMPLATE_ID')
 REDIRECT_URI = 'https://intern-final-0b4w.onrender.com/google_sign_in'
 
 
+
 SCOPES = ['openid', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
 
 flow = Flow.from_client_config(

@@ -6,7 +6,7 @@ document.getElementById("form_id").addEventListener('submit',function(event){
         assign: document.getElementById('assign').value,
         target_date: document.getElementById('target_date').value,
     };
-    alert(formData.role)
+    
     const templateParams = {
         role: formData.role,
         req: formData.req,
@@ -14,8 +14,6 @@ document.getElementById("form_id").addEventListener('submit',function(event){
         target_date: formData.target_date,
         email:config.email
     };
-    alert(templateParams.email)
-    alert(config.service_id)
     emailjs.send(config.service_id, config.template_id, templateParams)
     .then(function(response) {
         console.log('SUCCESS!', response.status, response.text);

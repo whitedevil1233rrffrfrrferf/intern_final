@@ -33,19 +33,19 @@ Ensure that Python is installed. The version used for this project is 3.12.0.
     - Save the changes and note down the `client_id` and `client_secret`.
 
 2.**Setting up Emailjs credentials:**
-    . Go to Emailjs Dashboard
+    - Go to Emailjs Dashboard
       -If you don't have an account sign up and log in
       -Once logged in create a new service or select an existing one
-    . Retrieve your service ID
+    - Retrieve your service ID
       -In the email services section, you will find the service ID, copy that ID
-    . Create or select a template
+    - Create or select a template
       -Go to the templates section 
       -Either create a new template or update an existing one 
       -Note down the template ID
-    . Get your public key
+    - Get your public key
       -Navigate to the Account > API Keys section
       -copy your Public key
-    . Update the values in the .env_sample file
+    - Update the values in the .env_sample file
 
 3. **Setting up Environment Variables:**
     - Rename the `.env_sample` file to `.env`.

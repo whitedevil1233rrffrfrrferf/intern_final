@@ -365,7 +365,7 @@ def process_and_insert_data(row, designation):
                         )
         db.session.add(new_employee)
         records_added = True
-    if designation == 'jr. qa eng' or designation =="qa automation engineer":
+    if designation == 'jr. qa engineer' or designation =="qa automation engineer":
         column_mappings = {
                     'S.No': 0,
                     'Centre': 1,
@@ -414,7 +414,7 @@ def process_and_insert_data(row, designation):
         records_added = True
 
 
-    if designation == 'sr. qa eng':
+    if designation == 'sr. qa engineer':
         
         column_mappings = {
                     'S.No': 0,
@@ -467,7 +467,7 @@ def process_and_insert_data(row, designation):
         db.session.add(new_employee)
         records_added = True
 
-    if designation == 'qa eng':
+    if designation == 'qa engineer':
         column_mappings = {
                     'S.No': 0,
                     'Centre': 1,
@@ -1772,12 +1772,12 @@ def dmax_upload():
                     designation = designation.strip().lower()
                     if designation=="intern":
                         process_and_insert_data(row, designation)
-                    if designation=="jr. qa eng" or designation=="qa automation engineer":
+                    if designation=="jr. qa engineer" or designation=="qa automation engineer":
                         process_and_insert_data(row, designation)
-                    if designation=="sr. qa eng":
+                    if designation=="sr. qa engineer":
                         
                         process_and_insert_data(row, designation)
-                    if designation=="qa eng":
+                    if designation=="qa engineer":
                         process_and_insert_data(row, designation) 
                     if designation == 'adm' or designation== 'qa lead':
                         process_and_insert_data(row, designation)  
@@ -1810,12 +1810,12 @@ def dmax_view():
     if project =="" or project is None:
         project=None
     if designation=="Jr QA Engineer":
-        designation="Jr. QA Eng"  
+        designation="Jr. QA Engineer"  
     if designation=="QA Engineer":
-        designation="QA Eng" 
+        designation="QA Engineer" 
     if designation=="Sr. QA Engineer":
         
-        designation="Sr. QA Eng"               
+        designation="Sr. QA Engineer"               
     
     # Query all records
     data = Dmax_tl.query
@@ -1853,6 +1853,8 @@ def dmax_view():
         elif role == 'qa_eng':
             if designation:
                 qa_data = qa_data.filter_by(Designation=designation)
+                print("h")
+                
             if location:
                 qa_data = qa_data.filter_by(Centre=location)
             if project:

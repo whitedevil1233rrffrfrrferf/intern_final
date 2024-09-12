@@ -105,7 +105,7 @@
   
           </div>
           <div style="display: flex; flex-direction: column;">
-            <div id="team_lead_div" class="role-section">
+            <div id="team_lead_div" class="role-section" style="display: {{ 'block' if role == 'team_lead'or role == '' or role is none else 'none' }};">
               <h2 class="filters_title my-3" >Team Lead's Dmax</h2>
             <div class="table my-4" >
                 <table class="table highlighted_row">
@@ -251,7 +251,7 @@
                 </table>
                 </div>
             </div>
-            <div id="intern_div" class="role-section">
+            <div id="intern_div" class="role-section" style="display: {{ 'block' if role == 'intern'or role == '' or role is none else 'none' }};">
               <h2 class="filters_title my-3" >Intern's Dmax</h2>
               <div class="table my-4" >
                   <table class="table highlighted_row">
@@ -396,7 +396,7 @@
                   </table>
                   </div>
             </div>
-            <div id="jr_qa_eng_div" class="role-section">
+            <div id="jr_qa_eng_div" class="role-section" style="display: {{ 'block' if role == 'jr_qa_eng'or role == '' or role is none else 'none' }};">
               <h2 class="filters_title my-3" >Jr.QA ENG's Dmax</h2>
               <div class="table my-4" >
                   <table class="table highlighted_row">
@@ -541,7 +541,7 @@
                   </table>
                   </div>
             </div>
-            <div id="qa_eng_div" class="role-section">
+            <div id="qa_eng_div" class="role-section" style="display: {{ 'block' if role == 'qa_eng'or role == '' or role is none else 'none' }};">
               <h2 class="filters_title my-3" >QA ENG's Dmax</h2>
               <div class="table my-4" >
                   <table class="table highlighted_row">
@@ -687,7 +687,7 @@
                   </table>
                   </div>
             </div>
-            <div id="sr_qa_eng_div" class="role-section">
+            <div id="sr_qa_eng_div" class="role-section" style="display: {{ 'block' if role == 'sr_qa_eng'or role == '' or role is none else 'none' }};">
               <h2 class="filters_title my-3" >Sr. QA ENG's Dmax</h2>
               <div class="table my-4" >
                   <table class="table highlighted_row">
@@ -881,19 +881,23 @@
     <script>
       var project="{{project}}"
       var designation="{{designation}}"
-      if (designation=="Jr QA Engineer"){
-        designation="" 
+      
+      
+      if (designation=="Jr. QA Engineer"){
+        designation="Jr QA Engineer" 
+        
       }
          
     if (designation=="QA Eng"){
-      designation="QA Engineer" 
+      designation="qa Engineer" 
     }
         
     if (designation=="Sr. QA Eng"){
       designation="Sr. QA Engineer" 
     }
     if (designation=="Jr. QA Eng"){
-      designation="Jr QA Engineer" 
+      designation="Jr qa engineer" 
+      alert(designation)
     }
         
          

@@ -59,8 +59,8 @@ PUBLIC_KEY=os.environ.get('EMAILJS_PUBLIC_KEY')
 SERVICE_ID=os.environ.get('EMAILJS_SERVICE_ID')
 TEMPLATE_ID=os.environ.get('EMAILJS_TEMPLATE_ID')
 
-REDIRECT_URI='http://localhost:5000/google_sign_in'
-# REDIRECT_URI = 'https://intern-final-0b4w.onrender.com/google_sign_in'
+# REDIRECT_URI='http://localhost:5000/google_sign_in'
+REDIRECT_URI = 'https://intern-final-0b4w.onrender.com/google_sign_in'
 
 
 

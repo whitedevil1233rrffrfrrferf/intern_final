@@ -107,16 +107,30 @@ class Login(db.Model):
     Name = db.Column(db.String(200))
     MobileNumber = db.Column(db.String(20))
     photo_filename = db.Column(db.String(255))
+
 class Delete_user(db.Model):
     __bind_key__="delete_user"
     id=db.Column(db.Integer,primary_key=True) 
     Name=db.Column(db.String(200))
     Date=db.Column(db.String(200))   
+
 class Resume(db.Model):
     __bind_key__="resume"  
     id=db.Column(db.Integer,primary_key=True)
     filename=db.Column(db.String(255), nullable=False)  
-
+    Name=db.Column(db.String(255))
+    Email=db.Column(db.String(255))
+    Qualification=db.Column(db.String(255))
+    Phone=db.Column(db.String(255))
+    Location=db.Column(db.String(255))
+    Experience=db.Column(db.String(255))
+    QA_Lead=db.Column(db.String(255))
+    Link=db.Column(db.String(255)) 
+    Role=db.Column(db.String(255))
+    Expected_CTC=db.Column(db.String(255))
+    Actual_CTC=db.Column(db.String(255))
+    Notice_period=db.Column(db.String(255))
+    
 class Intro(db.Model):
     __bind_key__="intro"
     id=db.Column(db.Integer,primary_key=True)
@@ -313,6 +327,36 @@ def extract_data_from_excel():
     db.session.commit()
     
     db.session.commit()
+
+def extract_excel_resume():
+    column_mappings = {
+        'Sno': 0,
+        'Emp_id': 1,
+        'Name': 2,
+        'Designation': 3,
+        'Department': 4,
+        'Project': 5,
+        'Job_role': 6,
+        'Employment_status': 7,
+        'Joining_date': 8,
+        'Experience': 9,
+        'Location': 10,
+        'Last_promoted': 11,
+        'Comments': 12
+    }
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        
+        if not all(cell is None for cell in row):
+            Sno = row[column_mappings['Sno']]
+            Emp_id = row[column_mappings['Emp_id']]
+            Name = row[column_mappings['Name']]
+            Designation = row[column_mappings['Designation']]
+            Department = row[column_mappings['Department']]
+            Project = row[column_mappings['Project']]
+            Job_role = row[column_mappings['Job_role']]
+            Employment_status = row[column_mappings['Employment_status']]
+            Joining_date = row[column_mappings['Joining_date']]
+            Experience = row[column_mappings['Experience']]
 
 def process_and_insert_data(row, designation):
     
@@ -608,6 +652,22 @@ def format_percentage(value):
         print(f"Unexpected type: {type(value)}")
         return None
     return round(value * 100, 2)
+
+def map_role_based_on_experience(experience):
+    # Convert months to years, assuming experience can be a float like 0.5 for 6 months
+    experience_in_years = float(experience)
+    
+    # Define the role based on the years of experience
+    if experience_in_years >= 6:
+        return "QA Lead"
+    elif 4 <= experience_in_years < 6:
+        return "Sr. QA Engineer"
+    elif 2 <= experience_in_years < 4:
+        return "QA Engineer"
+    elif 0.5 <= experience_in_years < 2:
+        return "Jr. QA Engineer"
+    else:
+        return "QA Intern"
 
 def dashboard_function():
     total_employees=Employee.query.count()
@@ -1064,6 +1124,7 @@ def get_employees_list(employment_status):
 @app.route("/resume",methods=["GET","POST"])
 def resume():
     flash_message=None
+    months=["January","February","March","April","May","June","July","August","September","October","November","December"]
     if request.method=="POST":
         selected_tag=request.form['tag']
         files=request.files.getlist('file')
@@ -1082,10 +1143,11 @@ def resume():
                     sucessfully_uploaded=True
                 else:
                      flash(f'{filename} already exists !', 'error')
+                    
         if sucessfully_uploaded:
             flash('Resume(s) uploaded successfully!', 'success')                
         return redirect(url_for('resume'))        
-    return render_template("resume.html")
+    return render_template("resume.html",months=months)
 
 # @app.route("/employee_management", methods=["GET", "POST"])
 # def employee():
@@ -2152,7 +2214,68 @@ def qareq():
         
     return render_template("qareq.html",public_key=public_key,service_id=service_id,template_id=template_id,email=email)
  
-
+@app.route("/excel_resume", methods=['GET', 'POST'])
+def excel_resume():
+    if request.method=="POST":
+        
+        if 'file' not in request.files:
+            flash('No file part')
+            
+            return redirect(request.url)
+        file = request.files['file']
+    
+        if file.filename == '':
+            flash('No selected file')
+            
+            return redirect(request.url)
+        if file:
+            try:
+                wb=load_workbook(file)
+                
+                sheet=wb.active
+                for i, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
+                
+                   if not all(cell is None for cell in row):
+                        email=row[1]
+                        name=row[2]
+                        qualification=row[3]
+                        phone=str(row[4])
+                        location=row[5]
+                        experience=row[6]
+                        lead=row[7]
+                        result=row[8]
+                        current_ctc=row[9]
+                        expecting_ctc=row[10]
+                        notice_period=row[11]
+                        suggestions=row[12]
+                        link=row[13]
+                        role = map_role_based_on_experience(experience)
+                        print(result,current_ctc,expecting_ctc,notice_period,suggestions)
+                        existing_employee =Resume.query.filter_by(Name=name).first()
+                        if not existing_employee:
+                            
+                            new_candidate = Resume(
+                                Email=email,
+                                filename=name,
+                                Name=name,
+                                Qualification=qualification,
+                                Phone=phone,
+                                Location=location,
+                                Experience=experience,
+                                QA_Lead=lead,
+                                Link=link,
+                                Role=role,
+                                Actual_CTC=current_ctc,
+                                Expected_CTC=expecting_ctc,
+                                Notice_period=notice_period
+                            )
+                            
+                            db.session.add(new_candidate)
+                            db.session.commit() 
+                            
+            except:
+                pass    
+    return redirect("/resume")        
 if __name__ == "__main__":
     app.run(debug=True)
 

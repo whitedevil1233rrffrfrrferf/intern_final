@@ -5,6 +5,17 @@
 .btn{
     width:4rem !important;
 }
+th{
+    font-size:15px;
+    font-family: 'poppins';
+    text-align: center;
+}
+td{
+    text-align: center;
+    word-wrap: break-word;        /* Older browsers */
+    overflow-wrap: break-word;    /* Modern browsers */
+    white-space: normal; 
+}
 .main_div{
     margin: 0%;
     width:24%; 
@@ -66,4 +77,8 @@ i{
     margin-right:auto!important ;
     width:5rem !important;
     margin-top:1rem;
+}
+label{
+    font-size:18px; 
+    color: #4699F9 !important;
 }

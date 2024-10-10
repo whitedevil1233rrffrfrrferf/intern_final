@@ -63,35 +63,42 @@
     <div class="first_div">
         {% include 'sidemenu.html'%}
 
-        <div style="width:85%; margin-left:8rem;" class="container">
+        <div style=" margin-left:8rem;overflow-x: auto;width: 140%;">
             <div class="filters" style="margin-bottom: 20px;">
                 <h1 style="text-align: center;  background-color:#4699F9;color: white">Employee resumes</h1>
                 <div class="flex" style="display: flex; justify-content: space-between; align-items: center;">
                     <div style="margin-bottom: 20px; margin-top: 20px;">
-                        <label for="introFilter" style="font-size: 20px; color: #4699F9;">Intro Call Status:</label>
+                        <label for="introFilter" >Intro Call Status:</label>
                         <select  id="introFilter" onchange="filterTableByIntroStatus()" style="margin-bottom: 20px; margin-top: 20px;">
                             <option value="">Select</option>
                             
                         </select>
                     </div>
                     <div style="margin-bottom: 20px; margin-top: 20px;">
-                        <label for="interview1Filter" style="font-size: 20px;color: #4699F9;">Interview 1 Status:</label>
+                        <label for="interview1Filter" >Interview 1 Status:</label>
                         <select id="interview1Filter" onchange="filterTableByInterview1Status()" style="margin-bottom: 20px; margin-top: 20px;">
                             <option value="">Select</option>
                             
                         </select>
                     </div>
                     <div style="margin-bottom: 20px; margin-top: 20px;">
-                        <label for="interview2Filter" style="font-size: 20px; color: #4699F9;">Interview 2 Status:</label>
+                        <label for="interview2Filter">Interview 2 Status:</label>
                         <select id="interview2Filter" onchange="filterTableByInterview2Status()" style="margin-bottom: 20px; margin-top: 20px;">
                             <option value="">Select</option>
                            
                         </select>
                     </div>
                     <div style="margin-bottom: 20px; margin-top: 20px;">
-                        <label for="allRoundsFilter" style="font-size: 20px; color: #4699F9;">All rounds cleared:</label>
+                        <label for="allRoundsFilter">All rounds cleared:</label>
                         <select id="allRoundsFilter" onchange="filterTableByAllRoundsStatus()" style="margin-bottom: 20px; margin-top: 20px;">
                             <option value="">Select</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 20px; margin-top: 20px;">
+                        <label for="month">Month:</label>
+                        <select id="month"  style="margin-bottom: 20px; margin-top: 20px;">
+                            <option value="">Select</option>
+                            <option value="">January</option>
                         </select>
                     </div>
                 </div>
@@ -99,18 +106,36 @@
             
             
             
-            <div class="table-responsive my-4">
-                <table class="table table-striped table-bordered">
+            <div class="table-responsive my-4" style="overflow-x:auto;">
+                <table class="table table-striped table-bordered" >
+                    <colgroup>
+                        <col style="width:2%;">  <!-- ID -->
+                        <col style="width:10%;"> <!-- Candidate Name -->
+                        <col style="width:7%;"> <!-- Email -->
+                        <col style="width:7%;"> <!-- Contact Number -->
+                        <col style="width:7%;"> <!-- Qualification -->
+                        <col style="width:8%;"> <!-- Experience/Fresher -->
+                        <col style="width: 10%;"> <!-- QA Lead Assigned -->
+                        <col style="width:8%;"> <!-- Location -->
+                        <col style="width: 10%;"> <!-- Role -->
+                        <col style="width:12%;"> <!-- Others -->
+                        <col style="width:10%;">  <!-- Action -->
+                        <col style="width:8%;"> <!-- Interview Details -->
+                        <col style="width: 5%;">  <!-- Delete -->
+                        <col hidden>               <!-- Intro Status (hidden) -->
+                    </colgroup>
                     <thead class="thead-dark">
                         <tr>
                             <th scope="col">ID</th>
-                            <th scope="col">Filename</th>
-                            <th scope="col">Name</th>
+                            <th scope="col">Candidate Name</th>
+                            <th scope="col">Email</th>
                             <th scope="col">Contact number</th>
-                            <th scope="col">Actual CTC</th>
-                            <th scope="col">Expected CTC</th>
+                            <th scope="col">Qualification</th>
+                            <th scope="col">Experience/Fresher</th>
+                            <th scope="col">QA Lead Assigned</th>
+                            <th scope="col">Location</th>   
                             <th scope="col">Role</th>
-                            <th scope="col">Location</th>
+                            <th scope="col">Others</th>
                             <th scope="col">Action</th>
                             <th scope="col">Interview Details</th>
                             <th scope="col">Delete</th>
@@ -123,7 +148,11 @@
                             <tr>
                                 <td>{{ start_index + loop.index }}</td>
                                 <td>
+                                    {% if resume.Link %}
+                                    <a href="{{resume.Link}}" class="long-filename  text-break" target="_blank">{{ resume.Name }}</a>
+                                    {% else %}  
                                     <a href="{{ url_for('view_resume', filename=resume.filename) }}" class="long-filename  text-break" target="_blank">{{ resume.filename }}</a>
+                                    {% endif %}
                                     <a href="#" style="font-size: 32px; margin-left: 20px; color: red;" onclick="getInterviewStatus(event,{{resume.id}})"><i class="fa-solid fa-info" style="font-size: 20px;"></i></a>
                                     <div id="toggle{{ resume.id }}" style="display: none;">
                                         <div id="introStatus{{ resume.id }}" style="margin-bottom: 3px; margin-top:5px;"></div>
@@ -132,52 +161,102 @@
                                         <div id="hrStatus{{ resume.id }}" style="margin-bottom: 3px;"></div>
                                     </div>
                                 </td>
-                                <td ><button class="btn btn-primary" id="btn_name{{resume.id}}"  onclick="showInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
+                                <td>
+                                    {% if resume.Email %}
+                                    {{ resume.Email }}
+                                    {% else %}   
+                                    <button class="btn btn-primary" id="btn_name{{resume.id}}"  onclick="showInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
                                     <div style="display: none;" id="name{{resume.id}}">
                                         <input type="text" id="nameInput{{resume.id}}" required>
                                         <center><button class="btn btn-primary sub" id="submitBtn{{resume.id}}" onclick="submitName({{resume.id}})">Submit</button></center>
                                     </div>
                                     
-                                    <div id="div_name{{resume.id}}" style="display: none;" onclick="editName({{resume.id}})"></div></td>
+                                    <div id="div_name{{resume.id}}" style="display: none;" onclick="editName({{resume.id}})"></div>
+                                    {% endif %}
+                                    </td>
                                     
                                 <td style="margin: auto;">
+                                    {% if resume.Phone %}
+                                    {{ resume.Phone }}
+                                    {% else %} 
                                     <button class="btn btn-primary" id="btn_contact{{resume.id}}" onclick="showContactInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
                                     <div style="display: none;" id="contact{{resume.id}}">
                                         <input type="text" id="contactInput{{resume.id}}" required>
                                         <center><button class="btn btn-primary sub" id="submitBtnContact{{resume.id}}" onclick="submitContact({{resume.id}})">Submit</button></center>
                                     </div>
                                     <div id="div_contact{{resume.id}}" style="display: none;" onclick="editContact({{resume.id}})"></div>
-                                </td>
-                                <td><button class="btn btn-primary" id="btn_actualCTC{{resume.id}}" onclick="showActualCTCInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
-                                <div style="display: none;" id="actualCTC{{resume.id}}">
-                                    <input type="text" id="actualCTCInput{{resume.id}}">
-                                    <center><button class="btn btn-primary sub" id="submitBtnActualCTC{{resume.id}}" onclick="submitActualCTC({{resume.id}})">Submit</button></center>
-                                </div>
-                                <div id="div_actualCTC{{resume.id}}" style="display: none;" onclick="editActualCTC({{resume.id}})"></div>
+                                    {% endif %}
                                 </td>
                                 <td>
+                                    {% if resume.Qualification %}
+                                    {{ resume.Qualification }}
+                                    {% else %} 
+                                    <button class="btn btn-primary" id="btn_actualCTC{{resume.id}}" onclick="showActualCTCInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
+                                    <div style="display: none;" id="actualCTC{{resume.id}}">
+                                        <input type="text" id="actualCTCInput{{resume.id}}">
+                                        <center><button class="btn btn-primary sub" id="submitBtnActualCTC{{resume.id}}" onclick="submitActualCTC({{resume.id}})">Submit</button></center>
+                                    </div>
+                                    <div id="div_actualCTC{{resume.id}}" style="display: none;" onclick="editActualCTC({{resume.id}})"></div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if resume.Experience %}
+                                    {{ resume.Experience }}
+                                    {% else %} 
                                     <button class="btn btn-primary" id="btn_expectedCTC{{resume.id}}" onclick="showExpectedCTCInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
                                     <div style="display: none;" id="expectedCTC{{resume.id}}">
                                         <input type="text" id="expectedCTCInput{{resume.id}}">
                                         <center><button class="btn btn-primary sub" id="submitBtnExpectedCTC{{resume.id}}" onclick="submitExpectedCTC({{resume.id}})">Submit</button></center>
                                     </div>
                                     <div id="div_expectedCTC{{resume.id}}" style="display: none;" onclick="editExpectedCTC({{resume.id}})"></div>  
+                                    {% endif %}
                                 </td>
                                 <td>
+                                    {% if resume.QA_Lead %}
+                                    {{ resume.QA_Lead }}
+                                    {% else %} 
                                     <button class="btn btn-primary" id="btn_role{{resume.id}}" onclick="showRoleInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
                                     <div style="display: none;" id="role{{resume.id}}">
                                         <input type="text" id="roleInput{{resume.id}}">
                                         <center><button class="btn btn-primary sub" id="submitBtnRole{{resume.id}}" onclick="submitRole({{resume.id}})">Submit</button></center>
                                     </div>
                                     <div id="div_role{{resume.id}}" style="display: none;" onclick="editRole({{resume.id}})"></div>  
+                                    {% endif %}
                                 </td>
                                 <td>
+                                    {% if resume.Location %}
+                                    {{ resume.Location }}
+                                    {% else %} 
                                     <button class="btn btn-primary" id="btn_location{{resume.id}}" onclick="showLocationInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
                                     <div style="display: none;" id="location{{resume.id}}">
                                         <input type="text" id="locationInput{{resume.id}}">
                                         <center><button class="btn btn-primary sub" id="submitBtnLocation{{resume.id}}" onclick="submitLocation({{resume.id}})">Submit</button></center>
                                     </div>
-                                    <div id="div_location{{resume.id}}" style="display: none;" onclick="editLocation({{resume.id}})"></div>  
+                                    <div id="div_location{{resume.id}}" style="display: none;" onclick="editLocation({{resume.id}})"></div>
+                                    {% endif %}  
+                                </td>
+                                <td>
+                                    {{resume.Role}}
+                                </td>
+                                <td>
+                                    <div>
+                                        {% if resume.Expected_CTC %}
+                                            <p>Expected CTC: {{ resume.Expected_CTC }}</p>
+                                        {% endif %}
+
+                                        {% if resume.Actual_CTC %}
+                                            <p>Actual CTC: {{ resume.Actual_CTC }}</p>
+                                        {% endif %}
+
+                                        {% if resume.Notice_period %}
+                                            <p>Notice Period: {{ resume.Notice_period }}</p>
+                                        {% endif %}
+
+                                        {% if not (resume.Expected_CTC or resume.Actual_CTC or resume.Notice_period) %}
+                                            <p>Nil</p>
+                                        {% endif %}
+
+                                    </div>
                                 </td>
                                 <td>
                                     <div>
@@ -199,7 +278,7 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                <div style="display: flex !important; align-items: center !important; gap: 2rem; align-items: center; margin-top: 10rem; margin-left:35%;">
+                <div style="display: flex !important; align-items: center !important; gap: 2rem; align-items: center; margin-top: 10rem; margin-left:25%; position: fixed;">
                 <div>
                     {% for page_num in resumes.iter_pages(left_edge=1,right_edge=1,left_current=1,right_current=2) %}
                     {% if page_num %}

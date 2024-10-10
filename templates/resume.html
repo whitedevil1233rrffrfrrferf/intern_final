@@ -28,6 +28,28 @@
             <label for="file" class="label">Upload a File:</label>
             <input type="file" id="file" name="file" class="file-input" accept=".pdf,.docx" required multiple style="width:40%;">
             <button type="submit" class="btn btn-primary submit" style="margin-left: 0px;">Upload</button>
+            
+          </form>
+          <form style="margin-left:6rem;" action="/excel_resume" enctype="multipart/form-data" method="POST">
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+              <div style="display: block; margin-top: 2rem;">
+                <label for="month" class="label">Month:</label>
+                <select name="month" id="month" required>
+                  <option value="" disabled>Select a month</option>
+                  {% for month in months %}
+                      <option value="{{ month }}">{{ month }}</option>
+                  {% endfor %}
+                </select>
+                
+              </div>
+              <div>
+                <label for="file" class="label">Upload a File:</label>
+                <input type="file" id="file" name="file" class="file-input" accept=".xlsx" required multiple style="width:40%;">
+                <button type="submit" class="btn btn-primary submit" style="margin-left: 0px;">Upload</button>
+                
+              </div>
+            </div>
+            
           </form>
         </div>
         

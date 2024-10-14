@@ -8,6 +8,7 @@
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='employee.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script>
         window.onload=function(){
             {% for resume in resumes %}
@@ -43,6 +44,23 @@
 
         }
     </script>
+    <script type="text/javascript">
+      (function(){
+          emailjs.init("{{ public_key }}");
+          
+      })();
+      </script>
+    <script type="text/javascript">
+        
+        const confg = {
+            service_id: '{{EMAILJS_SERVICE_ID}}',
+            template_id: '{{ EMAILJS_TEMPLATE_ID }}',
+            user_id: '{{ EMAILJS_USER_ID }}'
+            
+        };
+        
+        
+    </script>
 </head>
 <body>
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -63,10 +81,10 @@
     <div class="first_div">
         {% include 'sidemenu.html'%}
 
-        <div style=" margin-left:8rem;overflow-x: auto;width: 140%;">
+        <div style=" margin-left:8rem;overflow-x: auto;width: 140%;overflow-y:scroll;height:500%;">
             <div class="filters" style="margin-bottom: 20px;">
                 <h1 style="text-align: center;  background-color:#4699F9;color: white">Employee resumes</h1>
-                <div class="flex" style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="flex" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
                     <div style="margin-bottom: 20px; margin-top: 20px;">
                         <label for="introFilter" >Intro Call Status:</label>
                         <select  id="introFilter" onchange="filterTableByIntroStatus()" style="margin-bottom: 20px; margin-top: 20px;">
@@ -74,14 +92,14 @@
                             
                         </select>
                     </div>
-                    <div style="margin-bottom: 20px; margin-top: 20px;">
+                    <div style="margin-bottom: 10px; margin-top: 20px;">
                         <label for="interview1Filter" >Interview 1 Status:</label>
                         <select id="interview1Filter" onchange="filterTableByInterview1Status()" style="margin-bottom: 20px; margin-top: 20px;">
                             <option value="">Select</option>
                             
                         </select>
                     </div>
-                    <div style="margin-bottom: 20px; margin-top: 20px;">
+                    <div style="margin-bottom:10px; margin-top: 20px;">
                         <label for="interview2Filter">Interview 2 Status:</label>
                         <select id="interview2Filter" onchange="filterTableByInterview2Status()" style="margin-bottom: 20px; margin-top: 20px;">
                             <option value="">Select</option>
@@ -94,12 +112,30 @@
                             <option value="">Select</option>
                         </select>
                     </div>
-                    <div style="margin-bottom: 20px; margin-top: 20px;">
+                     <div style=" flex-basis: 100%;"></div>
+                    <div style="display: flex; gap: 2rem; align-items: center; justify-content: space-around;">
+                        <div style="margin-bottom: 20px;"">
                         <label for="month">Month:</label>
-                        <select id="month"  style="margin-bottom: 20px; margin-top: 20px;">
-                            <option value="">Select</option>
-                            <option value="">January</option>
+                        <select id="month" onchange="filterByMonth()" style="margin-bottom: 20px; margin-top: 20px;">
+                            {% for month in months %}
+                                <option value="{{ month }}" 
+                                    
+                                    {% if not selected_month and month == current_month %}
+                                        selected
+                                    {% elif selected_month and month == selected_month %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ month }}
+                                </option>
+                    {% endfor %}
                         </select>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <a href="/employee_management">
+                            <button class="btn btn-primary" style="width:7rem!important;" onclick="sendEmail()">Send Mail</button>
+                        </a>
+                    </div>    
                     </div>
                 </div>
             </div>
@@ -119,6 +155,7 @@
                         <col style="width:8%;"> <!-- Location -->
                         <col style="width: 10%;"> <!-- Role -->
                         <col style="width:12%;"> <!-- Others -->
+                        <col style="width:8%;"> <!-- Month -->
                         <col style="width:10%;">  <!-- Action -->
                         <col style="width:8%;"> <!-- Interview Details -->
                         <col style="width: 5%;">  <!-- Delete -->
@@ -136,6 +173,7 @@
                             <th scope="col">Location</th>   
                             <th scope="col">Role</th>
                             <th scope="col">Others</th>
+                            <th scope="col">Month</th>
                             <th scope="col">Action</th>
                             <th scope="col">Interview Details</th>
                             <th scope="col">Delete</th>
@@ -258,6 +296,7 @@
 
                                     </div>
                                 </td>
+                                <td>{{resume.Month}}</td>
                                 <td>
                                     <div>
                                         <a id="introButton{{ resume.id }}" href="{{ url_for('introCall', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2 " title="Intro call">Intro</a>
@@ -269,7 +308,7 @@
                                 </td>
                                <td><a href="{{url_for('resume_details',resume_id=resume.id)}}" class="btn btn-primary mx-1" title="view"><i class="fa-solid fa-eye mx-2" style="color:white;"></i></a></td>
                                <td>
-                                    <form action="{{ url_for('delete_resume', resume_id=resume.id) }}" method="POST" onsubmit="return handleDelete({{resume.id}}, this, '{{ resume.filename }}')">
+                                    <form action="{{ url_for('delete_resume', resume_id=resume.id,month=selected_month) }}" method="POST" onsubmit="return handleDelete({{resume.id}}, this, '{{ resume.filename }}')">
                                         <button type="submit" class="btn btn-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
                                     </form>
                                 </td>
@@ -278,14 +317,14 @@
                         {% endfor %}
                     </tbody>
                 </table>
-                <div style="display: flex !important; align-items: center !important; gap: 2rem; align-items: center; margin-top: 10rem; margin-left:25%; position: fixed;">
+                <div style="display: flex !important; align-items: center !important; gap: 2rem; align-items: center; margin-top: 10rem; margin-left:25%; ">
                 <div>
                     {% for page_num in resumes.iter_pages(left_edge=1,right_edge=1,left_current=1,right_current=2) %}
                     {% if page_num %}
                     {% if resumes.page == page_num%}
-                        <a class="btn btn-info mb-4" href="{{url_for('employee',page=page_num)}}" style="color: black;  ">{{page_num}}</a>
+                        <a class="btn btn-info mb-4" href="{{url_for('employee',page=page_num,month=selected_month)}}" style="color: black;  ">{{page_num}}</a>
                     {% else %}
-                        <a class="btn btn-outline-info mb-4" href="{{url_for('employee',page=page_num)}}" style="color: black; ">{{page_num}}</a>
+                        <a class="btn btn-outline-info mb-4" href="{{url_for('employee',page=page_num,month=selected_month)}}" style="color: black; ">{{page_num}}</a>
                     {% endif %}
                     {% else%}
                     ...
@@ -293,7 +332,7 @@
                 {% endfor %}
                     </div>
                 <div>
-                    <form method="POST">
+                    <form method="POST" action="{{ url_for('employee',month=selected_month) }}">
                     Select Page Size:
                     <select name="page_size" class="option" style="width: 5rem !important; margin-bottom: 2rem;font-size:16px;">
                         {% for option in page_size_options %}
@@ -301,6 +340,7 @@
                         {% endfor %}
                     </select>
                     <button type="submit" class="btn btn-primary" style="width:9rem!important; margin-left:20px !important;">Change Page Size</button>
+                    <input type="hidden" name="month" value="{{ selected_month }}">
                     </form>
                 </div>
                 
@@ -384,6 +424,16 @@
         return true;
         }
     </script>
+    <script>
+        function filterByMonth() {
+            const selectedMonth = document.getElementById("month").value;
+            const url = new URL(window.location.href);
+            url.searchParams.set("month", selectedMonth); // Add selected month to URL
+
+            window.location.href = url; // Redirect to the same page with the selected month
+        }
+    </script>
+    
 </body>
 </html>
 

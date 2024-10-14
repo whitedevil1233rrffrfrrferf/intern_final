@@ -349,3 +349,21 @@ function editLocation(resumeId) {
     document.getElementById('submitBtnLocation' + resumeId).style.display = 'block';
     document.getElementById('locationInput' + resumeId).style.display = 'block'; // Ensure input is visible
 }
+
+function sendEmail() {
+    const templateParams = {
+     // Replace with your actual input field ID
+    resume_table_html: `{{ resume_table_html | safe }`
+};
+
+emailjs.send(confg.service_id, confg.template_id, templateParams)
+.then(function(response) {
+    alert(config.service_id)
+    alert("y")
+    console.log('SUCCESS!', response.status, response.text);
+    alert('Email sent successfully!');
+}, function(error) {
+    console.log('FAILED...', error);
+    alert('Failed to send email.');
+});
+}

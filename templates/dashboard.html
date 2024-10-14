@@ -40,11 +40,36 @@
             </div>
           </div>
           <div class="col">
-            <div class="card h-100">
-              <div class="card-body">
-                <img src="https://banner2.cleanpng.com/20190724/geb/kisspng-product-design-technology-font-5d385089740a08.2768103715639717214753.jpg" height="50px" width="50px" class="icons">
-                <p class="card-text">No of Applications: {{total_resumes}}</p>
-                <p class="card-text">No of applications selected :{{hr_selected}}</p>
+            <div class="card h-80">
+              <div class="card-body" style="max-height:12.8rem; overflow-y: auto;">
+                <img src="https://banner2.cleanpng.com/20190724/geb/kisspng-product-design-technology-font-5d385089740a08.2768103715639717214753.jpg" height="50px" width="50px" class="icons" style="margin-bottom: 10px;">
+                
+                {% for role, data in statistics.items() %}
+                  <h5>{{role}}</h5>
+                  <p class="card-text">
+                    <strong>Intro: </strong> 
+                    Selected: {{ data.intro.selected }}, Rejected: {{ data.intro.rejected }}
+                </p>
+
+                <!-- Interview 1 phase -->
+                <p class="card-text">
+                    <strong>Interview 1: </strong> 
+                    Selected: {{ data.interview1.selected }}, Rejected: {{ data.interview1.rejected }}
+                </p>
+
+                <!-- Interview 2 phase -->
+                <p class="card-text">
+                    <strong>Interview 2: </strong> 
+                    Selected: {{ data.interview2.selected }}, Rejected: {{ data.interview2.rejected }}
+                </p>
+
+                <!-- HR phase -->
+                <p class="card-text">
+                    <strong>HR: </strong> 
+                    Selected: {{ data.hr.selected }}, Rejected: {{ data.hr.rejected }}
+                </p>
+                <hr>
+                {% endfor %}
               </div>
             </div>
           </div>

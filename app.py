@@ -1,6 +1,6 @@
-from flask import Flask, render_template,request,redirect,url_for,jsonify,send_from_directory,session,make_response,abort,flash
+from flask import Flask, render_template,request,redirect,url_for,jsonify,send_from_directory,session,make_response,abort,flash,render_template_string
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import extract,func,or_
+from sqlalchemy import extract,func,or_,ForeignKey
 from sqlalchemy.sql.expression import extract
 from openpyxl import load_workbook
 from datetime import date,datetime
@@ -17,9 +17,11 @@ from flask import current_app
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from google.auth.transport import requests
+import requests as req
 import secrets
 from dotenv import load_dotenv
 import time
+
 load_dotenv()
 app = Flask(__name__)
 profile_images_upload_folder = 'static/profile_images'
@@ -43,6 +45,7 @@ app.config['SQLALCHEMY_BINDS']={'login':"sqlite:///login.db",
                                 'dmax_jrqaeng':"sqlite:///dmax_jrqaeg.db",
                                 'dmax_qaeng':"sqlite:///dmax_qaeg.db",
                                 'dmax_srqaeng':"sqlite:///dmax_srqaeg.db"
+                                
                                 }
                                   
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -98,6 +101,8 @@ class Employee(db.Model):
     employee_status=db.Column(db.String(500))
 
 
+
+
 class Login(db.Model):
     __bind_key__="login"
     id=db.Column(db.Integer,primary_key=True)
@@ -116,6 +121,7 @@ class Delete_user(db.Model):
 
 class Resume(db.Model):
     __bind_key__="resume"  
+    __tablename__ = 'resume' 
     id=db.Column(db.Integer,primary_key=True)
     filename=db.Column(db.String(255), nullable=False)  
     Name=db.Column(db.String(255))
@@ -130,15 +136,18 @@ class Resume(db.Model):
     Expected_CTC=db.Column(db.String(255))
     Actual_CTC=db.Column(db.String(255))
     Notice_period=db.Column(db.String(255))
+    Month=db.Column(db.String(255))
     
 class Intro(db.Model):
     __bind_key__="intro"
+    __tablename__ = 'intro'
     id=db.Column(db.Integer,primary_key=True)
     Date=db.Column(db.String(200))
     Status=db.Column(db.String(200))
     Comments=db.Column(db.String(200))
     resumeId = db.Column(db.Integer)  
     SelectedPanel=db.Column(db.String(200))  
+    
 
 class Interview1(db.Model):
     __bind_key__="interview1" 
@@ -250,6 +259,69 @@ class Dmax_sr_qa_eng(db.Model):
     Skill = db.Column(db.Float)
     New_initiatives= db.Column(db.Float) 
     OverallDmaxScore = db.Column(db.Float)    
+
+def get_distinct_statistics():
+    # Querying distinct roles from the Resume table
+    distinct_roles = db.session.query(Resume.Role).distinct().all()
+    roles_list=[role[0] for role in distinct_roles]
+    statistics={}
+    for role in roles_list:
+        # Get all resume IDs for the current role
+        resume_ids = db.session.query(Resume.id).filter(Resume.Role == role).all()        
+        resume_ids = [resume_id[0] for resume_id in resume_ids]
+
+        selected_intro = db.session.query(Intro).filter(Intro.resumeId.in_(resume_ids), Intro.Status == 'Move to Interview 1').count()
+        rejected_intro= db.session.query(Intro).filter(Intro.resumeId.in_(resume_ids), Intro.Status == 'Rejected').count()
+
+        #interview1
+        selected_interview1 = db.session.query(Interview1).filter(Interview1.resumeId.in_(resume_ids), Interview1.Status == 'Move to Interview 2').count()
+        rejected_interview1 = db.session.query(Interview1).filter(Interview1.resumeId.in_(resume_ids), Interview1.Status == 'Rejected').count()
+
+        #interview2
+        selected_interview2 = db.session.query(Interview2).filter(Interview2.resumeId.in_(resume_ids), Interview2.Status == 'Move to HR Round').count()
+        rejected_interview2 = db.session.query(Interview2).filter(Interview2.resumeId.in_(resume_ids), Interview2.Status == 'Rejected').count()
+
+        #HR
+        selected_hr = db.session.query(Hr).filter(Hr.resumeId.in_(resume_ids), Hr.Status == 'Move to HR Process').count()
+        rejected_hr = db.session.query(Hr).filter(Hr.resumeId.in_(resume_ids), Hr.Status == 'Rejected').count()
+
+        statistics[role] = {
+             'intro': {
+                'selected': selected_intro,
+                'rejected': rejected_intro
+            },
+            'interview1': {
+                'selected': selected_interview1,
+                'rejected': rejected_interview1
+            },
+            'interview2': {
+                'selected': selected_interview2,
+                'rejected': rejected_interview2
+            },
+            'hr': {
+                'selected': selected_hr,
+                'rejected': rejected_hr
+            }
+        }
+    return(statistics)    
+
+def generate_html_table(resume_details):
+    html = '<table border="1" style="width:100%; border-collapse: collapse;">'
+    html += '<tr><th>Name</th><th>Role</th><th>Experience</th><th>Location</th><th>Actual CTC</th><th>Expected CTC</th><th>Phone</th><th>Email</th></tr>'
+    for detail in resume_details:
+        html += f'<tr>'
+        html += f'<td>{detail["Name"]}</td>'
+        html += f'<td>{detail["Role"]}</td>'
+        html += f'<td>{detail["Experience"]}</td>'
+        html += f'<td>{detail["Location"]}</td>'
+        html += f'<td>{detail["Actual CTC"]}</td>'
+        html += f'<td>{detail["Expected CTC"]}</td>'
+        html += f'<td>{detail["Phone"]}</td>'
+        html += f'<td>{detail["Email"]}</td>'
+        html += f'</tr>'
+    html += '</table>'
+    return html
+
 def get_month_from_date(date_str):
     """Extracts month from 'yyyy-mm-dd' format date string."""
     return date_str.split('-')[1] if date_str else None               
@@ -328,36 +400,61 @@ def extract_data_from_excel():
     
     db.session.commit()
 
-def extract_excel_resume():
-    column_mappings = {
-        'Sno': 0,
-        'Emp_id': 1,
-        'Name': 2,
-        'Designation': 3,
-        'Department': 4,
-        'Project': 5,
-        'Job_role': 6,
-        'Employment_status': 7,
-        'Joining_date': 8,
-        'Experience': 9,
-        'Location': 10,
-        'Last_promoted': 11,
-        'Comments': 12
-    }
-    for row in ws.iter_rows(min_row=2, values_only=True):
+# def extract_excel_resume():
+#     column_mappings = {
+#         'Sno': 0,
+#         'Emp_id': 1,
+#         'Name': 2,
+#         'Designation': 3,
+#         'Department': 4,
+#         'Project': 5,
+#         'Job_role': 6,
+#         'Employment_status': 7,
+#         'Joining_date': 8,
+#         'Experience': 9,
+#         'Location': 10,
+#         'Last_promoted': 11,
+#         'Comments': 12
+#     }
+#     for row in ws.iter_rows(min_row=2, values_only=True):
         
-        if not all(cell is None for cell in row):
-            Sno = row[column_mappings['Sno']]
-            Emp_id = row[column_mappings['Emp_id']]
-            Name = row[column_mappings['Name']]
-            Designation = row[column_mappings['Designation']]
-            Department = row[column_mappings['Department']]
-            Project = row[column_mappings['Project']]
-            Job_role = row[column_mappings['Job_role']]
-            Employment_status = row[column_mappings['Employment_status']]
-            Joining_date = row[column_mappings['Joining_date']]
-            Experience = row[column_mappings['Experience']]
+#         if not all(cell is None for cell in row):
+#             Sno = row[column_mappings['Sno']]
+#             Emp_id = row[column_mappings['Emp_id']]
+#             Name = row[column_mappings['Name']]
+#             Designation = row[column_mappings['Designation']]
+#             Department = row[column_mappings['Department']]
+#             Project = row[column_mappings['Project']]
+#             Job_role = row[column_mappings['Job_role']]
+#             Employment_status = row[column_mappings['Employment_status']]
+#             Joining_date = row[column_mappings['Joining_date']]
+#             Experience = row[column_mappings['Experience']]
+def send_email_via_emailjs(html_content):
+    # Use your existing EmailJS configuration
+    EMAILJS_USER_ID=os.environ.get('EMAILJS_PUBLIC_KEY')
+    EMAILJS_SERVICE_ID=os.environ.get('EMAILJS_SERVICE_ID')
+    EMAILJS_TEMPLATE_ID=os.environ.get('EMAILJS_TEMPLATE_ID_TABLE')
 
+    
+    
+
+    data = {
+        "service_id": EMAILJS_SERVICE_ID,
+        "template_id": EMAILJS_TEMPLATE_ID,
+        "user_id": EMAILJS_USER_ID,
+        "template_params": {
+            "html_content": html_content,
+            "subject": "Candidate Details",
+            "recipient_email": "varunrram2003@gmail.com"  # The recipient's email
+        }
+    }
+    print(html_content)
+    response = req.post('https://api.emailjs.com/api/v1.0/email/send', json=data)
+
+    if response.status_code == 200:
+        print("Email sent successfully!")
+    else:
+        print("Failed to send email:", response.text)
 def process_and_insert_data(row, designation):
     
     if designation == 'intern':
@@ -700,8 +797,10 @@ def dashboard_function():
 @app.context_processor
 def inject_total_employees():
     total_employees,active_employees,resigned_employees,total_resumes,hr_selected,current_year_count, last_year_count,Chennai_employees_count,kollu_employees_count,kaup_employees_count,tn_palyam_count,employment_status_counts, project_status_counts=dashboard_function()
+    statistics=get_distinct_statistics()
     return dict(total_employees=total_employees,active_employees=active_employees,resigned_employees=resigned_employees,total_resumes=total_resumes,hr_selected=hr_selected,current_year_count=current_year_count, last_year_count=last_year_count,Chennai_employees_count=Chennai_employees_count,kollu_employees_count=kollu_employees_count,kaup_employees_count=kaup_employees_count,tn_palyam_count=tn_palyam_count,employment_status_counts=employment_status_counts,
-                project_status_counts=project_status_counts)
+                project_status_counts=project_status_counts,statistics=statistics)
+
 @app.route("/",methods=["GET","POST"])
 def signPage():
     correct_user=None
@@ -992,6 +1091,8 @@ def Delete(sno):
     return redirect("/home")
 with app.app_context():
         db.create_all()
+        roles = get_distinct_statistics()
+        # print("Distinct Roles:", roles)
         # data=extract_data_from_excel()
 
 @app.route("/bulk",methods=["GET","POST"])
@@ -1104,7 +1205,7 @@ def register():
             photo=request.files['photo']
             if photo.filename!='':
                 filename=secure_filename(photo.filename)
-                print(filename)
+                # print(filename)
                 file_path=os.path.join(app.config['PROFILE_IMAGE_UPLOAD_FOLDER'],filename)
                 photo.save(file_path)
         user=Login(email=email,password=password,Role=role,Name=name,MobileNumber=mobile,photo_filename=filename)
@@ -1125,6 +1226,7 @@ def get_employees_list(employment_status):
 def resume():
     flash_message=None
     months=["January","February","March","April","May","June","July","August","September","October","November","December"]
+    current_month = datetime.now().strftime("%B")
     if request.method=="POST":
         selected_tag=request.form['tag']
         files=request.files.getlist('file')
@@ -1137,7 +1239,7 @@ def resume():
                 if not os.path.exists(target_path):
                     file.save(target_path)
                     
-                    resume=Resume(filename=new_filename)
+                    resume=Resume(filename=new_filename,Month=current_month)
                     db.session.add(resume)
                     db.session.commit()
                     sucessfully_uploaded=True
@@ -1187,9 +1289,38 @@ def resume():
 
 @app.route("/employee_management", methods=["GET", "POST"])
 def employee():
+    EMAILJS_USER_ID=os.environ.get('EMAILJS_PUBLIC_KEY')
+    public_key=os.environ.get('EMAILJS_PUBLIC_KEY')
+    EMAILJS_SERVICE_ID=os.environ.get('EMAILJS_SERVICE_ID')
+    EMAILJS_TEMPLATE_ID=os.environ.get('EMAILJS_TEMPLATE_ID_TABLE')
+    #email.js
+    accepted_interviews = db.session.query(Interview1.resumeId).filter_by(Status='Move to Interview 2').all()
+    accepted_resume_ids = [interview.resumeId for interview in accepted_interviews]
+
+    # Fetch resumes based on accepted interview IDs
+    resumes = db.session.query(Resume).filter(Resume.id.in_(accepted_resume_ids)).all()
+    resume_details = []
+
+    for resume in resumes:
+        # Extracting relevant fields dynamically from the resume object
+        details = {
+            'Name': resume.Name,
+            'Role': resume.Role,
+            'Experience': resume.Experience,
+            'Location': resume.Location,
+            'Month': resume.Month,
+            'Actual CTC': resume.Actual_CTC,
+            'Expected CTC': resume.Expected_CTC,
+            'Phone': resume.Phone,
+            'Email': resume.Email
+        }
+        resume_details.append(details)
+        resume_table_html = generate_html_table(resume_details)
+        
+
     default_page_size = 10
     page_size_options = [10, 20, 30, 40, 50]
-
+    months=["January","February","March","April","May","June","July","August","September","October","November","December"]
     if request.method == "POST":
         selected_page_size = int(request.form.get("page_size", default_page_size))
         session['page_size'] = selected_page_size
@@ -1197,13 +1328,19 @@ def employee():
         return redirect(url_for('employee', page=1))
     else:
         selected_page_size = session.get('page_size', default_page_size)
-
+    
+    
+    current_month = datetime.now().strftime("%B")
+    selected_month = request.args.get("month", current_month)
+    query = Resume.query
+    if selected_month:
+        query = query.filter(Resume.Month == selected_month)
     page = request.args.get('page', 1, type=int)
-    total_items = Resume.query.count()
+    total_items =query.count()
 
     # Handle case where there are no items
     if total_items == 0:
-        data = Resume.query.paginate(page=1, per_page=selected_page_size)
+        data =query.paginate(page=1, per_page=selected_page_size)
         start_index = 0
         total_pages = 1
     else:
@@ -1217,14 +1354,14 @@ def employee():
             page = new_page_count
 
         start_index = (page - 1) * selected_page_size
-        data = Resume.query.paginate(page=page, per_page=selected_page_size)
+        data = query.paginate(page=page, per_page=selected_page_size)
         total_pages = data.pages
         
     return render_template("employee.html", resumes=data,
                            page_size_options=page_size_options,
                            selected_page_size=selected_page_size,
                            total_items=total_items, total_pages=total_pages,
-                           start_index=start_index)
+                           start_index=start_index,months=months,current_month=current_month,selected_month=selected_month,resume_table_html=resume_table_html,EMAILJS_USER_ID=EMAILJS_USER_ID,EMAILJS_SERVICE_ID=EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID=EMAILJS_TEMPLATE_ID,public_key=public_key)
 
 
 @app.route("/view_resume/<filename>")
@@ -1237,7 +1374,7 @@ def view_resume(filename):
     if filename.endswith('.docx'):
         response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         response.headers['Content-Disposition'] = f'inline; filename={filename}'
-        print(response.headers['Content-Type'],response.headers['Content-Disposition'])
+        # print(response.headers['Content-Type'],response.headers['Content-Disposition'])
     elif filename.endswith('.pdf'):
         response.headers['Content-Type'] = 'application/pdf'
         response.headers['Content-Disposition'] = f'inline; filename={filename}'
@@ -1270,7 +1407,7 @@ def zip():
                             if allowed_files(filename):
                                 tag_filename=f"{selected_tag}_{filename}"
                                 target_path=os.path.join(app.config['UPLOAD_FOLDER'], tag_filename)
-                                print("File")
+                                # print("File")
                                 if not os.path.exists(target_path):
                                     shutil.move(file_path,target_path)
                                     resume=Resume(filename=tag_filename)
@@ -1602,7 +1739,7 @@ def profile():
         pic=session.get('picture')
         
         picture=pic if pic else ""
-        print(picture)
+        # print(picture)
 
         filename = user.photo_filename
         return render_template("profile.html",emailId=emailId,password=password,role=role,name=name,mobile=mobile,filename=filename,picture=picture)
@@ -1789,6 +1926,7 @@ def complete_registration():
 
 @app.route("/delete_resume/<int:resume_id>", methods=["POST"])
 def delete_resume(resume_id):
+    selected_month = request.args.get('month')
     resume = Resume.query.get_or_404(resume_id)
     resume_folder = 'static/files'
     file_path = os.path.join(resume_folder, resume.filename)
@@ -1801,7 +1939,7 @@ def delete_resume(resume_id):
     if os.path.exists(file_path):
         os.remove(file_path)
 
-    return redirect(url_for('employee'))
+    return redirect(url_for('employee', month=selected_month))
 
 
 @app.route('/dmax_upload', methods=['GET', 'POST'])
@@ -1915,7 +2053,7 @@ def dmax_view():
         elif role == 'qa_eng':
             if designation:
                 qa_data = qa_data.filter_by(Designation=designation)
-                print("h")
+                # print("h")
                 
             if location:
                 qa_data = qa_data.filter_by(Centre=location)
@@ -2217,6 +2355,7 @@ def qareq():
 @app.route("/excel_resume", methods=['GET', 'POST'])
 def excel_resume():
     if request.method=="POST":
+        current_month = datetime.now().strftime("%B")
         
         if 'file' not in request.files:
             flash('No file part')
@@ -2250,7 +2389,7 @@ def excel_resume():
                         suggestions=row[12]
                         link=row[13]
                         role = map_role_based_on_experience(experience)
-                        print(result,current_ctc,expecting_ctc,notice_period,suggestions)
+                        # print(result,current_ctc,expecting_ctc,notice_period,suggestions)
                         existing_employee =Resume.query.filter_by(Name=name).first()
                         if not existing_employee:
                             
@@ -2267,7 +2406,8 @@ def excel_resume():
                                 Role=role,
                                 Actual_CTC=current_ctc,
                                 Expected_CTC=expecting_ctc,
-                                Notice_period=notice_period
+                                Notice_period=notice_period,
+                                Month=current_month
                             )
                             
                             db.session.add(new_candidate)
@@ -2275,7 +2415,51 @@ def excel_resume():
                             
             except:
                 pass    
-    return redirect("/resume")        
+    return redirect("/resume")  
+
+@app.route("/send_mail")
+def send_mail():
+    # Fetch accepted interviews
+    
+
+    html_content = render_template_string('''
+        <body>
+            <h2>Candidate Details</h2>
+            <table border="1" style="width:100%; border-collapse: collapse;">
+              <tr>
+                <th>Name</th>
+                <th>Details</th>
+                <th>Phone</th>
+                <th>Email</th>
+              </tr>
+              {% for resume in resume_details %}
+              <tr>
+                <td>{{ resume.Name }}</td>
+                <td>
+                  Role: {{ resume.Role }}<br>
+                  Experience: {{ resume.Experience }}<br>
+                  Location: {{ resume.Location }}<br>
+                  Date of Joining: {{ resume.Date_of_Joining }}<br>
+                  Actual CTC: {{ resume.Actual_CTC }}<br>
+                  Expected CTC: {{ resume.Expected_CTC }}<br>
+                  Feedback: {{ resume.Feedback }}
+                </td>
+                <td>{{ resume.Phone }}</td>
+                <td>{{ resume.Email }}</td>
+              </tr>
+              {% endfor %}
+            </table>
+        </body>
+    ''', resume_details=resume_details)
+
+    # Send email using EmailJS
+    send_email_via_emailjs(html_content)
+
+    return "Email sent successfully!"    
+
+    print(resume_details)
+
+         
 if __name__ == "__main__":
     app.run(debug=True)
 

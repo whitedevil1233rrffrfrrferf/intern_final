@@ -325,6 +325,8 @@ def get_distinct_statistics():
         }
     return(statistics)    
 
+
+
 def send_email_with_file_link(file_link,EMAILJS_PUBLIC_KEY,EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID):
     email_data = {
         'service_id': EMAILJS_SERVICE_ID,
@@ -2726,8 +2728,11 @@ def edit_employee_resume(employee_id):
         db.session.commit()
         flash('Successfully updated!', 'success')
     return render_template("update_resume.html",resume=resume)
-       
+
+
+
 if __name__ == "__main__":
+    
     app.run(debug=True)
 
 

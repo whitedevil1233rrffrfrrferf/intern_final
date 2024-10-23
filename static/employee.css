@@ -82,6 +82,10 @@ label{
     font-size:18px; 
     color: #4699F9 !important;
 }
-select{
+.wrap-text{
     
+    max-width:5.3rem!important;
+    overflow-wrap: break-word; /* Breaks long words */
+    word-wrap: break-word; /* For older browsers */
+    white-space: normal; 
 }

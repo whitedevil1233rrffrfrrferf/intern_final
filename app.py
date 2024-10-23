@@ -2,7 +2,7 @@ from flask import Flask, render_template,request,redirect,url_for,jsonify,send_f
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import extract,func,or_,ForeignKey
 from sqlalchemy.sql.expression import extract
-from openpyxl import load_workbook
+from openpyxl import load_workbook,Workbook
 from datetime import date,datetime
 from dateutil.parser import parse
 from flask_migrate import Migrate
@@ -17,10 +17,15 @@ from flask import current_app
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from google.auth.transport import requests
+from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
+from googleapiclient.http import MediaFileUpload,MediaIoBaseUpload
 import requests as req
 import secrets
 from dotenv import load_dotenv
 import time
+import io
+import re
 
 load_dotenv()
 app = Flask(__name__)
@@ -62,12 +67,14 @@ PUBLIC_KEY=os.environ.get('EMAILJS_PUBLIC_KEY')
 SERVICE_ID=os.environ.get('EMAILJS_SERVICE_ID')
 TEMPLATE_ID=os.environ.get('EMAILJS_TEMPLATE_ID')
 
-# REDIRECT_URI='http://localhost:5000/google_sign_in'
+# REDIRECT_URI='http://localhost:5000/google_sign_in' # for oauth sign in
+# REDIRECT_URI_DRIVE='http://localhost:5000/google_drive_callback' #for google_drive
 REDIRECT_URI = 'https://intern-final-0b4w.onrender.com/google_sign_in'
-
+REDIRECT_URI_DRIVE='https://intern-final-0b4w.onrender.com/google_drive_callback'
 
 
 SCOPES = ['openid', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
+drive_scopes=['https://www.googleapis.com/auth/drive']
 
 flow = Flow.from_client_config(
     {
@@ -80,6 +87,19 @@ flow = Flow.from_client_config(
         }
     },
     scopes=SCOPES
+)
+
+drive_flow = Flow.from_client_config(
+    {
+        "web": {
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+            "redirect_uris": [REDIRECT_URI_DRIVE],
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+        }
+    },
+    scopes=drive_scopes
 )
 
 db = SQLAlchemy(app)
@@ -129,7 +149,7 @@ class Resume(db.Model):
     Qualification=db.Column(db.String(255))
     Phone=db.Column(db.String(255))
     Location=db.Column(db.String(255))
-    Experience=db.Column(db.String(255))
+    Experience=db.Column(db.Integer)
     QA_Lead=db.Column(db.String(255))
     Link=db.Column(db.String(255)) 
     Role=db.Column(db.String(255))
@@ -305,22 +325,86 @@ def get_distinct_statistics():
         }
     return(statistics)    
 
-def generate_html_table(resume_details):
-    html = '<table border="1" style="width:100%; border-collapse: collapse;">'
-    html += '<tr><th>Name</th><th>Role</th><th>Experience</th><th>Location</th><th>Actual CTC</th><th>Expected CTC</th><th>Phone</th><th>Email</th></tr>'
-    for detail in resume_details:
-        html += f'<tr>'
-        html += f'<td>{detail["Name"]}</td>'
-        html += f'<td>{detail["Role"]}</td>'
-        html += f'<td>{detail["Experience"]}</td>'
-        html += f'<td>{detail["Location"]}</td>'
-        html += f'<td>{detail["Actual CTC"]}</td>'
-        html += f'<td>{detail["Expected CTC"]}</td>'
-        html += f'<td>{detail["Phone"]}</td>'
-        html += f'<td>{detail["Email"]}</td>'
-        html += f'</tr>'
-    html += '</table>'
-    return html
+def send_email_with_file_link(file_link,EMAILJS_PUBLIC_KEY,EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID):
+    email_data = {
+        'service_id': EMAILJS_SERVICE_ID,
+        'template_id': EMAILJS_TEMPLATE_ID,
+        'user_id': EMAILJS_PUBLIC_KEY,
+        'template_params': {
+            'file_link': file_link,  # Attach the Drive link to the email
+            'to_email': 'varunrram2003@gmail.com@example.com',  # Replace with the recipient's email address
+            'subject': 'Resumes Uploaded to Google Drive',
+            'message': f'Here is the link to the uploaded file: {file_link}'
+        }
+    }
+    print(email_data)
+    # Send the email using the EmailJS API
+    response = requests.post(
+        'https://api.emailjs.com/api/v1.0/email/send',
+        json=email_data,
+        headers={'Content-Type': 'application/json'}
+    )
+
+    if response.status_code == 200:
+        print('Email sent successfully!')
+    else:
+        print(f'Failed to send email: {response.text}')
+
+def credentials_to_dict(credentials):
+    
+    return {
+        'token': credentials['access_token'],  # Use the public token attribute
+        'refresh_token': credentials['refresh_token'],  # Use the public refresh_token attribute
+        'scopes': credentials.scopes
+    }
+
+# def generate_html_table(resume_details):
+#      # Start the HTML string with the table header
+#     html = '<table border="1" style="width:100%; border-collapse: collapse;">'
+#     html += '<tr><th>Name</th><th>Role</th><th>Experience</th><th>Location</th>'
+#     html += '<th>Actual CTC</th><th>Expected CTC</th><th>Phone</th><th>Email</th></tr>'
+
+#     # Create rows using a list comprehension
+#     rows = [
+#         '<tr>' +
+#         ''.join(f'<td>{detail["Name"]}</td><td>{detail["Role"]}</td><td>{detail["Experience"]}</td>'
+#                 f'<td>{detail["Location"]}</td><td>{detail["Actual_CTC"]}</td>'
+#                 f'<td>{detail["Expected_CTC"]}</td><td>{detail["Phone"]}</td>'
+#                 f'<td>{detail["Email"]}</td>') + 
+#         '</tr>'
+#         for detail in resume_details
+#     ]
+
+#     # Join all rows and add to the table
+#     html += ''.join(rows)
+#     html += '</table>'
+#     return html
+
+def create_excel_in_memory(resume_data):
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = 'Resumes'
+
+    # Adding headers
+    headers = ['Name', 'Role', 'Experience', 'Location', 'Actual CTC', 'Expected CTC', 'Phone', 'Email']
+    sheet.append(headers)
+
+    # Adding resume data to Excel
+    for resume in resume_data:  # <-- Using resume_data here
+        sheet.append([
+            resume['Name'],           # Adding 'Name'
+            resume['Role'],           # Adding 'Role'
+            resume['Experience'],     # Adding 'Experience'
+            resume['Location'],       # Adding 'Location'
+            resume['Actual_CTC'],     # Adding 'Actual CTC'
+            resume['Expected_CTC'],   # Adding 'Expected CTC'
+            resume['Phone'],          # Adding 'Phone'
+            resume['Email']           # Adding 'Email'
+        ])
+    output = io.BytesIO()
+    workbook.save(output)
+    output.seek(0)  # Rewind the BytesIO object for reading
+    return output   
 
 def get_month_from_date(date_str):
     """Extracts month from 'yyyy-mm-dd' format date string."""
@@ -752,20 +836,22 @@ def format_percentage(value):
 
 def map_role_based_on_experience(experience):
     # Convert months to years, assuming experience can be a float like 0.5 for 6 months
-    experience_in_years = float(experience)
+    if experience:
+        experience_in_years = float(experience)
     
-    # Define the role based on the years of experience
-    if experience_in_years >= 6:
-        return "QA Lead"
-    elif 4 <= experience_in_years < 6:
-        return "Sr. QA Engineer"
-    elif 2 <= experience_in_years < 4:
-        return "QA Engineer"
-    elif 0.5 <= experience_in_years < 2:
-        return "Jr. QA Engineer"
-    else:
-        return "QA Intern"
+        # Define the role based on the years of experience
+        if experience_in_years >= 6:
+            return "QA Lead"
+        elif 4 <= experience_in_years < 6:
+            return "Sr. QA Engineer"
+        elif 2 <= experience_in_years < 4:
+            return "QA Engineer"
+        elif 0.5 <= experience_in_years < 2:
+            return "Jr. QA Engineer"
+        else:
+            return "QA Intern"
 
+    return None
 def dashboard_function():
     total_employees=Employee.query.count()
     active_employees = Employee.query.filter_by(employee_status='active').count()
@@ -1227,8 +1313,10 @@ def resume():
     flash_message=None
     months=["January","February","March","April","May","June","July","August","September","October","November","December"]
     current_month = datetime.now().strftime("%B")
+    
     if request.method=="POST":
         selected_tag=request.form['tag']
+        month=request.form['month']
         files=request.files.getlist('file')
         sucessfully_uploaded=False
         for file in files:
@@ -1239,7 +1327,7 @@ def resume():
                 if not os.path.exists(target_path):
                     file.save(target_path)
                     
-                    resume=Resume(filename=new_filename,Month=current_month)
+                    resume=Resume(filename=new_filename,Month=month)
                     db.session.add(resume)
                     db.session.commit()
                     sucessfully_uploaded=True
@@ -1249,7 +1337,7 @@ def resume():
         if sucessfully_uploaded:
             flash('Resume(s) uploaded successfully!', 'success')                
         return redirect(url_for('resume'))        
-    return render_template("resume.html",months=months)
+    return render_template("resume.html",months=months,current_month=current_month)
 
 # @app.route("/employee_management", methods=["GET", "POST"])
 # def employee():
@@ -1289,35 +1377,17 @@ def resume():
 
 @app.route("/employee_management", methods=["GET", "POST"])
 def employee():
-    EMAILJS_USER_ID=os.environ.get('EMAILJS_PUBLIC_KEY')
+    
+    file_link = session.pop('file_link', None)
     public_key=os.environ.get('EMAILJS_PUBLIC_KEY')
     EMAILJS_SERVICE_ID=os.environ.get('EMAILJS_SERVICE_ID')
     EMAILJS_TEMPLATE_ID=os.environ.get('EMAILJS_TEMPLATE_ID_TABLE')
-    #email.js
-    accepted_interviews = db.session.query(Interview1.resumeId).filter_by(Status='Move to Interview 2').all()
-    accepted_resume_ids = [interview.resumeId for interview in accepted_interviews]
-
-    # Fetch resumes based on accepted interview IDs
-    resumes = db.session.query(Resume).filter(Resume.id.in_(accepted_resume_ids)).all()
-    resume_details = []
-
-    for resume in resumes:
-        # Extracting relevant fields dynamically from the resume object
-        details = {
-            'Name': resume.Name,
-            'Role': resume.Role,
-            'Experience': resume.Experience,
-            'Location': resume.Location,
-            'Month': resume.Month,
-            'Actual CTC': resume.Actual_CTC,
-            'Expected CTC': resume.Expected_CTC,
-            'Phone': resume.Phone,
-            'Email': resume.Email
-        }
-        resume_details.append(details)
-        resume_table_html = generate_html_table(resume_details)
-        
-
+    # Prepare the email template parameters
+    
+    search_query = request.args.get("search", "").strip()
+    
+    qa_lead_query = request.args.get('qa_lead', '').strip()
+    
     default_page_size = 10
     page_size_options = [10, 20, 30, 40, 50]
     months=["January","February","March","April","May","June","July","August","September","October","November","December"]
@@ -1333,7 +1403,11 @@ def employee():
     current_month = datetime.now().strftime("%B")
     selected_month = request.args.get("month", current_month)
     query = Resume.query
-    if selected_month:
+    if search_query:
+        query = query.filter(Resume.Name.ilike(f"%{search_query}%"))
+    if qa_lead_query:
+        query=query.filter(Resume.QA_Lead.ilike(f"%{qa_lead_query}%"))   
+    if selected_month and not search_query and not qa_lead_query:
         query = query.filter(Resume.Month == selected_month)
     page = request.args.get('page', 1, type=int)
     total_items =query.count()
@@ -1361,7 +1435,7 @@ def employee():
                            page_size_options=page_size_options,
                            selected_page_size=selected_page_size,
                            total_items=total_items, total_pages=total_pages,
-                           start_index=start_index,months=months,current_month=current_month,selected_month=selected_month,resume_table_html=resume_table_html,EMAILJS_USER_ID=EMAILJS_USER_ID,EMAILJS_SERVICE_ID=EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID=EMAILJS_TEMPLATE_ID,public_key=public_key)
+                           start_index=start_index,months=months,current_month=current_month,selected_month=selected_month,file_link=file_link,public_key=public_key,service_id=EMAILJS_SERVICE_ID,template_id=EMAILJS_TEMPLATE_ID,search_query=search_query,qa_lead_query=qa_lead_query)
 
 
 @app.route("/view_resume/<filename>")
@@ -1849,6 +1923,7 @@ def google_signin():
     
     
     credentials = flow.credentials
+    
     request_session = requests.Request()
     time.sleep(1)
     try:
@@ -1861,7 +1936,9 @@ def google_signin():
     except Exception as e:
         print("Error verifying token:", str(e))  # Debugging output
         return redirect(url_for('dashBoard'))
-
+    
+    # session['credentials'] = credentials_to_dict(credentials)
+    # print(session['credentials'])
     email = id_info.get('email')
     name= id_info.get('name')
     picture = id_info.get('picture')
@@ -2356,7 +2433,8 @@ def qareq():
 def excel_resume():
     if request.method=="POST":
         current_month = datetime.now().strftime("%B")
-        
+        month=request.form['month_excel']
+        print(month)
         if 'file' not in request.files:
             flash('No file part')
             
@@ -2381,6 +2459,7 @@ def excel_resume():
                         phone=str(row[4])
                         location=row[5]
                         experience=row[6]
+                        
                         lead=row[7]
                         result=row[8]
                         current_ctc=row[9]
@@ -2389,7 +2468,33 @@ def excel_resume():
                         suggestions=row[12]
                         link=row[13]
                         role = map_role_based_on_experience(experience)
+                        
                         # print(result,current_ctc,expecting_ctc,notice_period,suggestions)
+                        try:
+                            # Convert the experience to a string, strip spaces, and remove any non-numeric characters (like 'yrs')
+                            experience = str(experience).strip() if experience else None
+                            print("1", experience)
+                            
+                            if experience:
+                                if "yrsss" in experience:
+                                    print("yes")
+                                # Remove non-numeric characters like "yrs" using a regular expression
+                                # This keeps only digits and a decimal point
+                                numeric_experience = re.sub(r'[^\d.]', '', experience)
+                                
+                                # Try converting the cleaned value to a float
+                                if numeric_experience:
+                                    float_experience = float(numeric_experience)
+                                    experience = str(float_experience)  # Convert back to string if successful
+                                    print("yrs experience",experience)  # Print for debugging
+                                else:
+                                    experience = None  # If cleaning results in an empty string, set to None
+                            else:
+                                experience = None  # Set to None if empty
+                        except Exception as e:
+                            # Log error if needed, and set experience to None in case of failure
+                            print(f"Error processing experience: {e}")
+                            experience = None
                         existing_employee =Resume.query.filter_by(Name=name).first()
                         if not existing_employee:
                             
@@ -2407,59 +2512,221 @@ def excel_resume():
                                 Actual_CTC=current_ctc,
                                 Expected_CTC=expecting_ctc,
                                 Notice_period=notice_period,
-                                Month=current_month
+                                Month=month
                             )
                             
                             db.session.add(new_candidate)
                             db.session.commit() 
+                            flash('Resume(s) uploaded successfully!', 'success')
+                        else:
+                            flash('Resume(s) already exists', 'error') 
                             
             except:
                 pass    
     return redirect("/resume")  
 
-@app.route("/send_mail")
-def send_mail():
-    # Fetch accepted interviews
+
+
+# @app.route("/file")
+# def file():
+#     EMAILJS_USER_ID=os.environ.get('EMAILJS_PUBLIC_KEY')
+#     public_key=os.environ.get('EMAILJS_PUBLIC_KEY')
+#     EMAILJS_SERVICE_ID=os.environ.get('EMAILJS_SERVICE_ID_TABLE')
+#     EMAILJS_TEMPLATE_ID=os.environ.get('EMAILJS_TEMPLATE_ID_TABLE')
+#     print(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID)
+#     #email.js
+#     accepted_interviews = db.session.query(Interview1.resumeId).filter_by(Status='Move to Interview 2').all()
+#     accepted_resume_ids = [interview.resumeId for interview in accepted_interviews]
+
+#     # Fetch resumes based on accepted interview IDs
+#     resumes = db.session.query(Resume).filter(Resume.id.in_(accepted_resume_ids)).all()
+#     resume_details = []
+
+#     for resume in resumes:
+#         # Extracting relevant fields dynamically from the resume object
+#         details = {
+#             'Name': resume.Name,
+#             'Role': resume.Role,
+#             'Experience': resume.Experience,
+#             'Location': resume.Location,
+#             'Month': resume.Month,
+#             'Actual CTC': resume.Actual_CTC,
+#             'Expected CTC': resume.Expected_CTC,
+#             'Phone': resume.Phone,
+#             'Email': resume.Email
+#         }
+#         resume_details.append(details)
+#         print(resume_details)
+        
+#     resume_table_html = [
+#         {
+#             'Name': resume.Name,
+#             'Role': resume.Role,
+#             'Experience': resume.Experience,
+#             'Location': resume.Location,
+#             'Actual_CTC': resume.Actual_CTC,
+#             'Expected_CTC': resume.Expected_CTC,
+#             'Phone': resume.Phone,
+#             'Email': resume.Email
+#         } for resume in resumes
+#     ]
+#     print(resume_table_html)
+#     if 'credentials' in session:
+#         credentials = Credentials(
+#         token=session['credentials']['token'],
+#         refresh_token=session['credentials']['refresh_token'],
+#         token_uri=session['credentials']['token_uri'],
+#         client_id=session['credentials']['client_id'],
+#         client_secret=session['credentials']['client_secret'],
+#         scopes=session['credentials']['scopes']
+#         )
+#         try:
+#             drive_service = build('drive', 'v3', credentials=credentials)
+            
+#             # Call your upload function or other operations here
+#             # Example: upload_to_drive(drive_service, excel_file_path)
+#         except Exception as e:
+#             print("Error building Drive service:", e)
+#             return "Error accessing Google Drive"
+#     excel_file = create_excel_in_memory(resume_table_html)
+#     return render_template("file.html",public_key=public_key)     
+
+@app.route('/google_drive_auth')
+def google_drive_auth():
+    credentials = session.get('credentials')
+    # print("Stored Credentials:", credentials) 
+    if credentials:
+        # Load existing credentials
+        creds = Credentials(**credentials)
+        # print("credentials scopes",creds.scopes)
+        # Check if the required scope is included
+        
+            # If the necessary scope is not present, redirect to authorize again
+        # print("Requesting new authorization for Drive scope.")
+        drive_flow.redirect_uri = REDIRECT_URI_DRIVE
+        authorization_url, state = drive_flow.authorization_url(prompt='consent')  # Request consent for new scope
+        session['state'] = state
+        return redirect(authorization_url)
+
+    else:
+        # No credentials found, initiate the OAuth process
+        flow = drive_flow
+        flow.redirect_uri = REDIRECT_URI_DRIVE
+        authorization_url, state = flow.authorization_url(prompt='consent')
+        session['state'] = state
+        return redirect(authorization_url)    
+
+    return None
+
+@app.route('/google_drive_callback')
+def google_drive_callback():
+    flow = drive_flow  # Use the same flow instance
+    flow.redirect_uri = REDIRECT_URI_DRIVE
+    authorization_response = request.url
+    credentials = flow.fetch_token(authorization_response=authorization_response)
+    
+    session['credentials'] = credentials_to_dict(credentials)  # Store credentials in session
+    # print("check this",session['credentials'])
+    return redirect(url_for('upload_to_drive'))
+
     
 
-    html_content = render_template_string('''
-        <body>
-            <h2>Candidate Details</h2>
-            <table border="1" style="width:100%; border-collapse: collapse;">
-              <tr>
-                <th>Name</th>
-                <th>Details</th>
-                <th>Phone</th>
-                <th>Email</th>
-              </tr>
-              {% for resume in resume_details %}
-              <tr>
-                <td>{{ resume.Name }}</td>
-                <td>
-                  Role: {{ resume.Role }}<br>
-                  Experience: {{ resume.Experience }}<br>
-                  Location: {{ resume.Location }}<br>
-                  Date of Joining: {{ resume.Date_of_Joining }}<br>
-                  Actual CTC: {{ resume.Actual_CTC }}<br>
-                  Expected CTC: {{ resume.Expected_CTC }}<br>
-                  Feedback: {{ resume.Feedback }}
-                </td>
-                <td>{{ resume.Phone }}</td>
-                <td>{{ resume.Email }}</td>
-              </tr>
-              {% endfor %}
-            </table>
-        </body>
-    ''', resume_details=resume_details)
+@app.route('/upload_to_drive')
+def upload_to_drive():
+    public_key=os.environ.get('EMAILJS_PUBLIC_KEY')
+    EMAILJS_SERVICE_ID=os.environ.get('EMAILJS_SERVICE_ID')
+    EMAILJS_TEMPLATE_ID=os.environ.get('EMAILJS_TEMPLATE_ID_TABLE')
+    try:
+        credentials = session.get('credentials')
+        if not credentials:
+            flash('No credentials found. Please authenticate first.', 'danger')
+            return redirect(url_for('google_drive_auth'))
+        accepted_interviews = db.session.query(Interview1.resumeId).filter_by(Status='Move to Interview 2').all()
+        accepted_resume_ids = [interview.resumeId for interview in accepted_interviews]
 
-    # Send email using EmailJS
-    send_email_via_emailjs(html_content)
+        # Fetch resumes based on accepted interview IDs
+        resumes = db.session.query(Resume).filter(Resume.id.in_(accepted_resume_ids)).all()
+        resume_details = []
 
-    return "Email sent successfully!"    
+        # for resume in resumes:
+        #     # Extracting relevant fields dynamically from the resume object
+        #     details = {
+        #         'Name': resume.Name,
+        #         'Role': resume.Role,
+        #         'Experience': resume.Experience,
+        #         'Location': resume.Location,
+        #         'Month': resume.Month,
+        #         'Actual CTC': resume.Actual_CTC,
+        #         'Expected CTC': resume.Expected_CTC,
+        #         'Phone': resume.Phone,
+        #         'Email': resume.Email
+        #     }
+        #     resume_details.append(details)
+        #     print(resume_details)
+            
+        resume_data = [
+            {
+                'Name': resume.Name,
+                'Role': resume.Role,
+                'Experience': resume.Experience,
+                'Location': resume.Location,
+                'Actual_CTC': resume.Actual_CTC,
+                'Expected_CTC': resume.Expected_CTC,
+                'Phone': resume.Phone,
+                'Email': resume.Email
+            } for resume in resumes
+        ]
+        # Load credentials
+        creds = Credentials(**credentials)
+        # print("this is ",creds.scopes)
+        # Create a Google Drive service object
+        drive_service = build('drive', 'v3', credentials=creds)
 
-    print(resume_details)
+        # Specify the path to your Excel file
+        excel_file = create_excel_in_memory(resume_data) 
+        file_metadata = {
+            'name': 'resumesssssssssss.xlsx',
+            'mimeType': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # Just specify the file name
+        }
+        
 
-         
+        # Prepare the file for upload
+        media = MediaIoBaseUpload(excel_file, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+        # Create the file in Google Drive
+        file = drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
+        file_id = file.get('id')
+        
+        file_link = f'https://docs.google.com/spreadsheets/d/{file_id}/edit'
+
+        # Make the file publicly accessible
+        permission = {
+            'type': 'anyone',
+            'role': 'reader'
+        }
+        drive_service.permissions().create(fileId=file_id, body=permission).execute()
+        session['file_link'] = file_link
+        send_email_with_file_link(file_link,public_key,EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID)
+        flash('File uploaded successfully!', 'success')
+        
+        return redirect(url_for('employee'))
+    except Exception as e:
+        # print(f'An error occurred: {str(e)}', 'danger')
+        return redirect(url_for('employee'))   
+
+@app.route('/edit_employee_resume/<int:employee_id>', methods=['GET', 'POST'])  
+def edit_employee_resume(employee_id):
+    # Fetch employee details from the database using employee_id
+    resume = Resume.query.get(employee_id)
+    if request.method=="POST":
+        resume.Qualification=request.form['qualification']
+        resume.Actual_CTC = request.form['actual_ctc']
+        resume.Expected_CTC = request.form['expected_ctc']
+        resume.QA_Lead=request.form['qa_lead']
+        db.session.commit()
+        flash('Successfully updated!', 'success')
+    return render_template("update_resume.html",resume=resume)
+       
 if __name__ == "__main__":
     app.run(debug=True)
 

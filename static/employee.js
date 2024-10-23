@@ -350,20 +350,94 @@ function editLocation(resumeId) {
     document.getElementById('locationInput' + resumeId).style.display = 'block'; // Ensure input is visible
 }
 
-function sendEmail() {
-    const templateParams = {
-     // Replace with your actual input field ID
-    resume_table_html: `{{ resume_table_html | safe }`
-};
+                                                /* Name search bar */
 
-emailjs.send(confg.service_id, confg.template_id, templateParams)
-.then(function(response) {
-    alert(config.service_id)
-    alert("y")
-    console.log('SUCCESS!', response.status, response.text);
-    alert('Email sent successfully!');
-}, function(error) {
-    console.log('FAILED...', error);
-    alert('Failed to send email.');
-});
+function filterTable() {
+    const searchQuery = document.getElementById("search_bar").value.toLowerCase();
+    const rows = document.querySelectorAll("tbody tr");
+    let foundMatch = false;
+
+    rows.forEach(row => {
+        const id = row.querySelector('td').textContent; // Assuming the first cell contains the resume id
+        const nameCell = document.getElementById(`name-${id}`);
+        
+        if (nameCell) {
+            const nameText = nameCell.textContent.toLowerCase();
+            if (nameText.includes(searchQuery)) {
+                row.style.display = "";
+                foundMatch = true;
+            } else {
+                row.style.display = "none";
+            }
+        }
+    });
+
+    // Show or hide the 'No results' message
+    const noResultsMessage = document.getElementById("noResults");
+    if (foundMatch) {
+        noResultsMessage.style.display = "none";
+    } else {
+        noResultsMessage.style.display = "block";
+    }
 }
+
+document.getElementById("clearSearch").addEventListener("click", function() {
+    // Clear the search input
+    document.getElementById("search_bar").value = "";
+
+    // Remove the 'search' parameter from the URL
+    const url = new URL(window.location.href);
+    url.searchParams.delete('search');
+    
+    // Replace the current URL with one that doesn't have the 'search' parameter
+    window.history.pushState({}, '', url.pathname);
+
+    // Reload the page without search query
+    window.location.href = url.pathname;  // Reload the page without any search parameter
+});
+
+                                                        /* QA Search bar */
+function filterTable_qa(){
+    const searchQuery = document.getElementById("search_bar_qa").value.toLowerCase();
+    const rows = document.querySelectorAll("tbody tr");
+    let foundMatch = false;
+
+    rows.forEach(row => {
+        const id = row.querySelector('td').textContent; // Assuming the first cell contains the resume id
+        const nameCell = document.getElementById(`QA_Lead-${id}`);
+        
+        if (nameCell) {
+            const nameText = nameCell.textContent.toLowerCase();
+            if (nameText.includes(searchQuery)) {
+                row.style.display = "";
+                foundMatch = true;
+            } else {
+                row.style.display = "none";
+            }
+        }
+    });
+
+    // Show or hide the 'No results' message
+    const noResultsMessage = document.getElementById("noResults");
+    if (foundMatch) {
+        noResultsMessage.style.display = "none";
+    } else {
+        noResultsMessage.style.display = "block";
+    }
+}
+
+document.getElementById("clearSearch_qa").addEventListener("click", function() {
+    // Clear the search input
+    document.getElementById("search_bar_qa").value = "";
+
+    // Remove the 'search' parameter from the URL
+    const url = new URL(window.location.href);
+    url.searchParams.delete('search');
+    
+    // Replace the current URL with one that doesn't have the 'search' parameter
+    window.history.pushState({}, '', url.pathname);
+
+    // Reload the page without search query
+    window.location.href = url.pathname;  // Reload the page without any search parameter
+});
+

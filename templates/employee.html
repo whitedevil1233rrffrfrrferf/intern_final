@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee data</title>
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+    </script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='employee.css') }}">
@@ -45,22 +48,13 @@
         }
     </script>
     <script type="text/javascript">
-      (function(){
-          emailjs.init("{{ public_key }}");
-          
-      })();
-      </script>
-    <script type="text/javascript">
-        
-        const confg = {
-            service_id: '{{EMAILJS_SERVICE_ID}}',
-            template_id: '{{ EMAILJS_TEMPLATE_ID }}',
-            user_id: '{{ EMAILJS_USER_ID }}'
-            
-        };
-        
-        
+        (function(){
+            emailjs.init("{{public_key}}");
+        })();
     </script>
+    
+
+    
 </head>
 <body>
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -81,9 +75,29 @@
     <div class="first_div">
         {% include 'sidemenu.html'%}
 
-        <div style=" margin-left:8rem;overflow-x: auto;width: 140%;overflow-y:scroll;height:500%;">
-            <div class="filters" style="margin-bottom: 20px;">
-                <h1 style="text-align: center;  background-color:#4699F9;color: white">Employee resumes</h1>
+        <div style=" margin-left:8rem;overflow-x: auto;width: 140%;overflow-y:scroll;height:500%;width: 400%;">
+            <div class="container-fluid" style="margin-bottom: 2rem;margin-top: 1rem !important;">
+          <nav class="navbar navbar-expand-lg bg-body-tertiary" style="margin-top: 1rem;">
+            <div class="container" >
+              
+              <div class="collapse navbar-collapse" id="navbarSupportedContent" style="display: flex; flex-direction: column;">
+                
+                <form class="d-flex col-10 my-2" action="{{ url_for('employee') }}" role="search" method="GET">
+                  <input class="form-control me-2" type="search" id="search_bar" placeholder="Search by Name" name="search" aria-label="Search" value="{{ search_query }}" style="margin-right:2rem!important;">
+                  <button class="btn btn-primary" type="submit" onclick="filterTable()">Search</button>
+                  <button type="button" class="btn btn-danger" id="clearSearch" style="margin-left: 10px;">Clear</button>
+                </form>
+                <form class="d-flex col-10 my-2" action="{{ url_for('employee') }}" role="search" method="GET">
+                  <input class="form-control me-2" type="search" id="search_bar_qa" placeholder="Search by QA Lead" name="qa_lead" aria-label="Search" value="{{qa_lead_query}}" style="margin-right:2rem!important;">
+                  <button class="btn btn-primary" type="submit" onclick="filterTable_qa()">Search</button>
+                  <button type="button" class="btn btn-danger" id="clearSearch_qa" style="margin-left: 10px;">Clear</button>
+                </form>
+              </div>
+            </div>
+          </nav>
+        </div>
+            <div class="filters" style="margin-bottom: 20px; " >
+                <h1 style="text-align: center;  background-color:#4699F9;color: white;">Employee resumes</h1>
                 <div class="flex" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
                     <div style="margin-bottom: 20px; margin-top: 20px;">
                         <label for="introFilter" >Intro Call Status:</label>
@@ -131,8 +145,8 @@
                     {% endfor %}
                         </select>
                     </div>
-                    <div style="margin-bottom: 20px;">
-                        <a href="/employee_management">
+                    <div style="margin-bottom: 20px;">                       
+                        <a href="{{ url_for('google_drive_auth') }}">
                             <button class="btn btn-primary" style="width:7rem!important;" onclick="sendEmail()">Send Mail</button>
                         </a>
                     </div>    
@@ -142,25 +156,9 @@
             
             
             
-            <div class="table-responsive my-4" style="overflow-x:auto;">
-                <table class="table table-striped table-bordered" >
-                    <colgroup>
-                        <col style="width:2%;">  <!-- ID -->
-                        <col style="width:10%;"> <!-- Candidate Name -->
-                        <col style="width:7%;"> <!-- Email -->
-                        <col style="width:7%;"> <!-- Contact Number -->
-                        <col style="width:7%;"> <!-- Qualification -->
-                        <col style="width:8%;"> <!-- Experience/Fresher -->
-                        <col style="width: 10%;"> <!-- QA Lead Assigned -->
-                        <col style="width:8%;"> <!-- Location -->
-                        <col style="width: 10%;"> <!-- Role -->
-                        <col style="width:12%;"> <!-- Others -->
-                        <col style="width:8%;"> <!-- Month -->
-                        <col style="width:10%;">  <!-- Action -->
-                        <col style="width:8%;"> <!-- Interview Details -->
-                        <col style="width: 5%;">  <!-- Delete -->
-                        <col hidden>               <!-- Intro Status (hidden) -->
-                    </colgroup>
+            <div class="table-responsive my-4" style="overflow-x:auto; width:max-content;">
+                <table class="table table-striped table-bordered" style="table-layout: auto;">
+                    
                     <thead class="thead-dark">
                         <tr>
                             <th scope="col">ID</th>
@@ -174,9 +172,9 @@
                             <th scope="col">Role</th>
                             <th scope="col">Others</th>
                             <th scope="col">Month</th>
-                            <th scope="col">Action</th>
                             <th scope="col">Interview Details</th>
-                            <th scope="col">Delete</th>
+                            <th scope="col">View</th>
+                            <th scope="col">Action</th>
                             <th scope="col" hidden>intro status</th>
                         </tr>
                     </thead>
@@ -185,7 +183,7 @@
                         {% for resume in resumes.items %}
                             <tr>
                                 <td>{{ start_index + loop.index }}</td>
-                                <td>
+                                <td class="wrap-text" id="name-{{ resume.id }}">
                                     {% if resume.Link %}
                                     <a href="{{resume.Link}}" class="long-filename  text-break" target="_blank">{{ resume.Name }}</a>
                                     {% else %}  
@@ -199,7 +197,7 @@
                                         <div id="hrStatus{{ resume.id }}" style="margin-bottom: 3px;"></div>
                                     </div>
                                 </td>
-                                <td>
+                                <td class="wrap-text" >
                                     {% if resume.Email %}
                                     {{ resume.Email }}
                                     {% else %}   
@@ -213,7 +211,7 @@
                                     {% endif %}
                                     </td>
                                     
-                                <td style="margin: auto;">
+                                <td style="margin: auto;" class="wrap-text">
                                     {% if resume.Phone %}
                                     {{ resume.Phone }}
                                     {% else %} 
@@ -225,7 +223,7 @@
                                     <div id="div_contact{{resume.id}}" style="display: none;" onclick="editContact({{resume.id}})"></div>
                                     {% endif %}
                                 </td>
-                                <td>
+                                <td class="wrap-text">
                                     {% if resume.Qualification %}
                                     {{ resume.Qualification }}
                                     {% else %} 
@@ -237,7 +235,7 @@
                                     <div id="div_actualCTC{{resume.id}}" style="display: none;" onclick="editActualCTC({{resume.id}})"></div>
                                     {% endif %}
                                 </td>
-                                <td>
+                                <td class="wrap-text">
                                     {% if resume.Experience %}
                                     {{ resume.Experience }}
                                     {% else %} 
@@ -249,7 +247,7 @@
                                     <div id="div_expectedCTC{{resume.id}}" style="display: none;" onclick="editExpectedCTC({{resume.id}})"></div>  
                                     {% endif %}
                                 </td>
-                                <td>
+                                <td class="wrap-text" id="QA_Lead-{{ resume.id }}">
                                     {% if resume.QA_Lead %}
                                     {{ resume.QA_Lead }}
                                     {% else %} 
@@ -261,7 +259,7 @@
                                     <div id="div_role{{resume.id}}" style="display: none;" onclick="editRole({{resume.id}})"></div>  
                                     {% endif %}
                                 </td>
-                                <td>
+                                <td class="wrap-text">
                                     {% if resume.Location %}
                                     {{ resume.Location }}
                                     {% else %} 
@@ -273,10 +271,10 @@
                                     <div id="div_location{{resume.id}}" style="display: none;" onclick="editLocation({{resume.id}})"></div>
                                     {% endif %}  
                                 </td>
-                                <td>
+                                <td class="wrap-text">
                                     {{resume.Role}}
                                 </td>
-                                <td>
+                                <td class="wrap-text">
                                     <div>
                                         {% if resume.Expected_CTC %}
                                             <p>Expected CTC: {{ resume.Expected_CTC }}</p>
@@ -296,8 +294,8 @@
 
                                     </div>
                                 </td>
-                                <td>{{resume.Month}}</td>
-                                <td>
+                                <td class="wrap-text">{{resume.Month}}</td>
+                                <td class="wrap-text">
                                     <div>
                                         <a id="introButton{{ resume.id }}" href="{{ url_for('introCall', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2 " title="Intro call">Intro</a>
                                         <a id="interview1Button{{ resume.id }}" href="{{ url_for('interview1v', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2" title="Interview 1"><i class="fa-solid fa-phone"></i> 1</a>
@@ -311,6 +309,7 @@
                                     <form action="{{ url_for('delete_resume', resume_id=resume.id,month=selected_month) }}" method="POST" onsubmit="return handleDelete({{resume.id}}, this, '{{ resume.filename }}')">
                                         <button type="submit" class="btn btn-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
                                     </form>
+                                    <button class="btn btn-primary" style="margin-top: 1rem;" onclick="window.location.href='{{ url_for('edit_employee_resume', employee_id=resume.id) }}'"><i class="fa-solid fa-pencil mx-2" style="color:#fff;"></i></button>
                                 </td>
                                <td id="intro_status" data-resume-id="{{ resume.id }}" hidden></td>
                             </tr>
@@ -322,9 +321,9 @@
                     {% for page_num in resumes.iter_pages(left_edge=1,right_edge=1,left_current=1,right_current=2) %}
                     {% if page_num %}
                     {% if resumes.page == page_num%}
-                        <a class="btn btn-info mb-4" href="{{url_for('employee',page=page_num,month=selected_month)}}" style="color: black;  ">{{page_num}}</a>
+                        <a class="btn btn-info mb-4" href="{{url_for('employee',page=page_num,month=selected_month,qa_lead=qa_lead_query)}}" style="color: black;  ">{{page_num}}</a>
                     {% else %}
-                        <a class="btn btn-outline-info mb-4" href="{{url_for('employee',page=page_num,month=selected_month)}}" style="color: black; ">{{page_num}}</a>
+                        <a class="btn btn-outline-info mb-4" href="{{url_for('employee',page=page_num,month=selected_month,qa_lead=qa_lead_query)}}" style="color: black; ">{{page_num}}</a>
                     {% endif %}
                     {% else%}
                     ...
@@ -434,6 +433,36 @@
         }
     </script>
     
+    <script type="text/javascript">
+    // Get the file link from the Flask session
+    const fileLink = "{{ file_link or '' }}";
+        
+    if (fileLink) {
+        
+        // Prepare EmailJS configuration
+        const confg = {
+            service_id: '{{ service_id }}',
+            template_id: '{{ template_id }}'
+        };
+
+        // Prepare the email parameters
+        const templateParams = {
+            file_link: fileLink,  // Attach the Google Drive file link
+            
+            message: `Here is the link to the uploaded file: ${fileLink}`
+        };
+
+        // Send the email
+        emailjs.send(confg.service_id, confg.template_id, templateParams)
+            .then(function(response) {
+                console.log('SUCCESS!', response.status, response.text);
+                alert('Email sent successfully!');
+            }, function(error) {
+                console.log('FAILED...', error);
+                alert('Failed to send email.');
+            });
+    }
+</script>
 </body>
 </html>
 

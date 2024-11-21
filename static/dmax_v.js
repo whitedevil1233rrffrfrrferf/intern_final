@@ -38,7 +38,7 @@ else{
 }
 
   // Update the window location with the new query parameters
-  window.location.href = `/dmax_view?${urlParams.toString()}`;
+  window.location.href = `${baseDmaxUrl}?${urlParams.toString()}`;
 }
     
 

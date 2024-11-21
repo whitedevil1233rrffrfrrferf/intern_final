@@ -26,7 +26,7 @@
           {% endif %}
         {% endwith %}
     <div class="sign_div">
-        <form action="/" method="post" class="form_div">
+        <form action="{{ url_for('signPage') }}" method="post" class="form_div">
             <div class="mb-3 my-3">
               <label for="exampleInputEmail1" class="form-label">Email address</label>
               <input type="email" class="form-control form-input" id="exampleInputEmail1" name="email" aria-describedby="emailHelp">
@@ -51,10 +51,10 @@
             </div>
             <!-- <hr style="color: white;"> -->
             <div style="display: flex; gap:1.5rem;">
-              <a data-mdb-ripple-init class="btn btn-primary btn-lg btn-block icon_btn" style="background-color:#55acee" href="/sign-in"
+              <a data-mdb-ripple-init class="btn btn-primary btn-lg btn-block icon_btn" style="background-color:#55acee" href="{{ url_for('sign_in') }}"
               role="button">
               <i class="fa-brands fa-google" style="color:white; margin-right: 0.2rem;"></i> <span style="color:white; font-size:1rem;">Sign In with Google</span> </a>
-              <a data-mdb-ripple-init class="btn btn-primary btn-lg btn-block icon_btn" style="background-color:#55acee" href="/sign-up"
+              <a data-mdb-ripple-init class="btn btn-primary btn-lg btn-block icon_btn" style="background-color:#55acee" href="{{ url_for('sign_up') }}"
               role="button">
               <i class="fa-brands fa-google" style="color:white; margin-right: 0.2rem;"></i> <span style="color:white; font-size:1rem;">Sign Up with Google</span> </a>  
             </div>

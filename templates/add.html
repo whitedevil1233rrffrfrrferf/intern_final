@@ -16,7 +16,7 @@
       <div class="container my-3" style="width:60%;">
         <h1 class="title"><center>Add a new Employee</center></h1>
         
-        <form action="/add" method="post" id="form_id"  >
+        <form action="{{ url_for('Add') }}" method="post" id="form_id"  >
             <div class="mb-3 label">
               <label for="emp_id" class="form-label">Emp_id <i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
               <input type="text" class="form-control" id="emp_id" name="emp_id" aria-describedby="emailHelp" required>
@@ -97,7 +97,7 @@
           </div> 
             <div style="display: flex; align-items: center; justify-content:center;margin-top: 3rem;">
               <button type="submit" class="btn btn-primary" style="width:6rem;height:3rem; margin-right: 3rem;">Submit</button>
-              <a class="btn btn-outline-secondary" href="/home" style=" padding:10px ;width:6rem; height:3rem;"><div style="display: flex; justify-content: space-between; padding:5px;">
+              <a class="btn btn-outline-secondary" href="{{ url_for('Home')}}" style=" padding:10px ;width:6rem; height:3rem;"><div style="display: flex; justify-content: space-between; padding:5px;">
                 <div>
                   <i class="fa-solid fa-backward" style="margin-right: 10px;"></i>
                 </div>

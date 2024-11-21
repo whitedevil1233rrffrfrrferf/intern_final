@@ -1,8 +1,51 @@
+window.onload = function() {
+    const resumeIds = document.querySelectorAll('[id^="introButton"]');
+    
+    // Iterate over each resume to fetch the interview status
+    resumeIds.forEach(resumeButton => {
+        const resumeId = resumeButton.id.replace('introButton', '');
+        const statusUrl = resumeButton.getAttribute('data-url');
+        
+        getInterviewStatusAndToggleButtons(resumeId, statusUrl);
+    });
+};
+
+function getInterviewStatusAndToggleButtons(resumeId, statusUrl) {
+    fetch(statusUrl)
+        .then(response => response.json())
+        .then(data => {
+            toggleInterviewButtons(resumeId, data.intro_status, data.interview1_status, data.interview2_status);
+        });
+}
+
+function toggleInterviewButtons(resumeId, introStatus, interview1Status, interview2Status) {
+    const introButton = document.getElementById(`introButton${resumeId}`);
+    const interview1Button = document.getElementById(`interview1Button${resumeId}`);
+    const interview2Button = document.getElementById(`interview2Button${resumeId}`);
+    const hrButton = document.getElementById(`hrButton${resumeId}`);
+    
+    // Hide buttons based on the status
+    if (introStatus === "Intro call not conducted" || introStatus === "Rejected") {
+        interview1Button.style.display = "none";
+        interview2Button.style.display = "none";
+        hrButton.style.display = "none";
+    }
+
+    if (interview1Status === "Interview 1 not conducted" || interview1Status === "Rejected") {
+        interview2Button.style.display = "none";
+        hrButton.style.display = "none";
+    }
+
+    if (interview2Status === "Interview 2 not conducted" || interview2Status === "Rejected") {
+        hrButton.style.display = "none";
+    }
+}
 function getInterviewStatus(event,resumeId){
     event.preventDefault();
+    const url = event.currentTarget.getAttribute("href");
     var curDisplayStyle=document.getElementById(`toggle${resumeId}`).style.display;
     document.getElementById(`toggle${resumeId}`).style.display=curDisplayStyle==="none"?"":"none"
-    fetch(`/get_interview_status/${resumeId}`)
+    fetch(url)
     .then(response=>response.json())
     .then(data=>{
         document.getElementById(`introStatus${resumeId}`).innerText= `Intro Call Status: ${data.intro_status}`;
@@ -20,7 +63,8 @@ function filterTableByIntroStatus(){
     const tableRows=document.querySelectorAll("tbody tr")
     tableRows.forEach(function(row){
        const resumeId=row.querySelector("#intro_status").dataset.resumeId;
-       fetch(`/get_interview_status/${resumeId}`)
+       const url = document.getElementById(`introButton${resumeId}`).getAttribute("data-url");
+       fetch(url)
        .then(response=>response.json())
        .then(data=>{
         const introStatus =data.intro_status.toLowerCase();
@@ -42,7 +86,8 @@ function filterTableByInterview1Status(){
 
     tableRows.forEach(function(row){
        const resumeId = row.querySelector("#intro_status").dataset.resumeId;
-       fetch(`/get_interview_status/${resumeId}`)
+       const url = document.getElementById(`introButton${resumeId}`).getAttribute("data-url");
+       fetch(url)
        .then(response => response.json())
        .then(data => {
             const interview1Status = data.interview1_status.toLowerCase();
@@ -66,7 +111,8 @@ function filterTableByInterview2Status(){
 
     tableRows.forEach(function(row){
        const resumeId = row.querySelector("#intro_status").dataset.resumeId;
-       fetch(`/get_interview_status/${resumeId}`)
+       const url = document.getElementById(`introButton${resumeId}`).getAttribute("data-url");
+       fetch(url)
        .then(response => response.json())
        .then(data => {
             const interview2Status = data.interview2_status.toLowerCase();
@@ -89,7 +135,8 @@ function filterTableByAllRoundsStatus(){
 
     tableRows.forEach(function(row){
        const resumeId = row.querySelector("#intro_status").dataset.resumeId;
-       fetch(`/get_interview_status/${resumeId}`)
+       const url = document.getElementById(`introButton${resumeId}`).getAttribute("data-url");
+       fetch(url)
        .then(response => response.json())
        .then(data => {
             const allRoundsStatus = data.all_rounds_status.toLowerCase();
@@ -441,3 +488,59 @@ document.getElementById("clearSearch_qa").addEventListener("click", function() {
     window.location.href = url.pathname;  // Reload the page without any search parameter
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+    const deleteAllButton = document.getElementById("delete-all");
+    const deleteSelectedButton = document.getElementById("delete-selected");
+    const selectAllCheckbox = document.getElementById("select-all");
+    const checkboxes = document.querySelectorAll(".resume-checkbox");
+    const checkboxColumns = document.querySelectorAll(".checkbox-column");
+
+    // Show checkboxes when "Delete All" is clicked
+    deleteAllButton.addEventListener("click", () => {
+        checkboxColumns.forEach(col => col.style.display = "");
+    });
+    selectAllCheckbox.addEventListener("change", () => {
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = selectAllCheckbox.checked;
+        });
+        toggleDeleteButton();
+    });
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener("change", () => {
+            toggleDeleteButton(); // Call toggleDeleteButton when an individual checkbox is clicked
+        });
+    });
+    function toggleDeleteButton() {
+        const anySelected = Array.from(checkboxes).some(checkbox => checkbox.checked);
+        deleteSelectedButton.disabled = !anySelected;
+    }
+    deleteSelectedButton.addEventListener("click", () => {
+        const selectedIds = Array.from(checkboxes)
+            .filter(checkbox => checkbox.checked)  // Filter only the checked checkboxes
+            .map(checkbox => checkbox.value);      // Get the value (ID) of each selected checkbox
+    
+            if (selectedIds.length > 0) {
+                if (confirm(`Are you sure you want to delete ${selectedIds.length} resumes?`)) {
+                    
+                    // Send selected IDs to the server
+                    
+                    fetch(deleteSelectedResumesUrl, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            
+                        },
+                        body: JSON.stringify({ resume_ids: selectedIds })
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.reload();
+                        } else {
+                            alert("Failed to delete resumes.");
+                        }
+                    });
+                }
+            }
+    });
+}
+)

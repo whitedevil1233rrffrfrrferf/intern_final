@@ -1,4 +1,4 @@
-from flask import Flask, render_template,request,redirect,url_for,jsonify,send_from_directory,session,make_response,abort,flash,render_template_string
+from flask import Flask, g, render_template,request,redirect,url_for,jsonify,send_from_directory,session,make_response,abort,flash,render_template_string
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import extract,func,or_,ForeignKey
 from sqlalchemy.sql.expression import extract
@@ -59,7 +59,7 @@ app.config['PROFILE_IMAGE_UPLOAD_FOLDER'] = 'static/profile_images'
 app.secret_key = os.environ.get('SECRET_KEY')
 
 
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '0'
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 CLIENT_ID = os.environ.get('CLIENT_ID')
 CLIENT_SECRET=os.environ.get('CLIENT_SECRET')
@@ -67,10 +67,10 @@ PUBLIC_KEY=os.environ.get('EMAILJS_PUBLIC_KEY')
 SERVICE_ID=os.environ.get('EMAILJS_SERVICE_ID')
 TEMPLATE_ID=os.environ.get('EMAILJS_TEMPLATE_ID')
 
-# REDIRECT_URI='http://localhost:5000/google_sign_in' # for oauth sign in
-# REDIRECT_URI_DRIVE='http://localhost:5000/google_drive_callback' #for google_drive
-REDIRECT_URI = 'https://intern-final-0b4w.onrender.com/google_sign_in'
-REDIRECT_URI_DRIVE='https://intern-final-0b4w.onrender.com/google_drive_callback'
+REDIRECT_URI='http://localhost:5000/google_sign_in' # for oauth sign in
+REDIRECT_URI_DRIVE='http://localhost:5000/google_drive_callback' #for google_drive
+# REDIRECT_URI = 'https://intern-final-0b4w.onrender.com/google_sign_in'
+# REDIRECT_URI_DRIVE='https://intern-final-0b4w.onrender.com/google_drive_callback'
 
 
 SCOPES = ['openid', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
@@ -285,6 +285,19 @@ def get_distinct_statistics():
     distinct_roles = db.session.query(Resume.Role).distinct().all()
     roles_list=[role[0] for role in distinct_roles]
     statistics={}
+    statistics_leads={}
+    distinct_leads = db.session.query(Resume.QA_Lead).distinct().all()
+    leads_list = [lead[0] for lead in distinct_leads]
+    # print(leads_list)
+
+    overall_counts = {
+        'intro': {'selected': 0, 'rejected': 0},
+        'interview1': {'selected': 0, 'rejected': 0},
+        'interview2': {'selected': 0, 'rejected': 0},
+        'hr': {'selected': 0, 'rejected': 0},
+        'grand_total': 0  # To accumulate overall grand total
+    }
+
     for role in roles_list:
         # Get all resume IDs for the current role
         resume_ids = db.session.query(Resume.id).filter(Resume.Role == role).all()        
@@ -323,8 +336,50 @@ def get_distinct_statistics():
                 'rejected': rejected_hr
             }
         }
-    return(statistics)    
+    for lead in leads_list:
+        resume_ids = db.session.query(Resume.id).filter(Resume.QA_Lead == lead).all()
+        resume_ids = [resume_id[0] for resume_id in resume_ids]
+        selected_intro = db.session.query(Intro).filter(Intro.resumeId.in_(resume_ids), Intro.Status == 'Move to Interview 1').count()
+        rejected_intro = db.session.query(Intro).filter(Intro.resumeId.in_(resume_ids), Intro.Status == 'Rejected').count()
 
+        selected_interview1 = db.session.query(Interview1).filter(Interview1.resumeId.in_(resume_ids), Interview1.Status == 'Move to Interview 2').count()
+        rejected_interview1 = db.session.query(Interview1).filter(Interview1.resumeId.in_(resume_ids), Interview1.Status == 'Rejected').count()
+
+        selected_interview2 = db.session.query(Interview2).filter(Interview2.resumeId.in_(resume_ids), Interview2.Status == 'Move to HR Round').count()
+        rejected_interview2 = db.session.query(Interview2).filter(Interview2.resumeId.in_(resume_ids), Interview2.Status == 'Rejected').count()
+
+        selected_hr = db.session.query(Hr).filter(Hr.resumeId.in_(resume_ids), Hr.Status == 'Move to HR Process').count()
+        rejected_hr = db.session.query(Hr).filter(Hr.resumeId.in_(resume_ids), Hr.Status == 'Rejected').count()
+
+        grand_total = (selected_intro + rejected_intro +
+                   selected_interview1 + rejected_interview1 +
+                   selected_interview2 + rejected_interview2 +
+                   selected_hr + rejected_hr)
+
+        lead_grand_total = (selected_intro + rejected_intro +
+                            selected_interview1 + rejected_interview1 +
+                            selected_interview2 + rejected_interview2 +
+                            selected_hr + rejected_hr)
+
+        statistics_leads[lead] = {
+            'intro': {'selected': selected_intro, 'rejected': rejected_intro},
+            'interview1': {'selected': selected_interview1, 'rejected': rejected_interview1},
+            'interview2': {'selected': selected_interview2, 'rejected': rejected_interview2},
+            'hr': {'selected': selected_hr, 'rejected': rejected_hr},
+            'grand_total': grand_total
+        }
+        overall_counts['intro']['selected'] += selected_intro
+        overall_counts['intro']['rejected'] += rejected_intro
+        overall_counts['interview1']['selected'] += selected_interview1
+        overall_counts['interview1']['rejected'] += rejected_interview1
+        overall_counts['interview2']['selected'] += selected_interview2
+        overall_counts['interview2']['rejected'] += rejected_interview2
+        overall_counts['hr']['selected'] += selected_hr
+        overall_counts['hr']['rejected'] += rejected_hr
+        overall_counts['grand_total'] += lead_grand_total
+           
+    return(statistics, statistics_leads,overall_counts)    
+    
 
 
 def send_email_with_file_link(file_link,EMAILJS_PUBLIC_KEY,EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID):
@@ -339,7 +394,7 @@ def send_email_with_file_link(file_link,EMAILJS_PUBLIC_KEY,EMAILJS_SERVICE_ID,EM
             'message': f'Here is the link to the uploaded file: {file_link}'
         }
     }
-    print(email_data)
+    
     # Send the email using the EmailJS API
     response = requests.post(
         'https://api.emailjs.com/api/v1.0/email/send',
@@ -534,7 +589,7 @@ def send_email_via_emailjs(html_content):
             "recipient_email": "varunrram2003@gmail.com"  # The recipient's email
         }
     }
-    print(html_content)
+    # print(html_content)
     response = req.post('https://api.emailjs.com/api/v1.0/email/send', json=data)
 
     if response.status_code == 200:
@@ -854,6 +909,8 @@ def map_role_based_on_experience(experience):
             return "QA Intern"
 
     return None
+
+
 def dashboard_function():
     total_employees=Employee.query.count()
     active_employees = Employee.query.filter_by(employee_status='active').count()
@@ -885,9 +942,25 @@ def dashboard_function():
 @app.context_processor
 def inject_total_employees():
     total_employees,active_employees,resigned_employees,total_resumes,hr_selected,current_year_count, last_year_count,Chennai_employees_count,kollu_employees_count,kaup_employees_count,tn_palyam_count,employment_status_counts, project_status_counts=dashboard_function()
-    statistics=get_distinct_statistics()
+    statistics,statistics_leads,overall_counts=get_distinct_statistics()
     return dict(total_employees=total_employees,active_employees=active_employees,resigned_employees=resigned_employees,total_resumes=total_resumes,hr_selected=hr_selected,current_year_count=current_year_count, last_year_count=last_year_count,Chennai_employees_count=Chennai_employees_count,kollu_employees_count=kollu_employees_count,kaup_employees_count=kaup_employees_count,tn_palyam_count=tn_palyam_count,employment_status_counts=employment_status_counts,
-                project_status_counts=project_status_counts,statistics=statistics)
+                project_status_counts=project_status_counts,statistics=statistics,statistics_leads=statistics_leads,overall_counts=overall_counts)
+@app.before_request
+def load_user():
+    
+    email = session.get('email')
+    print(f"Email from session: {email}") 
+    if email:
+        
+        user = Login.query.filter_by(email=email).first()
+        
+        if user:
+            
+            g.user_role = user.Role
+            
+        else:
+            print("No user found")    
+    
 
 @app.route("/",methods=["GET","POST"])
 def signPage():
@@ -1114,7 +1187,7 @@ def Add():
             db.session.add(employee)
             db.session.commit()
             flash(f'Added {name} successfully!', 'success')
-        return redirect("/add")
+        return redirect(url_for(Add))
     return render_template("add.html")
 
 @app.route("/update/<int:sno>",methods=["GET","POST"])
@@ -1164,7 +1237,7 @@ def Update(sno):
         db.session.add(employee)
         db.session.commit()
         flash(f'{name} updated successfully!', 'success')
-        return redirect(f"/update/{sno}")
+        return redirect(url_for('Update', sno=sno))
     employee=Employee.query.filter_by(Sno=sno).first()
     return render_template("update.html",employee=employee,selected_date=selected_date)
 
@@ -1179,7 +1252,8 @@ def Delete(sno):
     return redirect("/home")
 with app.app_context():
         db.create_all()
-        roles = get_distinct_statistics()
+        roles,leads,overall_counts = get_distinct_statistics()
+        # print("leads",leads)
         # print("Distinct Roles:", roles)
         # data=extract_data_from_excel()
 
@@ -1265,10 +1339,10 @@ def bulk():
                     if records_added:
                         flash('File uploaded successfully!', 'success')
                     
-                    return redirect("/home")            
+                    return redirect(url_for('Home'))            
                 except Exception as e:
                     flash(f'Error: {e}', 'error')
-                    return redirect("/bulk")
+                    return redirect(url_for('bulk'))
     
     return render_template("bulk.html")
     
@@ -1379,7 +1453,15 @@ def resume():
 
 @app.route("/employee_management", methods=["GET", "POST"])
 def employee():
-    
+    role=None
+    email=session.get('email')
+    if email:
+        user=Login.query.filter_by(email=email).first()
+        role=user.Role
+        
+        if not user:
+            return redirect(url_for('login'))
+
     file_link = session.pop('file_link', None)
     public_key=os.environ.get('EMAILJS_PUBLIC_KEY')
     EMAILJS_SERVICE_ID=os.environ.get('EMAILJS_SERVICE_ID')
@@ -1437,7 +1519,7 @@ def employee():
                            page_size_options=page_size_options,
                            selected_page_size=selected_page_size,
                            total_items=total_items, total_pages=total_pages,
-                           start_index=start_index,months=months,current_month=current_month,selected_month=selected_month,file_link=file_link,public_key=public_key,service_id=EMAILJS_SERVICE_ID,template_id=EMAILJS_TEMPLATE_ID,search_query=search_query,qa_lead_query=qa_lead_query)
+                           start_index=start_index,months=months,current_month=current_month,selected_month=selected_month,file_link=file_link,public_key=public_key,service_id=EMAILJS_SERVICE_ID,template_id=EMAILJS_TEMPLATE_ID,search_query=search_query,qa_lead_query=qa_lead_query,role=role)
 
 
 @app.route("/view_resume/<filename>")
@@ -1464,6 +1546,7 @@ def view_resume(filename):
 
 @app.route("/zip",methods=["GET","POST"])
 def zip():
+    current_month = datetime.now().strftime("%B")
     sucessful_message=None
     if request.method=="POST":
         
@@ -1486,7 +1569,7 @@ def zip():
                                 # print("File")
                                 if not os.path.exists(target_path):
                                     shutil.move(file_path,target_path)
-                                    resume=Resume(filename=tag_filename)
+                                    resume=Resume(filename=tag_filename,Month=current_month)
                                     db.session.add(resume)
                                     db.session.commit()
                                     sucessful_message=True
@@ -1883,7 +1966,7 @@ def update_profile():
                 changes.append("Profile Picture")
         if changes:
             flash('{} changed.'.format(', '.join(changes)), 'success')
-        return redirect("/profile")
+        return redirect(url_for('profile'))
          
 @app.route('/update_config', methods=['POST'])
 def update_config():
@@ -1962,12 +2045,12 @@ def google_signin():
         else:
             flash('Account already exists. Please sign in.', 'warning')
             
-            return redirect("/")
+            return redirect(url_for('signPage'))
     
     else :
         if not user:
             flash('Account does not exist. Please sign up first.', 'warning')
-            return redirect("/")
+            return redirect(url_for('signPage'))
         
     session['email']=email
     session['name']=name
@@ -2020,9 +2103,32 @@ def delete_resume(resume_id):
 
     return redirect(url_for('employee', month=selected_month))
 
+@app.route("/delete_selected_resumes", methods=["POST"])
+def delete_selected_resumes():
+    data = request.get_json()
+    resume_ids = data.get("resume_ids", [])
+    selected_month = request.args.get('month')
+    
+    if resume_ids:
+        resumes = Resume.query.filter(Resume.id.in_(resume_ids)).all()
+        for resume in resumes:
+            # Delete the file
+            resume_folder = 'static/files'
+            file_path = os.path.join(resume_folder, resume.filename)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+            # Delete the database entry
+            db.session.delete(resume)
+
+        db.session.commit()
+
+    return jsonify({"success": True, "message": "Selected resumes deleted!"}), 200
 
 @app.route('/dmax_upload', methods=['GET', 'POST'])
 def dmax_upload():
+    months=["January","February","March","April","May","June","July","August","September","October","November","December"]
+    current_month = datetime.now().strftime("%B")
     if request.method == 'POST':
         file = request.files['file']
         selected_month = request.form.get('month')
@@ -2064,7 +2170,7 @@ def dmax_upload():
                 
             flash("Data successfully uploaded!", "success")
                     
-            render_template('dmax_upload.html')
+            render_template('dmax_upload.html',months=months,current_month=current_month)
             
 
     return render_template('dmax_upload.html')
@@ -2073,7 +2179,7 @@ def dmax_upload():
 def dmax_view():
 
     
-    
+    dmax_view_url = url_for('dmax_view')
     role = request.args.get('role') or ''
     location = request.args.get('location') or ''
     designation=request.args.get('designation') or''
@@ -2168,7 +2274,7 @@ def dmax_view():
             data=data.all()      
             # Set other roles' data to empty lists
             intern_data = jr_qa_data = qa_data = sr_qa_data = []
-    return render_template('dmax_view.html', data=data,intern_data=intern_data,jr_qa_data=jr_qa_data,qa_data=qa_data,sr_qa_data=sr_qa_data,location=location,role=role,project=project,designation=designation,month=month)
+    return render_template('dmax_view.html', data=data,intern_data=intern_data,jr_qa_data=jr_qa_data,qa_data=qa_data,sr_qa_data=sr_qa_data,location=location,role=role,project=project,designation=designation,month=month,dmax_view_url=dmax_view_url)
     
 @app.route('/dmax_add', methods=['GET', 'POST'])
 def dmax_add():
@@ -2475,11 +2581,10 @@ def excel_resume():
                         try:
                             # Convert the experience to a string, strip spaces, and remove any non-numeric characters (like 'yrs')
                             experience = str(experience).strip() if experience else None
-                            print("1", experience)
+                            
                             
                             if experience:
-                                if "yrsss" in experience:
-                                    print("yes")
+                                
                                 # Remove non-numeric characters like "yrs" using a regular expression
                                 # This keeps only digits and a decimal point
                                 numeric_experience = re.sub(r'[^\d.]', '', experience)
@@ -2497,7 +2602,7 @@ def excel_resume():
                             # Log error if needed, and set experience to None in case of failure
                             print(f"Error processing experience: {e}")
                             experience = None
-                        existing_employee =Resume.query.filter_by(Name=name).first()
+                        existing_employee =Resume.query.filter_by(Email=email).first()
                         if not existing_employee:
                             
                             new_candidate = Resume(
@@ -2525,7 +2630,7 @@ def excel_resume():
                             
             except:
                 pass    
-    return redirect("/resume")  
+    return redirect(url_for('resume'))  
 
 
 
@@ -2721,10 +2826,18 @@ def edit_employee_resume(employee_id):
     # Fetch employee details from the database using employee_id
     resume = Resume.query.get(employee_id)
     if request.method=="POST":
+        resume.Email=request.form['email']
+        resume.Name=request.form['name']
         resume.Qualification=request.form['qualification']
+        resume.Phone=request.form['phone']
+        resume.Location=request.form['location']
         resume.Actual_CTC = request.form['actual_ctc']
         resume.Expected_CTC = request.form['expected_ctc']
         resume.QA_Lead=request.form['qa_lead']
+        resume.Experience=request.form['experience']
+        resume.Notice_period=request.form['notice_period']
+        resume.Link=request.form["resume_link"]
+        resume.Role=map_role_based_on_experience(resume.Experience)
         db.session.commit()
         flash('Successfully updated!', 'success')
     return render_template("update_resume.html",resume=resume)

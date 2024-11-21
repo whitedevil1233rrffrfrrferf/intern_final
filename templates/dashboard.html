@@ -24,14 +24,14 @@
       {% include 'sidemenu.html' %}
       
       <div class="content" style="padding:10px; height: 100vh; width:100%; margin-left: 150px;">
-        <h1 style="padding: 50px;"><center>Dashboard</center></h1>
+        <h1 style="padding: 50px;"><center>Employee Dashboard</center></h1>
       <div class="flex_div" style="flex: 1; justify-content: space-between;">
         <div class="row row-cols-1 row-cols-md-3 g-4" style="padding: 10px;">
           <div class="col">
-            <div class="card h-100 ">
+            <div class="card h-100" >
               
               <div class="card-body" >
-                <i class="fa-solid fa-3x fa-users icons"></i>
+                <i class="fa-solid fa-3x fa-users icons" style="margin-bottom: 20px;"></i>
                 
                 <p class="card-text" >Total number of employees :{{ total_employees }}</p>
                 <p class="card-text">Number of active employees :{{active_employees }}</p>
@@ -39,52 +39,8 @@
               </div>
             </div>
           </div>
-          <div class="col">
-            <div class="card h-80">
-              <div class="card-body" style="max-height:12.8rem; overflow-y: auto;">
-                <img src="https://banner2.cleanpng.com/20190724/geb/kisspng-product-design-technology-font-5d385089740a08.2768103715639717214753.jpg" height="50px" width="50px" class="icons" style="margin-bottom: 10px;">
-                
-                {% for role, data in statistics.items() %}
-                  <h5>{{role}}</h5>
-                  <p class="card-text">
-                    <strong>Intro: </strong> 
-                    Selected: {{ data.intro.selected }}, Rejected: {{ data.intro.rejected }}
-                </p>
-
-                <!-- Interview 1 phase -->
-                <p class="card-text">
-                    <strong>Interview 1: </strong> 
-                    Selected: {{ data.interview1.selected }}, Rejected: {{ data.interview1.rejected }}
-                </p>
-
-                <!-- Interview 2 phase -->
-                <p class="card-text">
-                    <strong>Interview 2: </strong> 
-                    Selected: {{ data.interview2.selected }}, Rejected: {{ data.interview2.rejected }}
-                </p>
-
-                <!-- HR phase -->
-                <p class="card-text">
-                    <strong>HR: </strong> 
-                    Selected: {{ data.hr.selected }}, Rejected: {{ data.hr.rejected }}
-                </p>
-                <hr>
-                {% endfor %}
-              </div>
-            </div>
-          </div>
-          <div class="col">
-            <div class="card h-100">
-              
-              <div class="card-body">
-                <img src="https://static.vecteezy.com/system/resources/previews/006/085/712/original/job-application-icon-free-vector.jpg" height="50px" width="50px" class="icons">
-                
-                <p class="card-text">Employees joined this year : {{current_year_count}}</p>
-                <p class="card-text">Employees joined Last year : {{last_year_count}}</p>
-                
-              </div>
-            </div>
-          </div>
+          
+          
           <div class="col">
             <div class="card h-80">
               <div class="card-body">
@@ -124,9 +80,324 @@
               </div>
             </div>
           </div>
+          <div class="col">
+            <div class="card h-100">
+              <div class="card-body">
+                <img src="https://banner2.cleanpng.com/20190724/geb/kisspng-product-design-technology-font-5d385089740a08.2768103715639717214753.jpg" height="50px" width="50px" class="icons">
+                <p class="card-text">No of Applications: {{total_resumes}}</p>
+                <p class="card-text">No of applications selected :{{hr_selected}}</p>
+              </div>
+            </div>
+          </div>
+          
+          
+
+          
           </div>
           
       </div>
+      <hr>
+      <h1 style="padding:20px;"><center>Resume Dashboard</center></h1>
+      <div class="flex_div" style="flex: 1; justify-content: space-between; margin-bottom: 20rem !important;">
+        <div class="row row-cols-1 row-cols-md-3 g-4" style="padding: 10px;">
+            <!-- Role based count -->
+
+      <div class="col" style="margin-bottom: 2rem;">
+        <div class="card h-100">
+          <div class="card-body" style="max-height:19rem; overflow-y: auto; max-width:25.8rem; overflow-x: auto;">
+            
+            <table class="table table-bordered" style="box-shadow:0 8px 16px rgba(0, 0, 0, 0.3); border: 1px solid gray;">
+              <thead>
+                <span style="color: white; font-size:1.3rem;">Interview count based on Role</span>
+                <tr>
+                    <th class="head">Result</th>
+                    <th class="head">Jr QA Engg</th>
+                    <th class="head">QA Engg</th>
+                    <th class="head">Sr QA Engg</th>
+                    <th class="head">Grand Total</th>
+                </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Intro round Selected</strong></td>
+                <td>{{ statistics.get('Jr. QA Engineer', {}).get('intro', {}).get('selected', 0) }}</td>
+                <td>
+                  {{ statistics.get('QA Engineer', {}).get('intro', {}).get('selected', 0) }}
+                </td>
+                <td>
+                  {{ statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('selected', 0) }}
+                </td>
+                <td>
+                  <!-- Grand Total for the Intro round -->
+                  {{ statistics.get('Jr. QA Engineer', {}).get('intro', {}).get('selected', 0) +
+                     statistics.get('QA Engineer', {}).get('intro', {}).get('selected', 0) +
+                     statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('selected', 0) }}
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Intro round Rejected</strong></td>
+                <td>{{statistics.get('Jr. QA Engineer', {}).get('intro', {}).get('rejected', 0)}}</td>
+                <td>
+                  {{ statistics.get('QA Engineer', {}).get('intro', {}).get('rejected', 0) }}
+                </td>
+                <td>
+                  {{ statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('rejected', 0) }}
+                </td>
+                
+                  <td>
+                    <!-- Grand Total for the Intro round -->
+                    {{ statistics.get('Jr. QA Engineer', {}).get('intro', {}).get('rejected', 0) +
+                       statistics.get('QA Engineer', {}).get('intro', {}).get('rejected', 0) +
+                       statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('rejected', 0) }}
+                  </td>
+                
+              </tr>
+              <tr>
+                <td><strong>Interview 1 Selected</strong></td>
+                <td>{{ statistics.get('Jr. QA Engineer', {}).get('interview1', {}).get('selected', 0) }}</td>
+                <td>
+                  {{ statistics.get('QA Engineer', {}).get('interview1', {}).get('selected', 0) }}
+                </td>
+                <td>
+                  {{ statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('selected', 0) }}
+                </td>
+                <td>
+                  <!-- Grand Total for the Intro round -->
+                  {{ statistics.get('Jr. QA Engineer', {}).get('interview1', {}).get('selected', 0) +
+                     statistics.get('QA Engineer', {}).get('interview1', {}).get('selected', 0) +
+                     statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('selected', 0) }}
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Interview 1 Rejected</strong></td>
+                <td>{{ statistics.get('Jr. QA Engineer', {}).get('interview1', {}).get('rejected', 0) }}</td>
+                <td>
+                  {{ statistics.get('QA Engineer', {}).get('interview1', {}).get('rejected', 0) }}
+                </td>
+                <td>
+                  {{ statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('rejected', 0) }}
+                </td>
+                <td>
+                  <!-- Grand Total for the Intro round -->
+                  {{ statistics.get('Jr. QA Engineer', {}).get('interview1', {}).get('rejected', 0) +
+                     statistics.get('QA Engineer', {}).get('interview1', {}).get('rejected', 0) +
+                     statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('rejected', 0) }}
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Interview 2 Selected</strong></td>
+                <td>{{ statistics.get('Jr. QA Engineer', {}).get('interview2', {}).get('selected', 0) }}</td>
+                <td>
+                  {{ statistics.get('QA Engineer', {}).get('interview2', {}).get('selected', 0) }}
+                </td>
+                <td>
+                  {{ statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('selected', 0) }}
+                </td>
+                <td>
+                  <!-- Grand Total for the Intro round -->
+                  {{ statistics.get('Jr. QA Engineer', {}).get('interview2', {}).get('selected', 0) +
+                     statistics.get('QA Engineer', {}).get('interview2', {}).get('selected', 0) +
+                     statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('selected', 0) }}
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Interview 2 Rejected</strong></td>
+                <td>{{ statistics.get('Jr. QA Engineer', {}).get('interview2', {}).get('rejected', 0) }}</td>
+                <td>
+                  {{ statistics.get('QA Engineer', {}).get('interview2', {}).get('rejected', 0) }}
+                </td>
+                <td>
+                  {{ statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('rejected', 0) }}
+                </td>
+                <td>
+                  <!-- Grand Total for the Intro round -->
+                  {{ statistics.get('Jr. QA Engineer', {}).get('interview2', {}).get('rejected', 0) +
+                     statistics.get('QA Engineer', {}).get('interview2', {}).get('rejected', 0) +
+                     statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('rejected', 0) }}
+                </td>
+              </tr>
+              <tr>
+                <td><strong>HR selected</strong></td>
+                <td>{{ statistics.get('Jr. QA Engineer', {}).get('hr', {}).get('selected', 0) }}</td>
+                <td>
+                  {{ statistics.get('QA Engineer', {}).get('hr', {}).get('selected', 0) }}
+                </td>
+                <td>
+                  {{ statistics.get('Sr. QA Engineer', {}).get('hr', {}).get('selected', 0) }}
+                </td>
+                <td>
+                  <!-- Grand Total for the Intro round -->
+                  {{ statistics.get('Jr. QA Engineer', {}).get('hr', {}).get('selected', 0) +
+                     statistics.get('QA Engineer', {}).get('hr', {}).get('selected', 0) +
+                     statistics.get('Sr. QA Engineer', {}).get('hr', {}).get('selected', 0) }}
+                </td>
+              </tr>
+              <tr>
+                <td><strong>HR Rejected</strong></td>
+                <td>{{ statistics.get('Jr. QA Engineer', {}).get('hr', {}).get('rejected', 0) }}</td>
+                <td>
+                  {{ statistics.get('QA Engineer', {}).get('hr', {}).get('rejected', 0) }}
+                </td>
+                <td>
+                  {{ statistics.get('Sr. QA Engineer', {}).get('hr', {}).get('rejected', 0) }}
+                </td>
+                <td>
+                  <!-- Grand Total for the Intro round -->
+                  {{ statistics.get('Jr. QA Engineer', {}).get('hr', {}).get('rejected', 0) +
+                     statistics.get('QA Engineer', {}).get('hr', {}).get('rejected', 0) +
+                     statistics.get('Sr. QA Engineer', {}).get('hr', {}).get('rejected', 0) }}
+                </td>
+              </tr>
+              
+              
+            </tbody>
+            </table>
+            
+          </div>
+        </div>
+      </div>
+      <!-- Lead based count -->
+      <div class="col">
+        <div class="card h-100" style="max-height:19rem; overflow-y: auto; max-width:25.8rem; overflow-x: auto;">
+          
+          <div class="card-body">
+            <table class="table table-bordered">
+              <thead>
+                <span style="color: white; font-size:1.3rem;"">Interview count based on QA leads</span>
+                <tr>
+                  <th class="head">Result</th>
+                  
+              
+                  {% for lead in statistics_leads.keys() %}
+                      <th class="head">{{ lead }}</th>
+                  {% endfor %}
+                  
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>Intro Round Selected</th>
+                  {% for lead in statistics_leads.keys() %}
+                      <td>{{statistics_leads[lead].intro.selected}}</td>
+                  {% endfor %}
+              </tr>
+              <tr>
+                <th>Intro Round Rejected</th>
+                {% for lead in statistics_leads.keys() %}
+                    <td>{{statistics_leads[lead].intro.rejected}}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+              <th>Interview 1 Selected</th>
+              {% for lead in statistics_leads.keys() %}
+                  <td>{{statistics_leads[lead].interview1.selected}}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <th>Interview 1 Rejected</th>
+              {% for lead in statistics_leads.keys() %}
+                  <td>{{statistics_leads[lead].interview1.rejected}}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <th>Interview 2 Selected</th>
+              {% for lead in statistics_leads.keys() %}
+                  <td>{{statistics_leads[lead].interview2.selected}}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <th>Interview 2 Rejected</th>
+              {% for lead in statistics_leads.keys() %}
+                  <td>{{statistics_leads[lead].interview2.rejected}}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <th>HR Selected</th>
+              {% for lead in statistics_leads.keys() %}
+                  <td>{{statistics_leads[lead].hr.selected}}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <th>HR Rejected</th>
+              {% for lead in statistics_leads.keys() %}
+                  <td>{{statistics_leads[lead].hr.rejected}}</td>
+              {% endfor %}
+            </tr>
+            <tr>
+              <th>Grand Total</th>
+              {% for lead in statistics_leads.keys() %}
+                  <td>{{ statistics_leads[lead].grand_total }}</td>  <!-- Displaying the grand total for each lead -->
+              {% endfor %}
+            </tr>
+              </tbody>
+            
+          </table>
+            
+          </div>
+        </div>
+      </div> 
+
+      <!--  Overall count  -->
+      <div class="col">
+        <div class="card h-100" style="max-height:19rem; overflow-y: auto; max-width:25.8rem; overflow-x: auto;">
+          
+          <div class="card-body">
+            <table class="table table-bordered">
+              <span style="color: white; font-size:1.3rem;">Overall Interview count</span>
+              <thead>
+                <tr>
+                  <th scope="col" class="head">Status</th>
+                  <th scope="col" class="head">Count</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>Intro Round Selected</th>
+                  <td>{{ overall_counts['intro']['selected'] }}</td>
+                </tr>
+              
+              <tr>
+                <th>Intro Round Rejected</th>
+                <td>{{ overall_counts['intro']['rejected'] }}</td>
+            </tr>
+            <tr>
+              <th>Interview 1 Selected</th>
+              <td>{{ overall_counts['interview1']['selected'] }}</td>
+            </tr>
+            <tr>
+              <th>Interview 1 Rejected</th>
+              <td>{{ overall_counts['interview1']['rejected'] }}</td>
+            </tr>
+            <tr>
+              <th>Interview 2 Selected</th>
+              <td>{{ overall_counts['interview2']['selected'] }}</td>
+            </tr>
+            <tr>
+              <th>Interview 2 Rejected</th>
+              <td>{{ overall_counts['interview2']['rejected'] }}</td>
+            </tr>
+            <tr>
+              <th>HR Selected</th>
+              <td>{{ overall_counts['hr']['selected'] }}</td>
+            </tr>
+            <tr>
+              <th>HR Rejected</th>
+              <td>{{ overall_counts['hr']['rejected'] }}</td>
+            </tr>
+            <tr>
+              <th>Grand Total</th>
+              <td>{{ overall_counts['grand_total']}}</td>
+            </tr>
+              </tbody>
+            
+          </table>
+            
+          </div>
+        </div>
+      </div>
+        </div>
+      </div>
+      
       </div>
      
     </div>

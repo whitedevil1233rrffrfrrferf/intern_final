@@ -313,9 +313,9 @@ td.truncate:hover::after {
                 <td>{{employee.Comments}}</td>
                 <td id="employee_status" hidden>{{employee.employee_status}}</td>
                 <!-- <td><a href="" type="button" class="btn btn-outline-secondary btn-sm mx-1">Update</button></td> -->
-                <td><a class="icon-1" href="/update/{{employee.Sno}}"><i class="fa-solid fa-pencil mx-2"></i></a></td>  
-                <!-- <td><a href="/delete/{{employee.Sno}}"><i class="fa-solid fa-trash mx-2"></i></a></td> -->
-                <td><a class="icon-2" href="/view/{{employee.Sno}}"><i class="fa-solid fa-eye mx-2"></i></a></td>
+                <td><a class="icon-1" href="{{ url_for('Update', sno=employee.Sno) }}"><i class="fa-solid fa-pencil mx-2"></i></a></td>  
+                <!-- <td><a href="{{ url_for('Delete', sno=employee.Sno) }}"><i class="fa-solid fa-trash mx-2"></i></a></td> -->
+                <td><a class="icon-2" href="{{ url_for('view', sno=employee.Sno) }}"><i class="fa-solid fa-eye mx-2"></i></a></td>
                   <!-- <td><a href="" type="button" class="btn btn-outline-secondary btn-sm mx-1">Delete</button></td>   -->
               </tr>
               {% endfor %}
@@ -357,10 +357,10 @@ td.truncate:hover::after {
           <div style="display: flex; align-items: center;justify-content:space-between!important; margin-left:40%; margin-top:rem; margin-bottom: 2rem;">
             <div style="display: flex; align-items: center; ">
               <div>
-                <a type="button" href="/add" class="btn btn-primary ">Add a new user</a>
+                <a type="button" href="{{ url_for('Add') }}" class="btn btn-primary ">Add a new user</a>
               </div>
               <div>
-                <a type="button" href="/bulk" class="btn btn-primary mx-3">Bulk add</a>
+                <a type="button" href="{{ url_for('bulk') }}" class="btn btn-primary mx-3">Bulk add</a>
               </div>
               <div style="text-align: center;  flex-wrap: wrap;">
                 Page {{ data.page }} of {{ total_pages }} | Total Employees: {{ total_items }}
@@ -402,6 +402,10 @@ td.truncate:hover::after {
         searchInput.value = '';
         searchInput.form.submit();
     }
+
+    </script>
+    <script>
+      const homeUrl = "{{ url_for('Home') }}";
     </script>
     <script src="{{ url_for('static', filename='config.js') }}"></script>
     <script src="{{ url_for('static', filename='index.js') }}"></script>    

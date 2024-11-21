@@ -253,7 +253,7 @@ function handleFilters() {
     }
   
     // Update the window location, including page, sort_by, and sort_order
-    window.location.href = `/home?page=${page}&sort_by=${sortBy}&sort_order=${sortOrder}&${urlParams.toString()}`;
+    window.location.href = `${homeUrl}?page=${page}&sort_by=${sortBy}&sort_order=${sortOrder}&${urlParams.toString()}`;
   }
 
 

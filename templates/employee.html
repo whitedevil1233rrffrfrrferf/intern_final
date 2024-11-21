@@ -12,41 +12,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='employee.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script>
-        window.onload=function(){
-            {% for resume in resumes %}
-            getInterviewStatusAndToggleButtons({{ resume.id }});
-            {% endfor %}
-        };
-
-        function getInterviewStatusAndToggleButtons(resumeId){
-            fetch(`/get_interview_status/${resumeId}`)
-        .then(response => response.json())
-        .then(data => {
-            toggleInterviewButtons(resumeId, data.intro_status,data.interview1_status,data.interview2_status);
-        });
-        }
-        function toggleInterviewButtons(resumeId,introStatus,interview1Status,interview2Status){
-            const introButton = document.getElementById(`introButton${resumeId}`);
-            const interview1Button = document.getElementById(`interview1Button${resumeId}`);
-            const interview2Button=document.getElementById(`interview2Button${resumeId}`);
-            const hrButton=document.getElementById(`hrButton${resumeId}`)
-            if (introStatus === "Intro call not conducted" ||introStatus === "Rejected" ) {
-            // If Intro call not conducted, hide Interview 1 button
-            interview1Button.style.display = "none";
-            interview2Button.style.display="none";
-            hrButton.style.display="none";
-        }
-            if (interview1Status === "Interview 1 not conducted" || interview1Status === "Rejected"){
-                interview2Button.style.display="none";
-                hrButton.style.display="none";
-            }
-            if (interview2Status==="Interview 2 not conducted" || interview2Status==="Rejected"){
-                hrButton.style.display="none"
-            }
-
-        }
-    </script>
+    
+    
     <script type="text/javascript">
         (function(){
             emailjs.init("{{public_key}}");
@@ -149,8 +116,12 @@
                         <a href="{{ url_for('google_drive_auth') }}">
                             <button class="btn btn-primary" style="width:7rem!important;" onclick="sendEmail()">Send Mail</button>
                         </a>
-                    </div>    
+                    </div> 
+                    <div style="margin-bottom: 20px;display: {{ 'inline-block' if role == 'admin' else 'none' }};">
+                        <button class="btn btn-danger" id="delete-all" style="width:7rem!important;">Delete all</button>
+                    </div>   
                     </div>
+                    
                 </div>
             </div>
             
@@ -161,6 +132,7 @@
                     
                     <thead class="thead-dark">
                         <tr>
+                            <th class="checkbox-column" style="display: none;"><input type="checkbox" id="select-all"></th>
                             <th scope="col">ID</th>
                             <th scope="col">Candidate Name</th>
                             <th scope="col">Email</th>
@@ -182,6 +154,9 @@
                         
                         {% for resume in resumes.items %}
                             <tr>
+                                <td class="checkbox-column" style="display: none;">
+                                    <input type="checkbox" class="resume-checkbox" value="{{ resume.id }}">
+                                </td>
                                 <td>{{ start_index + loop.index }}</td>
                                 <td class="wrap-text" id="name-{{ resume.id }}">
                                     {% if resume.Link %}
@@ -189,7 +164,7 @@
                                     {% else %}  
                                     <a href="{{ url_for('view_resume', filename=resume.filename) }}" class="long-filename  text-break" target="_blank">{{ resume.filename }}</a>
                                     {% endif %}
-                                    <a href="#" style="font-size: 32px; margin-left: 20px; color: red;" onclick="getInterviewStatus(event,{{resume.id}})"><i class="fa-solid fa-info" style="font-size: 20px;"></i></a>
+                                    <a href="{{ url_for('get_intro_status', resume_id=resume.id) }}"  style="font-size: 32px; margin-left: 20px; color: red;" onclick="getInterviewStatus(event,{{resume.id}})"><i class="fa-solid fa-info" style="font-size: 20px;"></i></a>
                                     <div id="toggle{{ resume.id }}" style="display: none;">
                                         <div id="introStatus{{ resume.id }}" style="margin-bottom: 3px; margin-top:5px;"></div>
                                         <div id="interview1Status{{ resume.id }}" style="margin-bottom: 3px;"></div>
@@ -201,13 +176,7 @@
                                     {% if resume.Email %}
                                     {{ resume.Email }}
                                     {% else %}   
-                                    <button class="btn btn-primary" id="btn_name{{resume.id}}"  onclick="showInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
-                                    <div style="display: none;" id="name{{resume.id}}">
-                                        <input type="text" id="nameInput{{resume.id}}" required>
-                                        <center><button class="btn btn-primary sub" id="submitBtn{{resume.id}}" onclick="submitName({{resume.id}})">Submit</button></center>
-                                    </div>
-                                    
-                                    <div id="div_name{{resume.id}}" style="display: none;" onclick="editName({{resume.id}})"></div>
+                                    None
                                     {% endif %}
                                     </td>
                                     
@@ -215,60 +184,35 @@
                                     {% if resume.Phone %}
                                     {{ resume.Phone }}
                                     {% else %} 
-                                    <button class="btn btn-primary" id="btn_contact{{resume.id}}" onclick="showContactInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
-                                    <div style="display: none;" id="contact{{resume.id}}">
-                                        <input type="text" id="contactInput{{resume.id}}" required>
-                                        <center><button class="btn btn-primary sub" id="submitBtnContact{{resume.id}}" onclick="submitContact({{resume.id}})">Submit</button></center>
-                                    </div>
-                                    <div id="div_contact{{resume.id}}" style="display: none;" onclick="editContact({{resume.id}})"></div>
+                                    None
                                     {% endif %}
                                 </td>
                                 <td class="wrap-text">
                                     {% if resume.Qualification %}
                                     {{ resume.Qualification }}
                                     {% else %} 
-                                    <button class="btn btn-primary" id="btn_actualCTC{{resume.id}}" onclick="showActualCTCInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
-                                    <div style="display: none;" id="actualCTC{{resume.id}}">
-                                        <input type="text" id="actualCTCInput{{resume.id}}">
-                                        <center><button class="btn btn-primary sub" id="submitBtnActualCTC{{resume.id}}" onclick="submitActualCTC({{resume.id}})">Submit</button></center>
-                                    </div>
-                                    <div id="div_actualCTC{{resume.id}}" style="display: none;" onclick="editActualCTC({{resume.id}})"></div>
+                                    None
                                     {% endif %}
                                 </td>
                                 <td class="wrap-text">
                                     {% if resume.Experience %}
                                     {{ resume.Experience }}
                                     {% else %} 
-                                    <button class="btn btn-primary" id="btn_expectedCTC{{resume.id}}" onclick="showExpectedCTCInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
-                                    <div style="display: none;" id="expectedCTC{{resume.id}}">
-                                        <input type="text" id="expectedCTCInput{{resume.id}}">
-                                        <center><button class="btn btn-primary sub" id="submitBtnExpectedCTC{{resume.id}}" onclick="submitExpectedCTC({{resume.id}})">Submit</button></center>
-                                    </div>
-                                    <div id="div_expectedCTC{{resume.id}}" style="display: none;" onclick="editExpectedCTC({{resume.id}})"></div>  
+                                    None
                                     {% endif %}
                                 </td>
                                 <td class="wrap-text" id="QA_Lead-{{ resume.id }}">
                                     {% if resume.QA_Lead %}
                                     {{ resume.QA_Lead }}
                                     {% else %} 
-                                    <button class="btn btn-primary" id="btn_role{{resume.id}}" onclick="showRoleInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
-                                    <div style="display: none;" id="role{{resume.id}}">
-                                        <input type="text" id="roleInput{{resume.id}}">
-                                        <center><button class="btn btn-primary sub" id="submitBtnRole{{resume.id}}" onclick="submitRole({{resume.id}})">Submit</button></center>
-                                    </div>
-                                    <div id="div_role{{resume.id}}" style="display: none;" onclick="editRole({{resume.id}})"></div>  
+                                    None
                                     {% endif %}
                                 </td>
                                 <td class="wrap-text">
                                     {% if resume.Location %}
                                     {{ resume.Location }}
                                     {% else %} 
-                                    <button class="btn btn-primary" id="btn_location{{resume.id}}" onclick="showLocationInput({{resume.id}})" title="add"><i class="fa-solid fa-user-plus icons" style="color: white;"></i></button>
-                                    <div style="display: none;" id="location{{resume.id}}">
-                                        <input type="text" id="locationInput{{resume.id}}">
-                                        <center><button class="btn btn-primary sub" id="submitBtnLocation{{resume.id}}" onclick="submitLocation({{resume.id}})">Submit</button></center>
-                                    </div>
-                                    <div id="div_location{{resume.id}}" style="display: none;" onclick="editLocation({{resume.id}})"></div>
+                                    None
                                     {% endif %}  
                                 </td>
                                 <td class="wrap-text">
@@ -297,7 +241,7 @@
                                 <td class="wrap-text">{{resume.Month}}</td>
                                 <td class="wrap-text">
                                     <div>
-                                        <a id="introButton{{ resume.id }}" href="{{ url_for('introCall', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2 " title="Intro call">Intro</a>
+                                        <a id="introButton{{ resume.id }}" href="{{ url_for('introCall', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2 " title="Intro call" data-url="{{ url_for('get_intro_status', resume_id=resume.id) }}">Intro</a>
                                         <a id="interview1Button{{ resume.id }}" href="{{ url_for('interview1v', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2" title="Interview 1"><i class="fa-solid fa-phone"></i> 1</a>
                                         <a id="interview2Button{{ resume.id }}" href="{{ url_for('interview2v', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2 " title="Interview 2"><i class="fa-solid fa-phone"></i> 2</a>
                                         <a id="hrButton{{ resume.id }}" href="{{ url_for('hr', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2" title="HR round">HR</a>
@@ -316,6 +260,9 @@
                         {% endfor %}
                     </tbody>
                 </table>
+                <div style="display: {{ 'inline-block' if role == 'admin' else 'none' }};">
+                    <button class="btn btn-danger" id="delete-selected" disabled style="width: 7rem !important;">Delete Selected</button>
+                </div>
                 <div style="display: flex !important; align-items: center !important; gap: 2rem; align-items: center; margin-top: 10rem; margin-left:25%; ">
                 <div>
                     {% for page_num in resumes.iter_pages(left_edge=1,right_edge=1,left_current=1,right_current=2) %}
@@ -353,13 +300,49 @@
             
     </div>
     
-                        
+                     
     </div>
     
     
     <script src="{{ url_for('static', filename='config.js') }}"></script>   
     <script src="{{ url_for('static', filename='employee.js') }}"></script>
+    <!-- <script>
+        
+       window.onload=function(){
+           {% for resume in resumes %}
+           getInterviewStatusAndToggleButtons({{ resume.id }});
+           {% endfor %}
+       };
 
+       function getInterviewStatusAndToggleButtons(resumeId){
+            
+           fetch(statusUrl)
+       .then(response => response.json())
+       .then(data => {
+           toggleInterviewButtons(resumeId, data.intro_status,data.interview1_status,data.interview2_status);
+       });
+       }
+       function toggleInterviewButtons(resumeId,introStatus,interview1Status,interview2Status){
+           const introButton = document.getElementById(`introButton${resumeId}`);
+           const interview1Button = document.getElementById(`interview1Button${resumeId}`);
+           const interview2Button=document.getElementById(`interview2Button${resumeId}`);
+           const hrButton=document.getElementById(`hrButton${resumeId}`)
+           if (introStatus === "Intro call not conducted" ||introStatus === "Rejected" ) {
+           // If Intro call not conducted, hide Interview 1 button
+           interview1Button.style.display = "none";
+           interview2Button.style.display="none";
+           hrButton.style.display="none";
+       }
+           if (interview1Status === "Interview 1 not conducted" || interview1Status === "Rejected"){
+               interview2Button.style.display="none";
+               hrButton.style.display="none";
+           }
+           if (interview2Status==="Interview 2 not conducted" || interview2Status==="Rejected"){
+               hrButton.style.display="none"
+           }
+
+       }
+   </script> -->
     <script>
         {% for resume in resumes %}
             var storedName{{resume.id}}=localStorage.getItem('enteredName{{ resume.id }}');
@@ -432,7 +415,9 @@
             window.location.href = url; // Redirect to the same page with the selected month
         }
     </script>
-    
+    <script>
+        var deleteSelectedResumesUrl = "{{ url_for('delete_selected_resumes') }}";
+    </script>
     <script type="text/javascript">
     // Get the file link from the Flask session
     const fileLink = "{{ file_link or '' }}";

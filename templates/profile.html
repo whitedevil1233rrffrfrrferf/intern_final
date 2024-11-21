@@ -49,7 +49,7 @@
             {% endif %} 
         {% endif %}    
         <button onclick="showFileInput()" style="margin-left:500px;"><i class="fa-solid fa-pencil mx-2"></i></button>
-        <form action="/update_profile" method="post" enctype="multipart/form-data">
+        <form action="{{url_for('update_profile')}}" method="post" enctype="multipart/form-data">
             <div class="mb-3 " id="pic" style="display:none;">
                 <label for="photo">Profile Picture:</label>
                 <input type="file" class="form-control" id="photo" name="photo">
@@ -89,7 +89,7 @@
 
             <div style="display: flex; margin-left: 30%;margin-top: 2rem;">
                 <button type="submit" class="btn btn-primary" style="width:6rem; height:3rem; margin-right: 2rem;">Submit</button>
-                <a class="btn btn-outline-secondary" href="/home" style="padding:10px ;width:6rem; height:3rem;"><div style="display: flex; justify-content: space-between; padding:5px;">
+                <a class="btn btn-outline-secondary" href="{{url_for('Home')}}" style="padding:10px ;width:6rem; height:3rem;"><div style="display: flex; justify-content: space-between; padding:5px;">
                     <div>
                       <i class="fa-solid fa-backward" style="margin-right: 10px;"></i>
                     </div>

@@ -18,7 +18,7 @@
       <div class="card">
         <div class="card-body">
             <div class="container" style="display: flex; justify-content: space-around; align-items: center; height: 20rem; margin-top: 20px;">
-                <form action="/bulk" method="post" enctype="multipart/form-data" style=" max-width:40rem; border: 1px solid black; padding: 20px; width:30rem; box-shadow: 5px 15px 25px rgba(0,0,0,0.35);">
+                <form action="{{ url_for('bulk') }}" method="post" enctype="multipart/form-data" style=" max-width:40rem; border: 1px solid black; padding: 20px; width:30rem; box-shadow: 5px 15px 25px rgba(0,0,0,0.35);">
     
                     <div  style="position: relative; left:100px;">
                         <h4 style="display: inline; text-align: center;">File:</h4>
@@ -67,7 +67,7 @@
                     class="fa-solid fa-download"></i></a>
         </div>
     </div> -->
-    <a class="btn btn-outline-secondary" href="/home" style=" padding:10px ;margin-top:30px; margin-left:570px;"><div style="display: flex; justify-content: space-between; padding:5px;">
+    <a class="btn btn-outline-secondary" href="{{ url_for('Home')}}" style=" padding:10px ;margin-top:30px; margin-left:570px;"><div style="display: flex; justify-content: space-between; padding:5px;">
       <div>
         <i class="fa-solid fa-backward" style="margin-right: 10px;"></i>
       </div>

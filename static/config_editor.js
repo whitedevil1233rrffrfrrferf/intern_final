@@ -90,7 +90,7 @@ document.getElementById("updateForm").addEventListener("submit", updateConfigVal
 
 // Function to save the updated configuration to the server
 function saveConfigToServer(config) {
-    fetch('/update_config', {
+    fetch(updateConfigUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

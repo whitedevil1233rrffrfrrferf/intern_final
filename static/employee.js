@@ -78,7 +78,31 @@ function filterTableByIntroStatus(){
     })
     
 }
-
+function handleFilters(){
+    const role = document.getElementById('role').value;
+    const week=document.getElementById('week').value;
+    const month=document.getElementById('month').value;
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const page = urlParams.get('page') || 1;
+    if (role) {
+        urlParams.set('role', role);
+    } else {
+        urlParams.delete('role');
+    }
+    if (week) {
+        urlParams.set('week', week);
+    } else {
+        urlParams.delete('week');
+    }
+    if (month) {
+        urlParams.set('month', month);
+    } else {
+        urlParams.delete('month');
+    }
+    window.location.href = `${homeUrl}?page=${page}&${urlParams.toString()}`;
+    
+}
 function filterTableByInterview1Status(){
     const interview1Filter = document.getElementById("interview1Filter");
     const selectedStatus = interview1Filter.value.toLowerCase();
@@ -489,14 +513,14 @@ document.getElementById("clearSearch_qa").addEventListener("click", function() {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-    const deleteAllButton = document.getElementById("delete-all");
+    
     const deleteSelectedButton = document.getElementById("delete-selected");
     const selectAllCheckbox = document.getElementById("select-all");
     const checkboxes = document.querySelectorAll(".resume-checkbox");
     const checkboxColumns = document.querySelectorAll(".checkbox-column");
 
     // Show checkboxes when "Delete All" is clicked
-    deleteAllButton.addEventListener("click", () => {
+    selectAllCheckbox.addEventListener("click", () => {
         checkboxColumns.forEach(col => col.style.display = "");
     });
     selectAllCheckbox.addEventListener("change", () => {

@@ -41,20 +41,21 @@
     {% endwith %}     
     <div class="first_div">
         {% include 'sidemenu.html'%}
-
+        
         <div style=" margin-left:8rem;overflow-x: auto;width: 140%;overflow-y:scroll;height:500%;width: 400%;">
+            <h1 style="text-align: center;  background-color:#4699F9;color: white;">Employee resumes</h1>
             <div class="container-fluid" style="margin-bottom: 2rem;margin-top: 1rem !important;">
           <nav class="navbar navbar-expand-lg bg-body-tertiary" style="margin-top: 1rem;">
             <div class="container" >
               
-              <div class="collapse navbar-collapse" id="navbarSupportedContent" style="display: flex; flex-direction: column;">
+              <div class="collapse navbar-collapse" id="navbarSupportedContent" style="display: flex; flex-direction: column;height: 4rem;">
                 
                 <form class="d-flex col-10 my-2" action="{{ url_for('employee') }}" role="search" method="GET">
-                  <input class="form-control me-2" type="search" id="search_bar" placeholder="Search by Name" name="search" aria-label="Search" value="{{ search_query }}" style="margin-right:2rem!important;">
+                  <input class="form-control me-2" type="search" id="search_bar" placeholder="Search by Name / QA Lead" name="search" aria-label="Search" value="{{ search_query }}" style="margin-right:2rem!important;">
                   <button class="btn btn-primary" type="submit" onclick="filterTable()">Search</button>
                   <button type="button" class="btn btn-danger" id="clearSearch" style="margin-left: 10px;">Clear</button>
                 </form>
-                <form class="d-flex col-10 my-2" action="{{ url_for('employee') }}" role="search" method="GET">
+                <form class="d-flex col-10 my-2" action="{{ url_for('employee') }}" role="search" method="GET" style="visibility: hidden;">
                   <input class="form-control me-2" type="search" id="search_bar_qa" placeholder="Search by QA Lead" name="qa_lead" aria-label="Search" value="{{qa_lead_query}}" style="margin-right:2rem!important;">
                   <button class="btn btn-primary" type="submit" onclick="filterTable_qa()">Search</button>
                   <button type="button" class="btn btn-danger" id="clearSearch_qa" style="margin-left: 10px;">Clear</button>
@@ -63,41 +64,51 @@
             </div>
           </nav>
         </div>
-            <div class="filters" style="margin-bottom: 20px; " >
-                <h1 style="text-align: center;  background-color:#4699F9;color: white;">Employee resumes</h1>
+            <div class="filters" style="margin-bottom: 20px; margin-left: 1rem; width: 95%;">
+                
                 <div class="flex" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
-                    <div style="margin-bottom: 20px; margin-top: 20px;">
+                    <div style="margin-bottom: 10px; margin-top: 20px;" class="inner_filter">
                         <label for="introFilter" >Intro Call Status:</label>
-                        <select  id="introFilter" onchange="filterTableByIntroStatus()" style="margin-bottom: 20px; margin-top: 20px;">
+                        <select  id="introFilter" onchange="filterTableByIntroStatus()" >
                             <option value="">Select</option>
                             
                         </select>
                     </div>
-                    <div style="margin-bottom: 10px; margin-top: 20px;">
+                    <div style="margin-bottom: 10px; margin-top: 20px;" class="inner_filter">
                         <label for="interview1Filter" >Interview 1 Status:</label>
-                        <select id="interview1Filter" onchange="filterTableByInterview1Status()" style="margin-bottom: 20px; margin-top: 20px;">
+                        <select id="interview1Filter" onchange="filterTableByInterview1Status()" >
                             <option value="">Select</option>
                             
                         </select>
                     </div>
-                    <div style="margin-bottom:10px; margin-top: 20px;">
+                    <div style="margin-bottom:10px; margin-top: 20px;" class="inner_filter">
                         <label for="interview2Filter">Interview 2 Status:</label>
-                        <select id="interview2Filter" onchange="filterTableByInterview2Status()" style="margin-bottom: 20px; margin-top: 20px;">
+                        <select id="interview2Filter" onchange="filterTableByInterview2Status()" >
                             <option value="">Select</option>
                            
                         </select>
                     </div>
-                    <div style="margin-bottom: 20px; margin-top: 20px;">
+                    <div style="margin-bottom: 10px; margin-top: 20px;" class="inner_filter">
                         <label for="allRoundsFilter">All rounds cleared:</label>
-                        <select id="allRoundsFilter" onchange="filterTableByAllRoundsStatus()" style="margin-bottom: 20px; margin-top: 20px;">
+                        <select id="allRoundsFilter" onchange="filterTableByAllRoundsStatus()" >
                             <option value="">Select</option>
                         </select>
                     </div>
-                     <div style=" flex-basis: 100%;"></div>
-                    <div style="display: flex; gap: 2rem; align-items: center; justify-content: space-around;">
-                        <div style="margin-bottom: 20px;"">
+                    <div class="inner_filter" style="margin-bottom: 10px; margin-top: 20px;">
+                        <label for="role" class="label " >Role:</label>
+                        <select name="role" id="role" onchange="handleFilters()" >
+                            <option value="">Select</option>
+                            <!-- Populate dynamically or add static options -->
+                            <option value="QA Engineer" {% if filter_role == 'QA Engineer' %}selected{% endif %}>QA Engineer</option>
+                            <option value="Jr. QA Engineer" {% if filter_role == 'Jr. QA Engineer' %}selected{% endif %}>Jr. QA Engineer</option>
+                            <option value="Sr. QA Engineer" {% if filter_role == 'Sr. QA Engineer' %}selected{% endif %}>Sr. QA Engineer</option>
+                            <option value="QA Lead" {% if filter_role == 'QA Lead' %}selected{% endif %}>QA Lead</option>
+                            <option value="Intern" {% if filter_role == 'Intern' %}selected{% endif %}>Intern</option>
+                        </select>
+                    </div>
+                    <div class="inner_filter" style="margin-bottom: 10px; margin-top: 20px;">
                         <label for="month">Month:</label>
-                        <select id="month" onchange="filterByMonth()" style="margin-bottom: 20px; margin-top: 20px;">
+                        <select id="month" onchange="handleFilters()" >
                             {% for month in months %}
                                 <option value="{{ month }}" 
                                     
@@ -109,44 +120,49 @@
                                 >
                                     {{ month }}
                                 </option>
-                    {% endfor %}
+                             {% endfor %}
                         </select>
                     </div>
-                    <div style="margin-bottom: 20px;">                       
-                        <a href="{{ url_for('google_drive_auth') }}">
-                            <button class="btn btn-primary" style="width:7rem!important;" onclick="sendEmail()">Send Mail</button>
-                        </a>
-                    </div> 
-                    <div style="margin-bottom: 20px;display: {{ 'inline-block' if role == 'admin' else 'none' }};">
-                        <button class="btn btn-danger" id="delete-all" style="width:7rem!important;">Delete all</button>
-                    </div>   
+                    <div class="inner_filter" style="margin-bottom: 10px; margin-top: 20px;">
+                        <label for="week"  >Week:</label>
+                        <select id="week" name="week"  required onchange="handleFilters()">
+                            <option value="">Select a Week</option>
+                            <option value="Week 1" {% if filter_week == "Week 1" %}selected{% endif %}>Week 1</option>
+                            <option value="Week 2" {% if filter_week == "Week 2" %}selected{% endif %}>Week 2</option>
+                            <option value="Week 3" {% if filter_week == "Week 3" %}selected{% endif %}>Week 3</option>
+                            <option value="Week 4" {% if filter_week == "Week 4" %}selected{% endif %}>Week 4</option>
+                            <option value="Week 5" {% if filter_week == "Week 5" %}selected{% endif %}>Week 5</option>
+                        </select>
                     </div>
+                     
                     
                 </div>
             </div>
             
             
             
-            <div class="table-responsive my-4" style="overflow-x:auto; width:max-content;">
-                <table class="table table-striped table-bordered" style="table-layout: auto;">
+            <div class="table-responsive my-4" style="overflow-x:auto; width:100%;">
+                <table class="table" style="table-layout: auto;">
                     
                     <thead class="thead-dark">
                         <tr>
-                            <th class="checkbox-column" style="display: none;"><input type="checkbox" id="select-all"></th>
+                            <th class="checkbox-column" ><input type="checkbox" id="select-all"></th>
                             <th scope="col">ID</th>
                             <th scope="col">Candidate Name</th>
-                            <th scope="col">Email</th>
+                            <!-- <th scope="col">Email</th> -->
                             <th scope="col">Contact number</th>
-                            <th scope="col">Qualification</th>
+                            <!-- <th scope="col">Qualification</th> -->
                             <th scope="col">Experience/Fresher</th>
                             <th scope="col">QA Lead Assigned</th>
-                            <th scope="col">Location</th>   
+                            <!-- <th scope="col">Location</th>    -->
                             <th scope="col">Role</th>
-                            <th scope="col">Others</th>
+                            <!-- <th scope="col">Others</th> -->
                             <th scope="col">Month</th>
+                            <th scope="col">Week</th>
                             <th scope="col">Interview Details</th>
                             <th scope="col">View</th>
                             <th scope="col">Action</th>
+                            
                             <th scope="col" hidden>intro status</th>
                         </tr>
                     </thead>
@@ -154,17 +170,17 @@
                         
                         {% for resume in resumes.items %}
                             <tr>
-                                <td class="checkbox-column" style="display: none;">
+                                <td class="checkbox-column" >
                                     <input type="checkbox" class="resume-checkbox" value="{{ resume.id }}">
                                 </td>
                                 <td>{{ start_index + loop.index }}</td>
                                 <td class="wrap-text" id="name-{{ resume.id }}">
                                     {% if resume.Link %}
-                                    <a href="{{resume.Link}}" class="long-filename  text-break" target="_blank">{{ resume.Name }}</a>
+                                    <a href="{{resume.Link}}" class="long-filename  text-break" target="_blank" >{{ resume.Name }}</a>
                                     {% else %}  
                                     <a href="{{ url_for('view_resume', filename=resume.filename) }}" class="long-filename  text-break" target="_blank">{{ resume.filename }}</a>
                                     {% endif %}
-                                    <a href="{{ url_for('get_intro_status', resume_id=resume.id) }}"  style="font-size: 32px; margin-left: 20px; color: red;" onclick="getInterviewStatus(event,{{resume.id}})"><i class="fa-solid fa-info" style="font-size: 20px;"></i></a>
+                                    <a href="{{ url_for('get_intro_status', resume_id=resume.id) }}"  style="margin-left: 20px; color: red;" onclick="getInterviewStatus(event,{{resume.id}})"><i class="fa-solid fa-info" style="font-size: 20px;"></i></a>
                                     <div id="toggle{{ resume.id }}" style="display: none;">
                                         <div id="introStatus{{ resume.id }}" style="margin-bottom: 3px; margin-top:5px;"></div>
                                         <div id="interview1Status{{ resume.id }}" style="margin-bottom: 3px;"></div>
@@ -172,13 +188,13 @@
                                         <div id="hrStatus{{ resume.id }}" style="margin-bottom: 3px;"></div>
                                     </div>
                                 </td>
-                                <td class="wrap-text" >
+                                <!-- <td class="wrap-text" >
                                     {% if resume.Email %}
                                     {{ resume.Email }}
                                     {% else %}   
                                     None
                                     {% endif %}
-                                    </td>
+                                    </td> -->
                                     
                                 <td style="margin: auto;" class="wrap-text">
                                     {% if resume.Phone %}
@@ -187,13 +203,38 @@
                                     None
                                     {% endif %}
                                 </td>
-                                <td class="wrap-text">
+                                <!-- <td class="wrap-text">
                                     {% if resume.Qualification %}
                                     {{ resume.Qualification }}
                                     {% else %} 
                                     None
                                     {% endif %}
-                                </td>
+                                </td> -->
+                                <div class="modal fade" id="viewModal{{ resume.id }}" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered"> <!-- Centers modal -->
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">{{ resume.Name }} details</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p><strong>Email:</strong> {{ resume.Email or "None" }}</p>
+                                                <p><strong>Qualification:</strong> {{ resume.Qualification or "None" }}</p>
+                                                <p><strong>Location:</strong> {{ resume.Location or "None" }}</p>
+                                                <p><strong>Actual CTC:</strong> {{ resume.Actual_CTC or "None" }}</p>
+                                                <p><strong>Expected CTC:</strong> {{ resume.Expected_CTC or "None" }}</p>
+                                                <p><strong>Notice period:</strong> {{ resume.Notice_period  or "None" }}</p>
+                                                
+                                                
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+              
+
                                 <td class="wrap-text">
                                     {% if resume.Experience %}
                                     {{ resume.Experience }}
@@ -208,17 +249,17 @@
                                     None
                                     {% endif %}
                                 </td>
-                                <td class="wrap-text">
+                                <!-- <td class="wrap-text">
                                     {% if resume.Location %}
                                     {{ resume.Location }}
                                     {% else %} 
                                     None
                                     {% endif %}  
-                                </td>
+                                </td> -->
                                 <td class="wrap-text">
                                     {{resume.Role}}
                                 </td>
-                                <td class="wrap-text">
+                                <!-- <td class="wrap-text">
                                     <div>
                                         {% if resume.Expected_CTC %}
                                             <p>Expected CTC: {{ resume.Expected_CTC }}</p>
@@ -237,8 +278,9 @@
                                         {% endif %}
 
                                     </div>
-                                </td>
+                                </td> -->
                                 <td class="wrap-text">{{resume.Month}}</td>
+                                <td class="wrap-text">{{resume.week}}</td>
                                 <td class="wrap-text">
                                     <div>
                                         <a id="introButton{{ resume.id }}" href="{{ url_for('introCall', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2 " title="Intro call" data-url="{{ url_for('get_intro_status', resume_id=resume.id) }}">Intro</a>
@@ -250,49 +292,55 @@
                                 </td>
                                <td><a href="{{url_for('resume_details',resume_id=resume.id)}}" class="btn btn-primary mx-1" title="view"><i class="fa-solid fa-eye mx-2" style="color:white;"></i></a></td>
                                <td>
-                                    <form action="{{ url_for('delete_resume', resume_id=resume.id,month=selected_month) }}" method="POST" onsubmit="return handleDelete({{resume.id}}, this, '{{ resume.filename }}')">
-                                        <button type="submit" class="btn btn-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
-                                    </form>
-                                    <button class="btn btn-primary" style="margin-top: 1rem;" onclick="window.location.href='{{ url_for('edit_employee_resume', employee_id=resume.id) }}'"><i class="fa-solid fa-pencil mx-2" style="color:#fff;"></i></button>
-                                </td>
-                               <td id="intro_status" data-resume-id="{{ resume.id }}" hidden></td>
+                                <button class="btn btn-primary" style=" display: block; margin-left: auto; margin-right: auto;" onclick="window.location.href='{{ url_for('edit_employee_resume', employee_id=resume.id) }}'"><i class="fa-solid fa-pencil mx-2" style="color:#fff;"></i></button>
+                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal{{ resume.id }}" style="margin-top: 1rem;">More Info</button>
+
+                               
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+                
+                <div style="display: flex !important; align-items: center !important; gap: 2rem; align-items: center; margin-top: 2rem;justify-content: space-between;">
                 <div style="display: {{ 'inline-block' if role == 'admin' else 'none' }};">
-                    <button class="btn btn-danger" id="delete-selected" disabled style="width: 7rem !important;">Delete Selected</button>
+                    <button class="btn btn-danger" id="delete-selected" disabled style="width: 7rem !important; margin-bottom: 3rem;">Delete </button>
                 </div>
-                <div style="display: flex !important; align-items: center !important; gap: 2rem; align-items: center; margin-top: 10rem; margin-left:25%; ">
-                <div>
-                    {% for page_num in resumes.iter_pages(left_edge=1,right_edge=1,left_current=1,right_current=2) %}
-                    {% if page_num %}
-                    {% if resumes.page == page_num%}
-                        <a class="btn btn-info mb-4" href="{{url_for('employee',page=page_num,month=selected_month,qa_lead=qa_lead_query)}}" style="color: black;  ">{{page_num}}</a>
-                    {% else %}
-                        <a class="btn btn-outline-info mb-4" href="{{url_for('employee',page=page_num,month=selected_month,qa_lead=qa_lead_query)}}" style="color: black; ">{{page_num}}</a>
-                    {% endif %}
-                    {% else%}
-                    ...
-                    {% endif %}
-                {% endfor %}
+                <div style="display: flex; flex-direction: column;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; ">
+                        <div>
+                            {% for page_num in resumes.iter_pages(left_edge=1,right_edge=1,left_current=1,right_current=2) %}
+                            {% if page_num %}
+                            {% if resumes.page == page_num%}
+                                <a class="btn btn-info mb-4" href="{{url_for('employee',page=page_num,month=selected_month,qa_lead=qa_lead_query)}}" style="color: black;  ">{{page_num}}</a>
+                            {% else %}
+                                <a class="btn btn-outline-info mb-4" href="{{url_for('employee',page=page_num,month=selected_month,qa_lead=qa_lead_query)}}" style="color: black; ">{{page_num}}</a>
+                            {% endif %}
+                            {% else%}
+                            ...
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        
                     </div>
-                <div>
-                    <form method="POST" action="{{ url_for('employee',month=selected_month) }}">
-                    Select Page Size:
-                    <select name="page_size" class="option" style="width: 5rem !important; margin-bottom: 2rem;font-size:16px;">
+                    <div >
+                        Showing {{ resumes.page }} to {{selected_page_size }} of {{ total_items }} resumes
+                    </div>
+                    
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <form method="POST" action="{{ url_for('employee',month=selected_month) }}" id="pageSizeForm">
+                    Results per page:
+                    <select name="page_size" class="option" style="width: 5rem !important; margin-bottom: 2rem;font-size:16px;" onchange="document.getElementById('pageSizeForm').submit();">
                         {% for option in page_size_options %}
                         <option value="{{ option }}" {% if option == selected_page_size %}selected{% endif %}>{{ option }}</option>
                         {% endfor %}
                     </select>
-                    <button type="submit" class="btn btn-primary" style="width:9rem!important; margin-left:20px !important;">Change Page Size</button>
+                    
                     <input type="hidden" name="month" value="{{ selected_month }}">
                     </form>
                 </div>
                 
-                <div style="margin-bottom: 2rem;">
-                    Page {{ resumes.page }} of {{total_pages }} | Total Resumes: {{ total_items }}
-                </div>
+                
                 
                 </div>
                 
@@ -300,49 +348,13 @@
             
     </div>
     
-                     
+                        
     </div>
     
     
     <script src="{{ url_for('static', filename='config.js') }}"></script>   
-    <script src="{{ url_for('static', filename='employee.js') }}"></script>
-    <!-- <script>
-        
-       window.onload=function(){
-           {% for resume in resumes %}
-           getInterviewStatusAndToggleButtons({{ resume.id }});
-           {% endfor %}
-       };
-
-       function getInterviewStatusAndToggleButtons(resumeId){
-            
-           fetch(statusUrl)
-       .then(response => response.json())
-       .then(data => {
-           toggleInterviewButtons(resumeId, data.intro_status,data.interview1_status,data.interview2_status);
-       });
-       }
-       function toggleInterviewButtons(resumeId,introStatus,interview1Status,interview2Status){
-           const introButton = document.getElementById(`introButton${resumeId}`);
-           const interview1Button = document.getElementById(`interview1Button${resumeId}`);
-           const interview2Button=document.getElementById(`interview2Button${resumeId}`);
-           const hrButton=document.getElementById(`hrButton${resumeId}`)
-           if (introStatus === "Intro call not conducted" ||introStatus === "Rejected" ) {
-           // If Intro call not conducted, hide Interview 1 button
-           interview1Button.style.display = "none";
-           interview2Button.style.display="none";
-           hrButton.style.display="none";
-       }
-           if (interview1Status === "Interview 1 not conducted" || interview1Status === "Rejected"){
-               interview2Button.style.display="none";
-               hrButton.style.display="none";
-           }
-           if (interview2Status==="Interview 2 not conducted" || interview2Status==="Rejected"){
-               hrButton.style.display="none"
-           }
-
-       }
-   </script> -->
+    <script src="{{ url_for('static', filename='employee.js') }}?v=1.6"></script>
+    
     <script>
         {% for resume in resumes %}
             var storedName{{resume.id}}=localStorage.getItem('enteredName{{ resume.id }}');
@@ -414,6 +426,9 @@
 
             window.location.href = url; // Redirect to the same page with the selected month
         }
+    </script>
+    <script>
+      const homeUrl = "{{ url_for('employee') }}";
     </script>
     <script>
         var deleteSelectedResumesUrl = "{{ url_for('delete_selected_resumes') }}";

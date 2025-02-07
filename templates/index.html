@@ -338,9 +338,9 @@ td.truncate:hover::after {
                 
               </div>
               <div>
-                <form method="POST" style="margin-bottom: 1rem;">
+                <form method="POST" style="margin-bottom: 1rem;" id="pageSizeForm">
                   Select Page Size:
-                  <select name="page_size">
+                  <select name="page_size" onchange="document.getElementById('pageSizeForm').submit();">
                     {% for option in page_size_options %}
                       <option value="{{ option }}" {% if option == selected_page_size %}selected{% endif %}>{{ option }}</option>
                     {% endfor %}

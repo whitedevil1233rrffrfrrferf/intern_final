@@ -68,6 +68,18 @@
                 
             </div>
             <div class="mb-3 label">
+              <label for="week" class="form-label">Week :</label>
+              <select class="form-control" id="week" name="week" aria-describedby="emailHelp" required>
+                <option value="" disabled selected>Select a Week</option>
+                <option value="Week 1" {% if resume.week == 'Week 1' %}selected{% endif %}>Week 1</option>
+                <option value="Week 2" {% if resume.week == 'Week 2' %}selected{% endif %}>Week 2</option>
+                <option value="Week 3" {% if resume.week == 'Week 3' %}selected{% endif %}>Week 3</option>
+                <option value="Week 4" {% if resume.week == 'Week 4' %}selected{% endif %}>Week 4</option>
+                <option value="Week 5" {% if resume.week == 'Week 5' %}selected{% endif %}>Week 5</option>
+              </select>
+              
+            </div>
+            <div class="mb-3 label">
                 <label for="emp_id" class="form-label">Resume Link:</label>
                 <input type="text" class="form-control" id="resume_link" name="resume_link" value="{{resume.Link}}" aria-describedby="emailHelp" required >
                 

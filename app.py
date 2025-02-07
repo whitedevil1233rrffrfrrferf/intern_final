@@ -1,6 +1,6 @@
 from flask import Flask, g, render_template,request,redirect,url_for,jsonify,send_from_directory,session,make_response,abort,flash,render_template_string
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import extract,func,or_,ForeignKey
+from sqlalchemy import extract,func,or_,ForeignKey,text
 from sqlalchemy.sql.expression import extract
 from openpyxl import load_workbook,Workbook
 from datetime import date,datetime
@@ -49,7 +49,8 @@ app.config['SQLALCHEMY_BINDS']={'login':"sqlite:///login.db",
                                 'dmax_interns':"sqlite:///dmax_intrn.db",
                                 'dmax_jrqaeng':"sqlite:///dmax_jrqaeg.db",
                                 'dmax_qaeng':"sqlite:///dmax_qaeg.db",
-                                'dmax_srqaeng':"sqlite:///dmax_srqaeg.db"
+                                'dmax_srqaeng':"sqlite:///dmax_srqaeg.db",
+                                'week':"sqlite:///week.db"
                                 
                                 }
                                   
@@ -57,7 +58,8 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['UPLOAD_FOLDER']=general_upload_folder
 app.config['PROFILE_IMAGE_UPLOAD_FOLDER'] = 'static/profile_images'
 app.secret_key = os.environ.get('SECRET_KEY')
-
+db = SQLAlchemy(app)
+migrate=Migrate(app,db)
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
@@ -102,7 +104,7 @@ drive_flow = Flow.from_client_config(
     scopes=drive_scopes
 )
 
-db = SQLAlchemy(app)
+
 
 class Employee(db.Model):
     Sno = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -119,8 +121,7 @@ class Employee(db.Model):
     Last_promoted = db.Column(db.String(500))
     Comments = db.Column(db.String(500))
     employee_status=db.Column(db.String(500))
-
-
+    salary=db.Column(db.Integer)   
 
 
 class Login(db.Model):
@@ -132,7 +133,7 @@ class Login(db.Model):
     Name = db.Column(db.String(200))
     MobileNumber = db.Column(db.String(20))
     photo_filename = db.Column(db.String(255))
-
+    
 class Delete_user(db.Model):
     __bind_key__="delete_user"
     id=db.Column(db.Integer,primary_key=True) 
@@ -157,6 +158,10 @@ class Resume(db.Model):
     Actual_CTC=db.Column(db.String(255))
     Notice_period=db.Column(db.String(255))
     Month=db.Column(db.String(255))
+    week=db.Column(db.String(255))
+    
+
+        
     
 class Intro(db.Model):
     __bind_key__="intro"
@@ -286,14 +291,16 @@ def get_distinct_statistics():
     roles_list=[role[0] for role in distinct_roles]
     statistics={}
     statistics_leads={}
+    weekly_statistics = {}
+    current_month = datetime.now().strftime('%B')
     distinct_leads = db.session.query(Resume.QA_Lead).distinct().all()
     leads_list = [lead[0] for lead in distinct_leads]
     # print(leads_list)
 
     overall_counts = {
-        'intro': {'selected': 0, 'rejected': 0},
-        'interview1': {'selected': 0, 'rejected': 0},
-        'interview2': {'selected': 0, 'rejected': 0},
+        'intro': {'selected': 0, 'rejected': 0,'hold':0},
+        'interview1': {'selected': 0, 'rejected': 0,'hold':0},
+        'interview2': {'selected': 0, 'rejected': 0 ,'hold':0},
         'hr': {'selected': 0, 'rejected': 0},
         'grand_total': 0  # To accumulate overall grand total
     }
@@ -302,17 +309,82 @@ def get_distinct_statistics():
         # Get all resume IDs for the current role
         resume_ids = db.session.query(Resume.id).filter(Resume.Role == role).all()        
         resume_ids = [resume_id[0] for resume_id in resume_ids]
+        weekly_statistics[role] = {}
+        
+        for week_label in ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5']:
+            resume_ids_week = db.session.query(Resume.id).filter(
+            Resume.Month == current_month,  # Match the current month
+            Resume.week == week_label       # Match the current week
+            ).all()
+            resume_ids_week = [resume_id[0] for resume_id in resume_ids_week]
+            selected_intro_week = db.session.query(Intro).filter(
+                Intro.resumeId.in_(resume_ids_week),
+                Intro.Status == 'Move to Interview 1'
+            ).count()
+            rejected_intro_week = db.session.query(Intro).filter(
+                Intro.resumeId.in_(resume_ids_week),
+                Intro.Status == 'Rejected'
+            ).count()
+            selected_interview1_week = db.session.query(Interview1).filter(
+                Interview1.resumeId.in_(resume_ids_week),
+                Interview1.Status == 'Move to Interview 2'
+            ).count()
+            rejected_interview1_week = db.session.query(Interview1).filter(
+                Interview1.resumeId.in_(resume_ids_week),
+                Interview1.Status == 'Rejected'
+            ).count()
+            selected_interview2_week = db.session.query(Interview2).filter(
+                Interview2.resumeId.in_(resume_ids_week),
+                Interview2.Status == 'Move to HR Round'
+            ).count()
+            rejected_interview2_week = db.session.query(Interview2).filter(
+                Interview2.resumeId.in_(resume_ids_week),
+                Interview2.Status == 'Rejected'
+            ).count()
+            selected_hr_week = db.session.query(Hr).filter(
+                Hr.resumeId.in_(resume_ids_week),
+                Hr.Status == 'Move to HR Process'
+            ).count()
+            rejected_hr_week = db.session.query(Hr).filter(
+                Hr.resumeId.in_(resume_ids_week),
+                Hr.Status == 'Rejected'
+            ).count()
+            weekly_statistics[role][week_label] = {
+            'intro': {
+                'selected': selected_intro_week,
+                'rejected': rejected_intro_week
+                
+            },
+            'interview1': {
+                'selected': selected_interview1_week,
+                'rejected': rejected_interview1_week
+                
+            },
+            'interview2': {
+                'selected': selected_interview2_week,
+                'rejected': rejected_interview2_week
+                
+            },  
+            'hr': {
+                'selected': selected_hr_week,
+                'rejected': rejected_hr_week
+                
+            }              
+            }
 
         selected_intro = db.session.query(Intro).filter(Intro.resumeId.in_(resume_ids), Intro.Status == 'Move to Interview 1').count()
         rejected_intro= db.session.query(Intro).filter(Intro.resumeId.in_(resume_ids), Intro.Status == 'Rejected').count()
+        hold_intro= db.session.query(Intro).filter(Intro.resumeId.in_(resume_ids), Intro.Status == 'hold').count()
 
         #interview1
         selected_interview1 = db.session.query(Interview1).filter(Interview1.resumeId.in_(resume_ids), Interview1.Status == 'Move to Interview 2').count()
         rejected_interview1 = db.session.query(Interview1).filter(Interview1.resumeId.in_(resume_ids), Interview1.Status == 'Rejected').count()
+        hold_interview1 = db.session.query(Interview1).filter(Interview1.resumeId.in_(resume_ids), Interview1.Status == 'hold').count()
 
         #interview2
         selected_interview2 = db.session.query(Interview2).filter(Interview2.resumeId.in_(resume_ids), Interview2.Status == 'Move to HR Round').count()
         rejected_interview2 = db.session.query(Interview2).filter(Interview2.resumeId.in_(resume_ids), Interview2.Status == 'Rejected').count()
+        hold_interview2 = db.session.query(Interview2).filter(Interview2.resumeId.in_(resume_ids), Interview2.Status == 'hold').count()
 
         #HR
         selected_hr = db.session.query(Hr).filter(Hr.resumeId.in_(resume_ids), Hr.Status == 'Move to HR Process').count()
@@ -321,15 +393,18 @@ def get_distinct_statistics():
         statistics[role] = {
              'intro': {
                 'selected': selected_intro,
-                'rejected': rejected_intro
+                'rejected': rejected_intro,
+                'hold':hold_intro
             },
             'interview1': {
                 'selected': selected_interview1,
-                'rejected': rejected_interview1
+                'rejected': rejected_interview1,
+                'hold':hold_interview1
             },
             'interview2': {
                 'selected': selected_interview2,
-                'rejected': rejected_interview2
+                'rejected': rejected_interview2,
+                'hold': hold_interview2
             },
             'hr': {
                 'selected': selected_hr,
@@ -339,46 +414,53 @@ def get_distinct_statistics():
     for lead in leads_list:
         resume_ids = db.session.query(Resume.id).filter(Resume.QA_Lead == lead).all()
         resume_ids = [resume_id[0] for resume_id in resume_ids]
+
         selected_intro = db.session.query(Intro).filter(Intro.resumeId.in_(resume_ids), Intro.Status == 'Move to Interview 1').count()
         rejected_intro = db.session.query(Intro).filter(Intro.resumeId.in_(resume_ids), Intro.Status == 'Rejected').count()
+        hold_intro = db.session.query(Intro).filter(Intro.resumeId.in_(resume_ids), Intro.Status == 'hold').count()
 
         selected_interview1 = db.session.query(Interview1).filter(Interview1.resumeId.in_(resume_ids), Interview1.Status == 'Move to Interview 2').count()
         rejected_interview1 = db.session.query(Interview1).filter(Interview1.resumeId.in_(resume_ids), Interview1.Status == 'Rejected').count()
+        hold_interview1 = db.session.query(Interview1).filter(Interview1.resumeId.in_(resume_ids), Interview1.Status == 'hold').count()
 
         selected_interview2 = db.session.query(Interview2).filter(Interview2.resumeId.in_(resume_ids), Interview2.Status == 'Move to HR Round').count()
         rejected_interview2 = db.session.query(Interview2).filter(Interview2.resumeId.in_(resume_ids), Interview2.Status == 'Rejected').count()
+        hold_interview2 = db.session.query(Interview2).filter(Interview2.resumeId.in_(resume_ids), Interview2.Status == 'hold').count()
 
         selected_hr = db.session.query(Hr).filter(Hr.resumeId.in_(resume_ids), Hr.Status == 'Move to HR Process').count()
         rejected_hr = db.session.query(Hr).filter(Hr.resumeId.in_(resume_ids), Hr.Status == 'Rejected').count()
 
-        grand_total = (selected_intro + rejected_intro +
-                   selected_interview1 + rejected_interview1 +
-                   selected_interview2 + rejected_interview2 +
+        grand_total = (selected_intro + rejected_intro + hold_intro +
+                   selected_interview1 + rejected_interview1 +hold_interview1 +
+                   selected_interview2 + rejected_interview2 +hold_interview2 +
                    selected_hr + rejected_hr)
 
-        lead_grand_total = (selected_intro + rejected_intro +
-                            selected_interview1 + rejected_interview1 +
-                            selected_interview2 + rejected_interview2 +
+        lead_grand_total = (selected_intro + rejected_intro + hold_intro +
+                            selected_interview1 + rejected_interview1 + hold_interview1 +
+                            selected_interview2 + rejected_interview2 + hold_interview2 +
                             selected_hr + rejected_hr)
 
         statistics_leads[lead] = {
-            'intro': {'selected': selected_intro, 'rejected': rejected_intro},
-            'interview1': {'selected': selected_interview1, 'rejected': rejected_interview1},
-            'interview2': {'selected': selected_interview2, 'rejected': rejected_interview2},
+            'intro': {'selected': selected_intro, 'rejected': rejected_intro,'hold':hold_intro},
+            'interview1': {'selected': selected_interview1, 'rejected': rejected_interview1,'hold':hold_interview1},
+            'interview2': {'selected': selected_interview2, 'rejected': rejected_interview2,'hold':hold_interview2},
             'hr': {'selected': selected_hr, 'rejected': rejected_hr},
             'grand_total': grand_total
         }
         overall_counts['intro']['selected'] += selected_intro
         overall_counts['intro']['rejected'] += rejected_intro
+        overall_counts['intro']['hold'] += hold_intro
         overall_counts['interview1']['selected'] += selected_interview1
         overall_counts['interview1']['rejected'] += rejected_interview1
+        overall_counts['interview1']['hold'] += hold_interview1
         overall_counts['interview2']['selected'] += selected_interview2
         overall_counts['interview2']['rejected'] += rejected_interview2
+        overall_counts['interview2']['hold'] += hold_interview2
         overall_counts['hr']['selected'] += selected_hr
         overall_counts['hr']['rejected'] += rejected_hr
         overall_counts['grand_total'] += lead_grand_total
            
-    return(statistics, statistics_leads,overall_counts)    
+    return(statistics, statistics_leads,overall_counts,weekly_statistics)    
     
 
 
@@ -942,9 +1024,9 @@ def dashboard_function():
 @app.context_processor
 def inject_total_employees():
     total_employees,active_employees,resigned_employees,total_resumes,hr_selected,current_year_count, last_year_count,Chennai_employees_count,kollu_employees_count,kaup_employees_count,tn_palyam_count,employment_status_counts, project_status_counts=dashboard_function()
-    statistics,statistics_leads,overall_counts=get_distinct_statistics()
+    statistics,statistics_leads,overall_counts,weekly_statistics=get_distinct_statistics()
     return dict(total_employees=total_employees,active_employees=active_employees,resigned_employees=resigned_employees,total_resumes=total_resumes,hr_selected=hr_selected,current_year_count=current_year_count, last_year_count=last_year_count,Chennai_employees_count=Chennai_employees_count,kollu_employees_count=kollu_employees_count,kaup_employees_count=kaup_employees_count,tn_palyam_count=tn_palyam_count,employment_status_counts=employment_status_counts,
-                project_status_counts=project_status_counts,statistics=statistics,statistics_leads=statistics_leads,overall_counts=overall_counts)
+                project_status_counts=project_status_counts,statistics=statistics,statistics_leads=statistics_leads,overall_counts=overall_counts,weekly_statistics=weekly_statistics)
 @app.before_request
 def load_user():
     
@@ -1252,10 +1334,12 @@ def Delete(sno):
     return redirect("/home")
 with app.app_context():
         db.create_all()
-        roles,leads,overall_counts = get_distinct_statistics()
+        roles,leads,overall_counts,weekly_statistics = get_distinct_statistics()
         # print("leads",leads)
         # print("Distinct Roles:", roles)
         # data=extract_data_from_excel()
+
+        
 
 @app.route("/bulk",methods=["GET","POST"])
 def bulk():
@@ -1468,9 +1552,13 @@ def employee():
     EMAILJS_TEMPLATE_ID=os.environ.get('EMAILJS_TEMPLATE_ID_TABLE')
     # Prepare the email template parameters
     
+    
+    
     search_query = request.args.get("search", "").strip()
     
-    qa_lead_query = request.args.get('qa_lead', '').strip()
+    # qa_lead_query = request.args.get('qa_lead', '').strip()
+    filter_role = request.args.get('role') 
+    filter_week=request.args.get('week')
     
     default_page_size = 10
     page_size_options = [10, 20, 30, 40, 50]
@@ -1487,15 +1575,23 @@ def employee():
     current_month = datetime.now().strftime("%B")
     selected_month = request.args.get("month", current_month)
     query = Resume.query
+
     if search_query:
-        query = query.filter(Resume.Name.ilike(f"%{search_query}%"))
-    if qa_lead_query:
-        query=query.filter(Resume.QA_Lead.ilike(f"%{qa_lead_query}%"))   
-    if selected_month and not search_query and not qa_lead_query:
+        query = query.filter(
+            or_(Resume.Name.ilike(f"%{search_query}%"), Resume.QA_Lead.ilike(f"%{search_query}%"))
+            )
+    # if qa_lead_query:
+    #     query=query.filter(Resume.QA_Lead.ilike(f"%{qa_lead_query}%"))
+    if filter_role:  # Filter by role if provided
+        query = query.filter(Resume.Role == filter_role)
+    if filter_week:  # Filter by role if provided
+        query = query.filter(Resume.week == filter_week)       
+    if selected_month and not search_query :
         query = query.filter(Resume.Month == selected_month)
     page = request.args.get('page', 1, type=int)
     total_items =query.count()
-
+    
+       
     # Handle case where there are no items
     if total_items == 0:
         data =query.paginate(page=1, per_page=selected_page_size)
@@ -1519,7 +1615,7 @@ def employee():
                            page_size_options=page_size_options,
                            selected_page_size=selected_page_size,
                            total_items=total_items, total_pages=total_pages,
-                           start_index=start_index,months=months,current_month=current_month,selected_month=selected_month,file_link=file_link,public_key=public_key,service_id=EMAILJS_SERVICE_ID,template_id=EMAILJS_TEMPLATE_ID,search_query=search_query,qa_lead_query=qa_lead_query,role=role)
+                           start_index=start_index,months=months,current_month=current_month,selected_month=selected_month,file_link=file_link,public_key=public_key,service_id=EMAILJS_SERVICE_ID,template_id=EMAILJS_TEMPLATE_ID,search_query=search_query,role=role,filter_role=filter_role,filter_week=filter_week)
 
 
 @app.route("/view_resume/<filename>")
@@ -1627,6 +1723,8 @@ def introCall(resume_id):
             flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
         elif status == "Move to Interview 1":
             flash("Candidate Moved to Interview 1", "success")  # Using 'success' for a green flash message
+        elif status == "hold":
+            flash("Candidate kept on hold", "warning")  # Using 'success' for a yellow flash message    
 
         return redirect(url_for('introCall', resume_id=resume.id))
     return render_template("intro.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date)
@@ -1693,6 +1791,8 @@ def interview1v(resume_id):
             flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
         elif status == "Move to Interview 2":
             flash("Candidate Moved to Interview 2", "success")  # Using 'success' for a green flash message
+        elif status == "hold":
+            flash("Candidate kept on hold", "warning")  # Using 'success' for a yellow flash message    
 
         return redirect(url_for('interview1v', resume_id=resume.id))
     resume = Resume.query.get(resume_id)
@@ -1736,6 +1836,8 @@ def interview2v(resume_id):
             flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
         elif status == "Move to HR Round":
             flash("Candidate Moved to HR Round", "success")  # Using 'success' for a green flash message
+        elif status == "hold":
+            flash("Candidate kept on hold", "warning")  # Using 'success' for a yellow flash message    
 
         return redirect(url_for('interview2v', resume_id=resume.id))
     return render_template("interview2.html",resume=resume,status1=status1,comments1=comments1,selected_panel=selected_panel,date=date)
@@ -2792,7 +2894,7 @@ def upload_to_drive():
         # Specify the path to your Excel file
         excel_file = create_excel_in_memory(resume_data) 
         file_metadata = {
-            'name': 'resumesssssssssss.xlsx',
+            'name': 'resume.xlsx',
             'mimeType': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # Just specify the file name
         }
         
@@ -2838,6 +2940,8 @@ def edit_employee_resume(employee_id):
         resume.Notice_period=request.form['notice_period']
         resume.Link=request.form["resume_link"]
         resume.Role=map_role_based_on_experience(resume.Experience)
+        resume.week = request.form['week']
+        
         db.session.commit()
         flash('Successfully updated!', 'success')
     return render_template("update_resume.html",resume=resume)

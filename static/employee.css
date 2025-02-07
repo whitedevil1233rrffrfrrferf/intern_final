@@ -3,18 +3,26 @@
     font-family: "poppins";
 }
 .btn{
-    width:4rem !important;
+    width:5rem !important;
 }
 th{
     font-size:15px;
     font-family: 'poppins';
     text-align: center;
+    background-color:#00ACFF !important;
+    color:white !important;
+    font-weight: bold !important;
+}
+th,td{
+    padding:4px;
+    border: 1px solid #ddd;
+    
 }
 td{
     text-align: center;
-    word-wrap: break-word;        /* Older browsers */
-    overflow-wrap: break-word;    /* Modern browsers */
+       /* Modern browsers */
     white-space: normal; 
+    
 }
 .main_div{
     margin: 0%;
@@ -64,10 +72,11 @@ td{
 }
 
 .btn{
-    width:4rem!important;
+    width:4.8rem!important;
+    height:2.6rem !important;
 }
 td{
-    padding:10px!important;
+    padding:7px!important;
 }
 i{
     font-size: 15px;
@@ -79,13 +88,30 @@ i{
     margin-top:1rem;
 }
 label{
-    font-size:18px; 
+    font-size:16px; 
     color: #4699F9 !important;
 }
 .wrap-text{
     
     max-width:5.3rem!important;
-    overflow-wrap: break-word; /* Breaks long words */
+    overflow-wrap: break-word !important; /* Breaks long words */
     word-wrap: break-word; /* For older browsers */
     white-space: normal; 
+}
+.inner_filter{
+    display: flex;
+    flex-direction: column;
+}
+select{
+    width:7.5rem;
+}
+.wrap-text a {
+    display: inline-block;
+    vertical-align: middle; /* Ensures inline elements align properly */
+}
+
+.wrap-text i {
+    font-size: 20px; /* Make icon size consistent */
+    vertical-align: middle;
+    margin-left: 8px; /* Reduce margin */
 }

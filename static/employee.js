@@ -57,26 +57,34 @@ function getInterviewStatus(event,resumeId){
 
 
 
-function filterTableByIntroStatus(){
-    
+function filterTableByIntroStatus() {
+    const introFilter = document.getElementById("introFilter");  
     const selectedStatus = introFilter.value.toLowerCase();
-    const tableRows=document.querySelectorAll("tbody tr")
-    tableRows.forEach(function(row){
-       const resumeId=row.querySelector("#intro_status").dataset.resumeId;
-       const url = document.getElementById(`introButton${resumeId}`).getAttribute("data-url");
-       fetch(url)
-       .then(response=>response.json())
-       .then(data=>{
-        const introStatus =data.intro_status.toLowerCase();
-        if (selectedStatus===""|| introStatus===selectedStatus.toLowerCase()){
-            row.style.display="";
-        }
-        else{
-            row.style.display="none"
-        }
-       })
-    })
-    
+    const tableRows = document.querySelectorAll("tbody tr");
+
+    tableRows.forEach(function (row) {
+        const introButton = row.querySelector("[id^='introButton']");
+        
+        if (!introButton) return;  // Skip row if there's no intro button
+        
+        const resumeId = introButton.getAttribute("id").replace("introButton", "");
+        const url = introButton.getAttribute("data-url");
+        
+        if (!url) return;  // Skip if data-url is missing
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const introStatus = data.intro_status.toLowerCase();
+                
+                if (selectedStatus === "" || introStatus === selectedStatus) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            })
+            .catch(error => console.error("Error fetching intro status:", error));
+    });
 }
 function handleFilters(){
     const role = document.getElementById('role').value;
@@ -103,80 +111,93 @@ function handleFilters(){
     window.location.href = `${homeUrl}?page=${page}&${urlParams.toString()}`;
     
 }
-function filterTableByInterview1Status(){
+function filterTableByInterview1Status() {
     const interview1Filter = document.getElementById("interview1Filter");
     const selectedStatus = interview1Filter.value.toLowerCase();
     const tableRows = document.querySelectorAll("tbody tr");
 
-    tableRows.forEach(function(row){
-       const resumeId = row.querySelector("#intro_status").dataset.resumeId;
-       const url = document.getElementById(`introButton${resumeId}`).getAttribute("data-url");
-       fetch(url)
-       .then(response => response.json())
-       .then(data => {
-            const interview1Status = data.interview1_status.toLowerCase();
+    tableRows.forEach(function(row) {
+        const introButton = row.querySelector("[id^='introButton']");
+        if (!introButton) return; // Skip if no button is found
 
-            if (selectedStatus === "" || interview1Status === selectedStatus.toLowerCase()) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
-       })
-       .catch(error => {
-            console.error("Error fetching interview status:", error);
-       });
+        const resumeId = introButton.getAttribute("id").replace("introButton", "");
+        const url = introButton.getAttribute("data-url");
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const interview1Status = data.interview1_status.toLowerCase();
+
+                if (selectedStatus === "" || interview1Status === selectedStatus) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching interview status:", error);
+            });
     });
 }
 
-function filterTableByInterview2Status(){
+function filterTableByInterview2Status() {
     const interview2Filter = document.getElementById("interview2Filter");
     const selectedStatus = interview2Filter.value.toLowerCase();
     const tableRows = document.querySelectorAll("tbody tr");
 
-    tableRows.forEach(function(row){
-       const resumeId = row.querySelector("#intro_status").dataset.resumeId;
-       const url = document.getElementById(`introButton${resumeId}`).getAttribute("data-url");
-       fetch(url)
-       .then(response => response.json())
-       .then(data => {
-            const interview2Status = data.interview2_status.toLowerCase();
+    tableRows.forEach(function(row) {
+        const introButton = row.querySelector("[id^='introButton']");
+        if (!introButton) return; // Skip if no button is found
 
-            if (selectedStatus === "" || interview2Status === selectedStatus.toLowerCase()) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
-       })
-       .catch(error => {
-            console.error("Error fetching interview status:", error);
-       });
+        const resumeId = introButton.getAttribute("id").replace("introButton", "");
+        const url = introButton.getAttribute("data-url");
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const interview2Status = data.interview2_status.toLowerCase();
+
+                if (selectedStatus === "" || interview2Status === selectedStatus) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching interview status:", error);
+            });
     });
 }
-function filterTableByAllRoundsStatus(){
+function filterTableByAllRoundsStatus() {
     const allRoundsFilter = document.getElementById("allRoundsFilter");
     const selectedStatus = allRoundsFilter.value.toLowerCase();
     const tableRows = document.querySelectorAll("tbody tr");
 
-    tableRows.forEach(function(row){
-       const resumeId = row.querySelector("#intro_status").dataset.resumeId;
-       const url = document.getElementById(`introButton${resumeId}`).getAttribute("data-url");
-       fetch(url)
-       .then(response => response.json())
-       .then(data => {
-            const allRoundsStatus = data.all_rounds_status.toLowerCase();
-            
-            // Check if all rounds are cleared and each round is "Move to Interview 1"
-            if (selectedStatus === "" || allRoundsStatus === "cleared") {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
-       })
-       .catch(error => {
-            console.error("Error fetching interview status:", error);
-       });
+    tableRows.forEach(function(row) {
+        const introButton = row.querySelector("[id^='introButton']");
+        if (!introButton) return; // Skip if no button is found
+
+        const resumeId = introButton.getAttribute("id").replace("introButton", "");
+        const url = introButton.getAttribute("data-url");
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const allRoundsStatus = data.all_rounds_status.toLowerCase();
+
+                // Check if "Cleared" or matches the selected status
+                if (selectedStatus === "" || allRoundsStatus === selectedStatus) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching all rounds status:", error);
+            });
     });
 }
+
 // function hideSideMenu(){
 //     const div=document.querySelector(".main_div")
 //     div.style.display="none"
@@ -568,3 +589,45 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 }
 )
+
+document.getElementById('dropdown-btn').addEventListener('click', function() {
+    let menu = document.getElementById('dropdown-menu');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+});
+
+// Hide menu when clicking outside
+
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('#dropdown-container')) {
+        document.getElementById('dropdown-menu').style.display = 'none';
+    }
+});
+document.querySelectorAll('#dropdown-menu input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        let selectedValues = Array.from(document.querySelectorAll('#dropdown-menu input[type="checkbox"]:checked'))
+                                  .map(cb => cb.value);
+        
+        
+    });
+});
+document.querySelectorAll('#dropdown-menu input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+        let columnClass = this.value; // Get the class name from checkbox value
+        let isChecked = this.checked; // Check if it's checked or not
+
+        // Select both <th> and <td> elements that match the class
+        document.querySelectorAll('.' + columnClass).forEach(cell => {
+            cell.style.display = isChecked ? '' : 'none';
+        });
+        let visibleColumns = document.querySelectorAll('th:not([style*="display: none"])').length;
+
+        // Adjust table width dynamically
+        let table = document.querySelector('.table');
+        let minWidth = 50; // Initial table width in percentage
+        let maxWidth = 100; // Maximum width
+
+        // Increase width based on visible columns
+        let newWidth = minWidth + (visibleColumns * 5); // Example: increase 5% per column
+        table.style.width = newWidth > maxWidth ? '100%' : newWidth + '%';
+    });
+});

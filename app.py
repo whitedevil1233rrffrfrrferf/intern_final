@@ -1580,8 +1580,7 @@ def employee():
         query = query.filter(
             or_(Resume.Name.ilike(f"%{search_query}%"), Resume.QA_Lead.ilike(f"%{search_query}%"))
             )
-    # if qa_lead_query:
-    #     query=query.filter(Resume.QA_Lead.ilike(f"%{qa_lead_query}%"))
+    
     if filter_role:  # Filter by role if provided
         query = query.filter(Resume.Role == filter_role)
     if filter_week:  # Filter by role if provided
@@ -1596,6 +1595,7 @@ def employee():
     if total_items == 0:
         data =query.paginate(page=1, per_page=selected_page_size)
         start_index = 0
+        end_index=0
         total_pages = 1
     else:
         # Handle pagination
@@ -1608,14 +1608,20 @@ def employee():
             page = new_page_count
 
         start_index = (page - 1) * selected_page_size
-        data = query.paginate(page=page, per_page=selected_page_size)
-        total_pages = data.pages
         
+        data = query.paginate(page=page, per_page=selected_page_size)
+        if start_index:
+            total_pages = 0
+            end_index = 0
+            
+        else:    
+            total_pages = data.pages
+            end_index = min(start_index + selected_page_size, total_items)
     return render_template("employee.html", resumes=data,
                            page_size_options=page_size_options,
                            selected_page_size=selected_page_size,
                            total_items=total_items, total_pages=total_pages,
-                           start_index=start_index,months=months,current_month=current_month,selected_month=selected_month,file_link=file_link,public_key=public_key,service_id=EMAILJS_SERVICE_ID,template_id=EMAILJS_TEMPLATE_ID,search_query=search_query,role=role,filter_role=filter_role,filter_week=filter_week)
+                           start_index=start_index,months=months,current_month=current_month,selected_month=selected_month,file_link=file_link,public_key=public_key,service_id=EMAILJS_SERVICE_ID,template_id=EMAILJS_TEMPLATE_ID,search_query=search_query,role=role,filter_role=filter_role,filter_week=filter_week,end_index=end_index)
 
 
 @app.route("/view_resume/<filename>")
@@ -1684,7 +1690,7 @@ def zip():
 
 @app.route("/introcall/<int:resume_id>", methods=['GET', 'POST'])
 def introCall(resume_id):
-    selected_panel=None
+    selected_panel=""
     resume=Resume.query.get(resume_id)
     existing_entry=Intro.query.filter_by(resumeId=resume.id).first()
     if existing_entry:
@@ -1695,7 +1701,7 @@ def introCall(resume_id):
     else:
         status1 = None
         comments1 = None
-        selected_panel = None
+        selected_panel = ""
         date = None
     if request.method == 'POST':
         
@@ -1722,13 +1728,10 @@ def introCall(resume_id):
         if status == "Rejected":
             flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
         elif status == "Move to Interview 1":
-            flash("Candidate Moved to Interview 1", "success")  # Using 'success' for a green flash message
-        elif status == "hold":
-            flash("Candidate kept on hold", "warning")  # Using 'success' for a yellow flash message    
-
+            flash("Candidate Moved to L1", "success")  # Using 'success' for a green flash message
+            return redirect(url_for('interview1v', resume_id=resume_id))
         return redirect(url_for('introCall', resume_id=resume.id))
     return render_template("intro.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date)
-
 @app.route("/interview1")
 def interview1():
     return render_template("interview1.html")
@@ -1745,11 +1748,32 @@ def introv():
 @app.route("/resume_details/<int:resume_id>")
 def resume_details(resume_id):
     resume=Resume.query.get(resume_id)
+    intro = Intro.query.filter_by(resumeId=resume_id).first()
+    interview1 = Interview1.query.filter_by(resumeId=resume_id).first()
+    interview2 = Interview2.query.filter_by(resumeId=resume_id).first()
+    hr = Hr.query.filter_by(resumeId=resume_id).first()
+
+    intro_status = intro.Status if intro else "Intro call not conducted"
+    interview1_status = interview1.Status if interview1 else "Interview 1 not conducted"
+    interview2_status = interview2.Status if interview2 else "Interview 2 not conducted"
+    hr_status = hr.Status if hr else "HR not conducted"
+
+    statuses = [intro_status, interview1_status, interview2_status, hr_status]
+    all_rounds_status = "Cleared"
+
+    for status in statuses:
+        if status == "Rejected" or "not conducted" in status:
+            all_rounds_status = "Rejected"
+            break
     intro_call=Intro.query.filter_by(resumeId=resume_id).first()
     interview1=Interview1.query.filter_by(resumeId=resume_id).first()
     interview2=Interview2.query.filter_by(resumeId=resume_id).first()
     hr=Hr.query.filter_by(resumeId=resume_id).first()
-    return render_template("resume_details.html",resume=resume,intro_call=intro_call,interview1=interview1,interview2=interview2,hr=hr)
+    return render_template("resume_details.html",resume=resume,intro_call=intro_call,interview1=interview1,interview2=interview2,hr=hr,intro_status=intro_status,
+        interview1_status=interview1_status,
+        interview2_status=interview2_status,
+        hr_status=hr_status,
+        all_rounds_status=all_rounds_status)
 
 @app.route("/interview1v/<int:resume_id>", methods=["GET", "POST"])
 def interview1v(resume_id):
@@ -1763,7 +1787,7 @@ def interview1v(resume_id):
     else:
         status1 = None
         comments1 = None
-        selected_panel=None
+        selected_panel=""
         date = None
     if request.method=="POST":
         date=request.form["date"]
@@ -1791,6 +1815,7 @@ def interview1v(resume_id):
             flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
         elif status == "Move to Interview 2":
             flash("Candidate Moved to Interview 2", "success")  # Using 'success' for a green flash message
+            return redirect(url_for('interview2v', resume_id=resume_id))
         elif status == "hold":
             flash("Candidate kept on hold", "warning")  # Using 'success' for a yellow flash message    
 
@@ -1802,6 +1827,7 @@ def interview1v(resume_id):
 def interview2v(resume_id):
     resume=Resume.query.get(resume_id)
     existing_entry=Interview2.query.filter_by(resumeId=resume.id).first()
+    selected_panel=""
     if existing_entry:
         status1 = existing_entry.Status
         comments1 = existing_entry.Comments
@@ -1810,7 +1836,7 @@ def interview2v(resume_id):
     else:
         status1 = None
         comments1 = None
-        selected_panel=None
+        selected_panel = ""
         date=None
     if request.method=="POST":
         
@@ -1823,19 +1849,21 @@ def interview2v(resume_id):
             existing_entry.Date = date
             existing_entry.Status = status
             existing_entry.Comments = comments
-            existing_entry.SelectedPanel = selected_panel
+            selected_panel = existing_entry.SelectedPanel if existing_entry.SelectedPanel else ""
             status1 = existing_entry.Status
             comments1 = existing_entry.Comments
         else:    
             entry=Interview2(Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
             db.session.add(entry)
             status1=status
+            selected_panel=selected_panel
             comments1=comments
         db.session.commit()
         if status == "Rejected":
             flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
         elif status == "Move to HR Round":
             flash("Candidate Moved to HR Round", "success")  # Using 'success' for a green flash message
+            return redirect(url_for('hr', resume_id=resume_id))
         elif status == "hold":
             flash("Candidate kept on hold", "warning")  # Using 'success' for a yellow flash message    
 
@@ -1854,7 +1882,7 @@ def hr(resume_id):
     else:
         status1 = None
         comments1 = None
-        selected_panel=None
+        selected_panel=""
         date=None
     if request.method=="POST":
         date=request.form["date"]
@@ -2946,6 +2974,14 @@ def edit_employee_resume(employee_id):
         flash('Successfully updated!', 'success')
     return render_template("update_resume.html",resume=resume)
 
+
+@app.route("/form_test", methods=["GET","POST"])
+def form_test():
+    if request.method == "POST":
+        name = request.form.get("selectedPanel")
+        email = request.form.get("panelEmail")
+        return f"Received Name: {name}, Email: {email}"
+    return render_template("form_test.html")
 
 
 if __name__ == "__main__":

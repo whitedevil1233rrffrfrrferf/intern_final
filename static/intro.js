@@ -144,3 +144,15 @@ function highlightSelectedPanels() {
     
     
 }
+
+
+// Pop up js functionality //
+
+
+
+
+
+
+
+                                            
+

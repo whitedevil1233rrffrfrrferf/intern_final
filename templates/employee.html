@@ -19,7 +19,26 @@
             emailjs.init("{{public_key}}");
         })();
     </script>
-    
+    <style>
+        #dropdown-container {
+            position: relative;
+            display: inline-block;
+        }
+        #dropdown-menu {
+            display: none;
+            width: 100%;
+            position: absolute;
+            background: white;
+            color: black !important;
+            border: 1px solid #ccc;
+            padding:10px;
+            z-index: 100;
+        }
+        label{
+            display: block;
+            
+        }
+    </style>
 
     
 </head>
@@ -42,7 +61,7 @@
     <div class="first_div">
         {% include 'sidemenu.html'%}
         
-        <div style=" margin-left:8rem;overflow-x: auto;width: 140%;overflow-y:scroll;height:500%;width: 400%;">
+        <div style=" margin-left:7rem;width: 140%;height:500%;width: 400%; overflow-x: hidden;">
             <h1 style="text-align: center;  background-color:#4699F9;color: white;">Employee resumes</h1>
             <div class="container-fluid" style="margin-bottom: 2rem;margin-top: 1rem !important;">
           <nav class="navbar navbar-expand-lg bg-body-tertiary" style="margin-top: 1rem;">
@@ -51,7 +70,7 @@
               <div class="collapse navbar-collapse" id="navbarSupportedContent" style="display: flex; flex-direction: column;height: 4rem;">
                 
                 <form class="d-flex col-10 my-2" action="{{ url_for('employee') }}" role="search" method="GET">
-                  <input class="form-control me-2" type="search" id="search_bar" placeholder="Search by Name / QA Lead" name="search" aria-label="Search" value="{{ search_query }}" style="margin-right:2rem!important;">
+                  <input class="form-control me-2" type="search" id="search_bar" placeholder="Search by Name / QA Lead" name="search" aria-label="Search" value="{{ search_query }}"  style="margin-right:2rem!important;">
                   <button class="btn btn-primary" type="submit" onclick="filterTable()">Search</button>
                   <button type="button" class="btn btn-danger" id="clearSearch" style="margin-left: 10px;">Clear</button>
                 </form>
@@ -68,34 +87,34 @@
                 
                 <div class="flex" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
                     <div style="margin-bottom: 10px; margin-top: 20px;" class="inner_filter">
-                        <label for="introFilter" >Intro Call Status:</label>
+                        <label for="introFilter" class="filter_label">Intro Call Status:</label>
                         <select  id="introFilter" onchange="filterTableByIntroStatus()" >
                             <option value="">Select</option>
                             
                         </select>
                     </div>
                     <div style="margin-bottom: 10px; margin-top: 20px;" class="inner_filter">
-                        <label for="interview1Filter" >Interview 1 Status:</label>
+                        <label for="interview1Filter" class="filter_label">Interview 1 Status:</label>
                         <select id="interview1Filter" onchange="filterTableByInterview1Status()" >
                             <option value="">Select</option>
                             
                         </select>
                     </div>
                     <div style="margin-bottom:10px; margin-top: 20px;" class="inner_filter">
-                        <label for="interview2Filter">Interview 2 Status:</label>
+                        <label for="interview2Filter" class="filter_label">Interview 2 Status:</label>
                         <select id="interview2Filter" onchange="filterTableByInterview2Status()" >
                             <option value="">Select</option>
                            
                         </select>
                     </div>
                     <div style="margin-bottom: 10px; margin-top: 20px;" class="inner_filter">
-                        <label for="allRoundsFilter">All rounds cleared:</label>
+                        <label for="allRoundsFilter" class="filter_label">All rounds cleared:</label>
                         <select id="allRoundsFilter" onchange="filterTableByAllRoundsStatus()" >
                             <option value="">Select</option>
                         </select>
                     </div>
                     <div class="inner_filter" style="margin-bottom: 10px; margin-top: 20px;">
-                        <label for="role" class="label " >Role:</label>
+                        <label for="role" class="label " class="filter_label">Role:</label>
                         <select name="role" id="role" onchange="handleFilters()" >
                             <option value="">Select</option>
                             <!-- Populate dynamically or add static options -->
@@ -107,7 +126,7 @@
                         </select>
                     </div>
                     <div class="inner_filter" style="margin-bottom: 10px; margin-top: 20px;">
-                        <label for="month">Month:</label>
+                        <label for="month" class="filter_label">Month:</label>
                         <select id="month" onchange="handleFilters()" >
                             {% for month in months %}
                                 <option value="{{ month }}" 
@@ -124,7 +143,7 @@
                         </select>
                     </div>
                     <div class="inner_filter" style="margin-bottom: 10px; margin-top: 20px;">
-                        <label for="week"  >Week:</label>
+                        <label for="week"  class="filter_label">Week:</label>
                         <select id="week" name="week"  required onchange="handleFilters()">
                             <option value="">Select a Week</option>
                             <option value="Week 1" {% if filter_week == "Week 1" %}selected{% endif %}>Week 1</option>
@@ -134,34 +153,57 @@
                             <option value="Week 5" {% if filter_week == "Week 5" %}selected{% endif %}>Week 5</option>
                         </select>
                     </div>
-                     
+                    <div class="inner_filter" style="margin-bottom: 10px; margin-top: 20px;">
+                        <label for="columnSelect" class="label " class="filter_label">Columns to display:</label>
+                        <div id="dropdown-container">
+                            <button id="dropdown-btn">Select Columns ▼</button>
+                            <div id="dropdown-menu">
+                                <label style="margin-bottom: 5px; color: black;"><input type="checkbox" value="candidate_id" checked> ID</label>
+                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="candidate_name" checked style="color: black !important;">Name</label>
+                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="contact_number" checked>Contact Num</label>
+                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="experience" checked> Experience</label>
+                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="qa_lead" > QA Lead</label>
+                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="role" checked> Role</label>
+                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="month" > Month</label>
+                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="week" > Week</label>
+                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="int_details" checked> Interview Det</label>
+                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="view" checked> View</label>
+                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="action" checked> Action</label>
+                            </div>
+                        </div>
+                        
+                    </div> 
                     
                 </div>
             </div>
             
             
             
-            <div class="table-responsive my-4" style="overflow-x:auto; width:100%;">
-                <table class="table" style="table-layout: auto;">
+            <div class="table-responsive my-4">
+                <table class="table" style="min-width:90%;width: auto;
+                max-width: 95%; 
+                table-layout: auto;
+                margin-left:1%; 
+                white-space: nowrap;">
                     
                     <thead class="thead-dark">
                         <tr>
                             <th class="checkbox-column" ><input type="checkbox" id="select-all"></th>
-                            <th scope="col">ID</th>
-                            <th scope="col">Candidate Name</th>
-                            <!-- <th scope="col">Email</th> -->
-                            <th scope="col">Contact number</th>
+                            <th scope="col" class="candidate_id" >ID</th>
+                            <th scope="col" class="candidate_name">Candidate Name</th>
+                            <!-- <th scope="col" class="candidate_email">Email</th> -->
+                            <th scope="col" class="contact_number" >Contact number</th>
                             <!-- <th scope="col">Qualification</th> -->
-                            <th scope="col">Experience/Fresher</th>
-                            <th scope="col">QA Lead Assigned</th>
-                            <!-- <th scope="col">Location</th>    -->
-                            <th scope="col">Role</th>
-                            <!-- <th scope="col">Others</th> -->
-                            <th scope="col">Month</th>
-                            <th scope="col">Week</th>
-                            <th scope="col">Interview Details</th>
-                            <th scope="col">View</th>
-                            <th scope="col">Action</th>
+                            <th scope="col" class="experience" style="width: 0.3%;">Experience/Fresher</th>
+                            <th scope="col" class="qa_lead" style="display: none;">QA Lead Assigned</th>
+                            <!-- <th scope="col" class="location">Location</th>    -->
+                            <th scope="col" class="role">Role</th>
+                            <!-- <th scope="col" class="others">Others</th> -->
+                            <th scope="col" class="month" style="display: none;">Month</th>
+                            <th scope="col" class="week" style="display: none;">Week</th>
+                            <th scope="col" class="int_details" >Interview Details</th>
+                            <th scope="col" class="view" >View</th>
+                            <th scope="col" class="action">Action</th>
                             
                             <th scope="col" hidden>intro status</th>
                         </tr>
@@ -170,17 +212,17 @@
                         
                         {% for resume in resumes.items %}
                             <tr>
-                                <td class="checkbox-column" >
+                                <td class="checkbox-column " >
                                     <input type="checkbox" class="resume-checkbox" value="{{ resume.id }}">
                                 </td>
-                                <td>{{ start_index + loop.index }}</td>
-                                <td class="wrap-text" id="name-{{ resume.id }}">
+                                <td class="checkbox-column candidate_id" >{{ start_index + loop.index }}</td>
+                                <td class="wrap-text checkbox-column candidate_name" id="name-{{ resume.id }}">
                                     {% if resume.Link %}
                                     <a href="{{resume.Link}}" class="long-filename  text-break" target="_blank" >{{ resume.Name }}</a>
                                     {% else %}  
                                     <a href="{{ url_for('view_resume', filename=resume.filename) }}" class="long-filename  text-break" target="_blank">{{ resume.filename }}</a>
                                     {% endif %}
-                                    <a href="{{ url_for('get_intro_status', resume_id=resume.id) }}"  style="margin-left: 20px; color: red;" onclick="getInterviewStatus(event,{{resume.id}})"><i class="fa-solid fa-info" style="font-size: 20px;"></i></a>
+                                    <a href="{{ url_for('get_intro_status', resume_id=resume.id) }}"  style="margin-left: 20px; color: red;display: none;" onclick="getInterviewStatus(event,{{resume.id}})"><i class="fa-solid fa-info" style="font-size: 20px;"></i></a>
                                     <div id="toggle{{ resume.id }}" style="display: none;">
                                         <div id="introStatus{{ resume.id }}" style="margin-bottom: 3px; margin-top:5px;"></div>
                                         <div id="interview1Status{{ resume.id }}" style="margin-bottom: 3px;"></div>
@@ -196,7 +238,7 @@
                                     {% endif %}
                                     </td> -->
                                     
-                                <td style="margin: auto;" class="wrap-text">
+                                <td style="margin: auto;" class="wrap-text checkbox-column contact_number">
                                     {% if resume.Phone %}
                                     {{ resume.Phone }}
                                     {% else %} 
@@ -235,14 +277,14 @@
                                 </div>
               
 
-                                <td class="wrap-text">
+                                <td class="wrap-text checkbox-column experience">
                                     {% if resume.Experience %}
                                     {{ resume.Experience }}
                                     {% else %} 
                                     None
                                     {% endif %}
                                 </td>
-                                <td class="wrap-text" id="QA_Lead-{{ resume.id }}">
+                                <td class="wrap-text checkbox-column qa_lead" id="QA_Lead-{{ resume.id }}" style="display: none;">
                                     {% if resume.QA_Lead %}
                                     {{ resume.QA_Lead }}
                                     {% else %} 
@@ -256,7 +298,7 @@
                                     None
                                     {% endif %}  
                                 </td> -->
-                                <td class="wrap-text">
+                                <td class="wrap-text checkbox-column role">
                                     {{resume.Role}}
                                 </td>
                                 <!-- <td class="wrap-text">
@@ -279,9 +321,9 @@
 
                                     </div>
                                 </td> -->
-                                <td class="wrap-text">{{resume.Month}}</td>
-                                <td class="wrap-text">{{resume.week}}</td>
-                                <td class="wrap-text">
+                                <td class="wrap-text checkbox-column month" style="display: none;">{{resume.Month}}</td>
+                                <td class="wrap-text checkbox-column week" style="display: none;">{{resume.week}}</td>
+                                <td class="wrap-text checkbox-column int_details" >
                                     <div>
                                         <a id="introButton{{ resume.id }}" href="{{ url_for('introCall', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2 " title="Intro call" data-url="{{ url_for('get_intro_status', resume_id=resume.id) }}">Intro</a>
                                         <a id="interview1Button{{ resume.id }}" href="{{ url_for('interview1v', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2" title="Interview 1"><i class="fa-solid fa-phone"></i> 1</a>
@@ -290,8 +332,8 @@
                                     </div>
                                     
                                 </td>
-                               <td><a href="{{url_for('resume_details',resume_id=resume.id)}}" class="btn btn-primary mx-1" title="view"><i class="fa-solid fa-eye mx-2" style="color:white;"></i></a></td>
-                               <td>
+                               <td class="wrap-text checkbox-column view" ><a href="{{url_for('resume_details',resume_id=resume.id)}}" class="btn btn-primary mx-1" title="view"><i class="fa-solid fa-eye mx-2" style="color:white;"></i></a></td>
+                               <td class="wrap-text checkbox-column action">
                                 <button class="btn btn-primary" style=" display: block; margin-left: auto; margin-right: auto;" onclick="window.location.href='{{ url_for('edit_employee_resume', employee_id=resume.id) }}'"><i class="fa-solid fa-pencil mx-2" style="color:#fff;"></i></button>
                                 <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal{{ resume.id }}" style="margin-top: 1rem;">More Info</button>
 
@@ -311,9 +353,9 @@
                             {% for page_num in resumes.iter_pages(left_edge=1,right_edge=1,left_current=1,right_current=2) %}
                             {% if page_num %}
                             {% if resumes.page == page_num%}
-                                <a class="btn btn-info mb-4" href="{{url_for('employee',page=page_num,month=selected_month,qa_lead=qa_lead_query)}}" style="color: black;  ">{{page_num}}</a>
+                                <a class="btn btn-info mb-4" href="{{url_for('employee',page=page_num,month=selected_month,search=search_query)}}" style="color: black;  ">{{page_num}}</a>
                             {% else %}
-                                <a class="btn btn-outline-info mb-4" href="{{url_for('employee',page=page_num,month=selected_month,qa_lead=qa_lead_query)}}" style="color: black; ">{{page_num}}</a>
+                                <a class="btn btn-outline-info mb-4" href="{{url_for('employee',page=page_num,month=selected_month,search=search_query)}}" style="color: black; ">{{page_num}}</a>
                             {% endif %}
                             {% else%}
                             ...
@@ -323,7 +365,7 @@
                         
                     </div>
                     <div >
-                        Showing {{ resumes.page }} to {{selected_page_size }} of {{ total_items }} resumes
+                        Showing {{ start_index + 1 }} to {{ end_index }} of {{ total_items }} resumes
                     </div>
                     
                 </div>

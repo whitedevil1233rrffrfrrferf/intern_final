@@ -14,6 +14,30 @@
     {% include 'sidemenu.html'%}
     <div style="width: 950px; text-align: center; margin-left: 300px;">
       <h1 class="heading" style=" margin-bottom:60px;">Interview details</h1>
+      <div class="container">
+        
+        <h1 class="heading">Interview Status</h1>
+        <table class="table table-striped" style="margin-bottom:40px;">
+            <thead class="thead-dark">
+              <tr>
+                <th scope="col">Intro</th>
+                <th scope="col">Interview 1</th>
+                <th scope="col">Interview 2</th>
+                <th scope="col">HR</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{intro_status}}</td>
+                <td>{{interview1_status}}</td>
+                <td>{{interview2_status}}</td>
+                <td>{{hr_status}}</td>
+                
+              </tr>
+            </tbody>
+          </table>
+        
+    </div>
     <div class="container">
         {% if intro_call %}
         <h1 class="heading">Intro call details</h1>

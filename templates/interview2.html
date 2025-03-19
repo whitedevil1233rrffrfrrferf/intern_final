@@ -1,106 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interview2</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='interview2.css') }}">
-</head>
-<body>
-    <script>
-      var status1="{{status1}}"
-      var comments1="{{comments1}}"
-      var selected_panel="{{selected_panel}}"
-      var date="{{date}}"
-    </script>
-    <div>
-      {%include 'sidemenu.html'%}
-      <div class="container" style="width: 950px; ">
-        <h1 style="text-align: center;  background-color:#4699F9; color: white; width: 100%; align-items: center; justify-content: center;">Enter L2 details</h1>
-      <div style="margin-top:50px;">
-          <form action="{{ url_for('interview2v', resume_id=resume.id) }}" method="post" >
-            <div style="display: flex; gap: 2rem; align-items: center;">
-                    <input type="text" id="selectedPanel" name="selectedPanel" class="form-control"  value="{{selected_panel}}" ">
-                    <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#panelModal">Add</button>  
-                </div>
-                <div class="modal fade" id="panelModal" tabindex="-1" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered">
-                      <div class="modal-content">
-                          <div class="modal-header">
-                              <h5 class="modal-title">Add Panel Member</h5>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                          </div>
-                          <div class="modal-body">
-                              <input type="text" id="panelName" placeholder="Enter Name" class="form-control mb-2" value="">
-                              <input type="email" id="panelEmail" placeholder="Enter Email" class="form-control mb-2" value=" ">
-                          </div>
-                          <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                              <button type="button" class="btn btn-success" id="savePanel">Save</button>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              <div class="mb-3">
-                <label for="date" class="form-label"  style="font-size:20px; color:#1AACAC;">Date</label>
-                <i class="fa-solid fa-star" style="font-size:8px;position: relative;bottom:10px; color: red;"></i>
-                <input type="date" name="date" class="form-control" id="date" value="{{ date or '' }}" required>
-              </div>
-              <div class="mb-3">
-                  <label for="status"  style="font-size:20px; color:#1AACAC; margin-top: 20px;">Status</label>
-                  <i class="fa-solid fa-star" style="font-size:8px;position: relative;bottom:10px; color: red;"></i>
-                  <select id="status" name="status" required>
-                    
-                    <option value="Rejected" {{ 'selected' if status1 == 'Rejected' else '' }}>Rejected</option>
-                    <option value="Move to HR Round" {{ 'selected' if status1 == 'Move to HR Round' else '' }}>Move to HR Round</option>
-                    <option value="hold" {{ 'selected' if status1 == 'hold' else '' }}>On Hold</option>
-                  </select>
-              </div>
-              <div class="mb-3">
-                  <label for="comments"  style="font-size:20px; color:#1AACAC; margin-top: 20px;">Comments</label>
-                  <i class="fa-solid fa-star" style="font-size:8px;position: relative;bottom:10px; color: red;"></i>
-                  <input class="form-control" name="comments" type="text" value="{{comments1}}" placeholder="Enter your comments" required>
-              </div>
-              
-              <input type="hidden" id="selectedPanel" name="selectedPanel" value="{{selected_panel}}">
-              <div style="display: flex; align-items: center; justify-content:center;">
-                <button type="submit" class="btn btn-primary" style="width:6rem; height:3rem; margin-right: 3rem;">Submit</button>
-                <a class="btn btn-outline-secondary" href="{{url_for('employee')}}" style=" padding:10px ;width:6rem; height:3rem;"><div style="display: flex; justify-content: space-between; padding:5px;">
-                  <div >
-                    <i class="fa-solid fa-backward" style="margin-right: 10px;"></i>
-                  </div>
-                  <div>
-                    Back
-                  </div>
-                </div>
-                </a>
-              </div>
-            </form>
-      </div>
-      <div style="margin-top: 20px;text-align: center; width: 75%; margin-left:15%;">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-              {% if messages %}
-                  {% for category, message in messages %}
-                      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                          {{ message }}
-                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                      </div>
-                  {% endfor %}
-              {% endif %}
-          {% endwith %}
-        </div>
-    </div>
-    </div>
-    
-      <script src="{{ url_for('static', filename='intro.js') }}"></script> 
-      <script src="{{ url_for('static', filename='modal.js') }}"></script> 
-</body>
-</html> -->
-
-
-
 
 
 <!DOCTYPE html>
@@ -109,248 +6,284 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interview 2</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="{{ url_for('static', filename='interview1.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        .panel-members {
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+        }
+        .form-group {
             display: flex;
-            flex-direction: column; /* Stack panel members vertically */
-            gap: 5px; /* Space between panel members */
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .form-group label {
+            width: 150px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #1AACAC;
+        }
+        .form-control, select, textarea {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
         .panel-member {
             display: flex;
             align-items: center;
-            justify-content: space-between; /* Space between name and buttons */
-            padding: 5px;
-            border: 1px solid #ccc; /* Optional: Add border for clarity */
-            border-radius: 5px; /* Optional: Rounded corners */
+            justify-content: space-between;
+            background: #f9f9f9;
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 5px;
         }
         .btn-danger {
-            background-color: blue; /* Change delete button color to blue */
-            border-color: blue; /* Ensure border matches */
-            color: white; /* Change text color to white for better visibility */
+            background-color: rgb(8, 184, 197);
+            border-color: rgb(9, 195, 241);
+            color: white;
         }
-        .mb-3 {
-            margin-top: 20px; /* Add space above the date section */
+        .add-button-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
-
-        #panelFeedbackContainer h3 {
-    font-size: 20px; /* Set the font size to match other headings */
-}
-
-.feedback-section {
-    margin-bottom: 10px; /* Space between feedback sections */
-}
-
-
-#panelFeedbackContainer h3 {
-            font-size: 20px; /* Set the font size to match other headings */
-            color: lightblue; /* Set the color to light blue */
-        }
-        .feedback-section {
-            margin-bottom: 10px; /* Space between feedback sections */
+        .dropdown-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
-    <script>
-      var status1="{{status1}}"
-      var comments1="{{comments1}}"
-      var selected_panel="{{selected_panel}}"
-      var date="{{date}}"
-    </script>
-    <div>
-      {% include 'sidemenu.html' %}
-      <div class="container main">
-        <h1 style="text-align: center; background-color:#4699F9; color: white;">Enter L2 details</h1>
-        <div style="margin-top:50px;">
-            <form action="{{ url_for('interview1v', resume_id=resume.id) }}" method="post">
-                <div class="mb-3 d-flex justify-content-between align-items-center">
-                    <label for="selectedPanel" class="form-label" style="font-size:20px; color:#1AACAC;">Panel Members</label>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#panelModal">Add</button>
-                </div>
-                <div class="panel-members">
-                    {% for member in selected_panel %}
-                        <div class="panel-member">
-                            <span>{{ member }}</span>
-                            <div>
-                                <button type="button" class="btn btn-danger btn-sm delete-btn" data-member="{{ member }}">
-                                    <i class="fa-solid fa-trash"></i> <!-- Delete icon -->
-                                </button>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-                <div class="modal fade" id="panelModal" tabindex="-1" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered">
-                      <div class="modal-content">
-                          <div class="modal-header">
-                              <h5 class="modal-title">Add Panel Member</h5>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                          </div>
-                          <div class="modal-body">
-                              <input type="text" id="panelName" placeholder="Enter Name" class="form-control mb-2" value="">
-                              <input type="email" id="panelEmail" placeholder="Enter Email" class="form-control mb-2" value="">
-                          </div>
-                          <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                              <button type="button" class="btn btn-success" id="savePanel">Save</button>
-                          </div>
-                      </div>
-                  </div>
-                </div>
-                <div class="mb-3">
-                    <label for="date" class="form-label" style="font-size:20px; color:#1AACAC;">Date</label>
-                    <i class="fa-solid fa-star" style="font-size:8px;position: relative;bottom:10px; color: red;"></i>
-                    <input type="date" class="form-control" name="date" id="date" value="{{ date or '' }}" required>
-                </div>
-                <div class="mb-3">
-                    <label for="status" style="font-size:20px; color:#1AACAC; margin-top: 20px;">Status</label>
-                    <i class="fa-solid fa-star" style="font-size:8px;position: relative;bottom:10px; color: red;"></i>
-                    <select id="status" name="status" required>
-                      <option value="Rejected" {{ 'selected' if status1 == 'Rejected' else '' }}>Rejected</option>
-                      <option value="Move to Interview 1" {{ 'selected' if status1 == 'Move to Interview 1' else '' }}>Move to Interview 1</option>
-                      
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="comments" style="font-size:20px; color:#1AACAC; margin-top: 20px;">Comments:</label>
-                    <input class="form-control" type="text" name="comments" value="{{comments1}}" placeholder="Enter your comments" required>
-                </div>
 
-                 <!-- panel feedback section -->
-                 <div id="panelFeedbackContainer">
-                  <h3 style="color: rgb(12, 181, 238);">Panel Feedback <span style="color: rgb(235, 8, 8);">*</span></h3>
-                  <div id="feedbackSections"></div>
-                
-                <input type="hidden" id="selectedPanel" name="selectedPanel" value="{{selected_panel}}">
-                <div style="display: flex; align-items: center; justify-content: center;">
-                  <button type="submit" class="btn btn-primary" style="width:6rem; height:3rem; margin-right: 2rem;">Submit</button>
-                  <a class="btn btn-outline-secondary" href="{{url_for('employee')}}" style="padding:10px; width:6rem; height:3rem;">
-                    <div style="display: flex; justify-content: space-between; padding:5px;">
-                      <div>
-                        <i class="fa-solid fa-backward" style="margin-right: 10px;"></i>
-                      </div>
-                      <div>
-                        Back
-                      </div>
-                    </div>
-                  </a>
-                </div>
-            </form>
+<div class="container">
+    <h1 class="text-center" style="background-color:#4699F9; color: white; padding: 10px;">Enter L2 Details</h1>
+
+    <form action="{{ url_for('interview1v', resume_id=resume.id) }}" method="post">
+        <div class="form-group">
+            <label for="selectedPanel">Panel Members</label>
+            <div style="flex: 1;" id="panelList"></div>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#panelModal">+ Add</button>
         </div>
-        <div style="margin-top: 20px;text-align: center; width: 75%; margin-left:15%;">
-          {% with messages = get_flashed_messages(with_categories=true) %}
-              {% if messages %}
-                  {% for category, message in messages %}
-                      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                          {{ message }}
-                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                      </div>
-                  {% endfor %}
-              {% endif %}
-          {% endwith %}
+
+        <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" class="form-control" name="date" id="date" required>
         </div>
-      </div>
+
+        <div class="form-group" style="position: relative;">
+            <label for="status">Status</label>
+            <select id="status" name="status" class="form-control" required>
+                <option value="Rejected">Rejected</option>
+                <option value="Move to Interview 1">Move to Interview 1</option>
+               
+            </select>
+            <i class="fa-solid fa-chevron-down dropdown-icon"></i>
+        </div>
+
+        <div class="form-group">
+            <label for="comments">Comments</label>
+            <textarea class="form-control" name="comments" id="comments" placeholder="Enter your comments" required></textarea>
+        </div>
+
+        <div id="feedbackSections"></div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <a class="btn btn-outline-secondary" href="{{ url_for('employee') }}">Back</a>
+        </div>
+    </form>
+</div>
+
+<div class="modal fade" id="panelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Panel Member</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="panelName" placeholder="Enter Name" class="form-control mb-2">
+                <input type="email" id="panelEmail" placeholder="Enter Email" class="form-control mb-2">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="savePanel">Save</button>
+            </div>
+        </div>
     </div>
-    
-    <script src="{{ url_for('static', filename='intro.js') }}"></script> 
-    <script src="{{ url_for('static', filename='modal.js') }}"></script> 
-    <script>
-        document.getElementById('savePanel').addEventListener('click', function() {
-            const panelName = document.getElementById('panelName').value;
-            const panelEmail = document.getElementById('panelEmail').value;
+</div>
 
-            if (panelName && panelEmail) {
-                const panelMembersContainer = document.querySelector('.panel-members');
-                const newPanelMember = document.createElement('div');
-                newPanelMember.className = 'panel-member';
-                newPanelMember.innerHTML = `
+<!-- Bootstrap Script -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- JavaScript Code -->
+<!-- <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("savePanel").addEventListener("click", function () {
+            const panelName = document.getElementById("panelName").value.trim();
+            const panelList = document.getElementById("panelList");
+            const feedbackSection = document.getElementById("feedbackSections");
+
+            if (panelName) {
+                // Check if panel member already exists
+                if (document.querySelector(`.panel-member[data-member="${panelName}"]`)) {
+                    alert("Panel member already added!");
+                    return;
+                }
+
+                // Create a panel member entry (only name)
+                const newMember = document.createElement("div");
+                newMember.className = "panel-member d-flex justify-content-between align-items-center";
+                newMember.dataset.member = panelName;
+                newMember.innerHTML = `
                     <span>${panelName}</span>
-                    <div>
-                        <button type="button" class="btn btn-danger btn-sm delete-btn" data-member="${panelName}">
-                            <i class="fa-solid fa-trash"></i> <!-- Delete icon -->
-                        </button>
-                    </div>
+                    <button type="button" class="btn btn-danger btn-sm delete-btn">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
                 `;
-                panelMembersContainer.insertBefore(newPanelMember, panelMembersContainer.lastElementChild); // Insert before the Add button
+                panelList.appendChild(newMember);
 
-                // Clear the input fields
-                document.getElementById('panelName').value = '';
-                document.getElementById('panelEmail').value = '';
+                // Add feedback field dynamically
+                const newFeedback = document.createElement("div");
+                newFeedback.className = "form-group feedback-field";
+                newFeedback.dataset.member = panelName;
+                newFeedback.innerHTML = `
+                    <label>${panelName} Feedback:</label>
+                    <textarea class="form-control" name="feedback_${panelName}" placeholder="Enter feedback for ${panelName}"></textarea>
+                `;
+                feedbackSection.appendChild(newFeedback);
 
-                // Close the modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('panelModal'));
-                modal.hide();
+                // Clear input fields
+                document.getElementById("panelName").value = "";
+
+                // Close the modal properly
+                const modalElement = document.getElementById("panelModal");
+                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                modalInstance.hide();
             } else {
-                alert('Please enter both name and email.');
+                alert("Enter the panel member name.");
             }
         });
 
-        // Event delegation for delete buttons
-        document.querySelector('.panel-members').addEventListener('click', function(e) {
-    if (e.target.classList.contains('delete-btn')) {
-        const memberName = e.target.getAttribute('data-member');
-        const memberDiv = Array.from(document.querySelectorAll('.panel-member')).find(div => div.textContent.includes(memberName));
-        if (memberDiv) {
-            memberDiv.remove(); // Remove the member from the display
+        // Delete functionality for dynamically added panel members
+        document.addEventListener("click", function (event) {
+            if (event.target.closest(".delete-btn")) {
+                const memberDiv = event.target.closest(".panel-member");
+                const memberName = memberDiv.dataset.member;
+                memberDiv.remove();
+
+                // Remove the corresponding feedback field
+                document.querySelector(`.feedback-field[data-member="${memberName}"]`)?.remove();
+            }
+        });
+    });
+</script> -->
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const panelList = document.getElementById("panelList");
+        const feedbackSection = document.getElementById("feedbackSections");
+
+        // Function to load saved panel members from localStorage
+        function loadPanelMembers() {
+            const savedPanels = JSON.parse(localStorage.getItem("panelMembers")) || [];
+            panelList.innerHTML = "";  // Clear existing list
+            feedbackSection.innerHTML = "";  // Clear existing feedback
+
+            savedPanels.forEach(panelName => {
+                addPanelMember(panelName);
+            });
         }
-    }
-});
 
+        // Function to add a panel member
+        function addPanelMember(panelName) {
+            if (!panelName) return;
 
-const panelMembers = []; // This should be populated with the names of the panel members
+            // Check if panel member already exists
+            if (document.querySelector(`.panel-member[data-member="${panelName}"]`)) {
+                alert("Panel member already added!");
+                return;
+            }
 
-function updateFeedbackSections() {
-    const feedbackContainer = document.getElementById('feedbackSections');
-    feedbackContainer.innerHTML = ''; // Clear existing feedback sections
+            // Create panel member entry
+            const newMember = document.createElement("div");
+            newMember.className = "panel-member d-flex justify-content-between align-items-center";
+            newMember.dataset.member = panelName;
+            newMember.innerHTML = `
+                <span>${panelName}</span>
+                <button type="button" class="btn btn-danger btn-sm delete-btn">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            `;
+            panelList.appendChild(newMember);
 
-    panelMembers.forEach((member, index) => {
-        const feedbackDiv = document.createElement('div');
-        feedbackDiv.className = 'feedback-section';
-        feedbackDiv.innerHTML = `
-            <label for="feedback${index}">${member} Feedback:</label>
-            <textarea id="feedback${index}" placeholder="Enter feedback for ${member}" class="form-control mb-2"></textarea>
-        `;
-        feedbackContainer.appendChild(feedbackDiv);
-    });
-}
+            // Add feedback field dynamically
+            const newFeedback = document.createElement("div");
+            newFeedback.className = "form-group feedback-field";
+            newFeedback.dataset.member = panelName;
+            newFeedback.innerHTML = `
+                <label>${panelName} Feedback:</label>
+                <textarea class="form-control" name="feedback_${panelName}" placeholder="Enter feedback for ${panelName}"></textarea>
+            `;
+            feedbackSection.appendChild(newFeedback);
 
-// Call this function whenever you add a new panel member
-function addPanelMember(name) {
-    panelMembers.push(name);
-    updateFeedbackSections();
-}
-
-// Example of adding a member
-addPanelMember('Panel Member 1');
-addPanelMember('Panel Member 2');
-
-function submitFeedback() {
-    const feedbackData = panelMembers.map((member, index) => {
-        return {
-            member: member,
-            feedback: document.getElementById(`feedback${index}`).value
-        };
-    });
-
-    // Send feedbackData to your backend for processing
-    fetch('/submitFeedback', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(feedbackData)
-    }).then(response => {
-        if (response.ok) {
-            alert('Feedback submitted successfully!');
-        } else {
-            alert('Error submitting feedback.');
+            // Save updated panel members to localStorage
+            savePanelMembers();
         }
+
+        // Function to save panel members in localStorage
+        function savePanelMembers() {
+            const panelNames = [...document.querySelectorAll(".panel-member")].map(div => div.dataset.member);
+            localStorage.setItem("panelMembers", JSON.stringify(panelNames));
+        }
+
+        // Handle Save button click
+        document.getElementById("savePanel").addEventListener("click", function () {
+            const panelName = document.getElementById("panelName").value.trim();
+            if (panelName) {
+                addPanelMember(panelName);
+                document.getElementById("panelName").value = ""; // Clear input
+
+                // Close the modal properly
+                const modalElement = document.getElementById("panelModal");
+                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                modalInstance.hide();
+            } else {
+                alert("Enter the panel member name.");
+            }
+        });
+
+        // Handle Delete button click
+        document.addEventListener("click", function (event) {
+            if (event.target.closest(".delete-btn")) {
+                const memberDiv = event.target.closest(".panel-member");
+                const memberName = memberDiv.dataset.member;
+                memberDiv.remove();
+
+                // Remove the corresponding feedback field
+                document.querySelector(`.feedback-field[data-member="${memberName}"]`)?.remove();
+
+                // Update localStorage
+                savePanelMembers();
+            }
+        });
+
+        // Load panel members when the page loads
+        loadPanelMembers();
     });
-}
-         
-    </script>
+</script>
+
 </body>
 </html>

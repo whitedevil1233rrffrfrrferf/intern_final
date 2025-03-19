@@ -196,9 +196,12 @@
         const panelList = document.getElementById("panelList");
         const feedbackSection = document.getElementById("feedbackSections");
 
-        // Function to load saved panel members from localStorage
+        // Get unique key based on page URL
+        const pageKey = `panelMembers_${window.location.pathname}`;
+
+        // Function to load saved panel members from localStorage for this page
         function loadPanelMembers() {
-            const savedPanels = JSON.parse(localStorage.getItem("panelMembers")) || [];
+            const savedPanels = JSON.parse(localStorage.getItem(pageKey)) || [];
             panelList.innerHTML = "";  // Clear existing list
             feedbackSection.innerHTML = "";  // Clear existing feedback
 
@@ -243,10 +246,10 @@
             savePanelMembers();
         }
 
-        // Function to save panel members in localStorage
+        // Function to save panel members in localStorage for this specific page
         function savePanelMembers() {
             const panelNames = [...document.querySelectorAll(".panel-member")].map(div => div.dataset.member);
-            localStorage.setItem("panelMembers", JSON.stringify(panelNames));
+            localStorage.setItem(pageKey, JSON.stringify(panelNames));
         }
 
         // Handle Save button click
@@ -280,10 +283,11 @@
             }
         });
 
-        // Load panel members when the page loads
+        // Load panel members when the page loads (only for this specific page)
         loadPanelMembers();
     });
 </script>
+
 
 </body>
 </html>

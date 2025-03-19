@@ -61,6 +61,20 @@
             color: #666;
             pointer-events: none;
         }
+
+      
+    .required::after {
+        content: " *";
+        color: red;
+        font-weight: bold;
+    }
+
+    .btn-primary:disabled {
+        background-color: gray;
+        border-color: gray;
+        cursor: not-allowed;
+    }
+
     </style>
 </head>
 <body>

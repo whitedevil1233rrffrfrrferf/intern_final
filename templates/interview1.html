@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,6 +8,7 @@
     <title>Interview1</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="/static/email.js"> </script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -48,34 +51,139 @@
             border-color: rgb(9, 195, 241);
             color: white;
         }
-        .add-button-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        .required::after {
+            content: " *";
+            color: red;
+            font-weight: bold;
         }
-        .dropdown-icon {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #666;
-            pointer-events: none;
-        }
-
-      
-    .required::after {
-        content: " *";
-        color: red;
-        font-weight: bold;
-    }
-
-    .btn-primary:disabled {
-        background-color: gray;
-        border-color: gray;
-        cursor: not-allowed;
-    }
-
     </style>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<!-- <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        emailjs.init("Y-IUMgYHei_SzaQci"); // Replace with your EmailJS user ID
+    });
+
+    function sendEmail(candidateName, candidateEmail, status, callback) {
+        const submitButton = document.querySelector("button[type='submit']");
+        submitButton.innerHTML = "Sending Email...";
+        submitButton.disabled = true; // Prevent multiple clicks
+
+        const templateParams = {
+            to_email: 'shwethaacharya829@gmail.com, shwetha.20cs084@sode-edu.in',
+            candidate_name: candidateName,
+            candidate_email: candidateEmail,
+            status: status,  // ✅ Now we pass the status dynamically
+            message: `Candidate ${candidateName} has been marked as '${status}'.`
+        };
+
+        emailjs.send("service_qghdq8f", "template_1jyba8e", templateParams)
+            .then(function(response) {
+                if (response.status === 200) {  // ✅ Check if response is successful
+                    console.log("📨 Email sent successfully", response);
+                    
+                    alert("✅ Email sent successfully!");
+
+                    setTimeout(() => {
+                        if (callback) callback(); // ✅ Submit form after email is sent
+                    }, 2000); // Delay to allow user to see popup
+                } else {
+                    console.error("⚠️ Unexpected email response", response);
+                    alert("⚠️ Email sending issue. Please try again.");
+                    submitButton.innerHTML = "Submit";
+                    submitButton.disabled = false;
+                }
+            })
+            .catch(function(error) {
+                console.error("❌ Error sending email", error);
+                alert("⚠️ Failed to send email. Please try again.");
+                submitButton.innerHTML = "Submit";
+                submitButton.disabled = false;
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector("form").addEventListener("submit", function (event) {
+            const status = document.getElementById("status").value; // ✅ Fetch status dynamically
+            const candidateName = "{{ resume.Name }}"; // Fetch from Flask
+            const candidateEmail = "{{ resume.Email }}"; // Fetch from Flask
+
+            if (status !== "Rejected") { // ✅ Send email for any status except "Rejected"
+                event.preventDefault(); 
+                sendEmail(candidateName, candidateEmail, status, () => {
+                    this.submit(); // ✅ Submit the form after email is sent
+                });
+            }
+        });
+    });
+</script> -->
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        emailjs.init("Y-IUMgYHei_SzaQci");  // Replace with your EmailJS user ID
+    });
+
+    function sendEmail(candidateName, candidateEmail, status, ccEmails, callback) {
+        const submitButton = document.querySelector("button[type='submit']");
+        submitButton.innerHTML = "Sending Email...";
+        submitButton.disabled = true;
+
+        const templateParams = {
+            to_email: 'shwethaacharya829@gmail.com, sourav.20cs089@sode-edu.in',
+            cc_email: ccEmails.join(", "),  // ✅ Include CC emails
+            candidate_name: candidateName,
+            candidate_email: candidateEmail,
+            status: status,
+            message: `Candidate ${candidateName} has been marked as '${status}'.`
+        };
+
+        emailjs.send("service_qghdq8f", "template_1jyba8e", templateParams)
+            .then(function(response) {
+                if (response.status === 200) {
+                    console.log("📨 Email sent successfully", response);
+                    alert("✅ Email sent successfully!");
+
+                    setTimeout(() => {
+                        if (callback) callback();
+                    }, 2000);
+                } else {
+                    console.error("⚠️ Unexpected email response", response);
+                    alert("⚠️ Email sending issue. Please try again.");
+                    submitButton.innerHTML = "Submit";
+                    submitButton.disabled = false;
+                }
+            })
+            .catch(function(error) {
+                console.error("❌ Error sending email", error);
+                alert("⚠️ Failed to send email. Please try again.");
+                submitButton.innerHTML = "Submit";
+                submitButton.disabled = false;
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector("form").addEventListener("submit", function (event) {
+            const status = document.getElementById("status").value;
+            const candidateName = "{{ resume.Name }}";
+            const candidateEmail = "{{ resume.Email }}";
+            const panelEmails = JSON.parse('{{ panel_emails | tojson | safe }}');
+            console.log("Panel Emails:", panelEmails); // ✅ Get CC emails
+
+            if (status !== "Rejected") {
+                event.preventDefault(); 
+                sendEmail(candidateName, candidateEmail, status, panelEmails, () => {
+                    this.submit();
+                });
+            }
+        });
+    });
+
+</script>
+
+
+
+
 </head>
 <body>
 
@@ -85,29 +193,34 @@
     <form action="{{ url_for('interview1v', resume_id=resume.id) }}" method="post">
         <div class="form-group">
             <label for="selectedPanel">Panel Members</label>
-            <div style="flex: 1;" id="panelList"></div>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#panelModal">+ Add</button>
+            <div style="flex: 1;" id="panelList">
+                <!-- <textarea class="form-control" id="panelPlaceholder" readonly></textarea> -->
+                <input type="text" class="form-control" id="panelPlaceholder" readonly>
+            </div>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#panelModal">Add</button>
         </div>
+
+        <input type="hidden" name="panel_members" id="panelMembersInput">
 
         <div class="form-group">
             <label for="date">Date</label>
             <input type="date" class="form-control" name="date" id="date" required>
         </div>
 
-        <div class="form-group" style="position: relative;">
+        <div class="form-group">
             <label for="status">Status</label>
             <select id="status" name="status" class="form-control" required>
                 <option value="Rejected">Rejected</option>
                 <option value="Move to Interview 2">Move to Interview 2</option>
                 <option value="hold">On Hold</option>
             </select>
-            <i class="fa-solid fa-chevron-down dropdown-icon"></i>
         </div>
 
         <div class="form-group">
-            <label for="comments">Comments</label>
-            <textarea class="form-control" name="comments" id="comments" placeholder="Enter your comments" required></textarea>
+            <label for="comments" class="required">Comments</label>
+            <input type="text" class="form-control" id="comments" name="comments" value="None" readonly required>
         </div>
+        
 
         <div id="feedbackSections"></div>
 
@@ -118,6 +231,7 @@
     </form>
 </div>
 
+<!-- Add Panel Member Modal -->
 <div class="modal fade" id="panelModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -137,165 +251,87 @@
     </div>
 </div>
 
-<!-- Bootstrap Script -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- JavaScript Code -->
-<!-- <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("savePanel").addEventListener("click", function () {
-            const panelName = document.getElementById("panelName").value.trim();
-            const panelList = document.getElementById("panelList");
-            const feedbackSection = document.getElementById("feedbackSections");
-
-            if (panelName) {
-                // Check if panel member already exists
-                if (document.querySelector(`.panel-member[data-member="${panelName}"]`)) {
-                    alert("Panel member already added!");
-                    return;
-                }
-
-                // Create a panel member entry (only name)
-                const newMember = document.createElement("div");
-                newMember.className = "panel-member d-flex justify-content-between align-items-center";
-                newMember.dataset.member = panelName;
-                newMember.innerHTML = `
-                    <span>${panelName}</span>
-                    <button type="button" class="btn btn-danger btn-sm delete-btn">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                `;
-                panelList.appendChild(newMember);
-
-                // Add feedback field dynamically
-                const newFeedback = document.createElement("div");
-                newFeedback.className = "form-group feedback-field";
-                newFeedback.dataset.member = panelName;
-                newFeedback.innerHTML = `
-                    <label>${panelName} Feedback:</label>
-                    <textarea class="form-control" name="feedback_${panelName}" placeholder="Enter feedback for ${panelName}"></textarea>
-                `;
-                feedbackSection.appendChild(newFeedback);
-
-                // Clear input fields
-                document.getElementById("panelName").value = "";
-
-                // Close the modal properly
-                const modalElement = document.getElementById("panelModal");
-                const modalInstance = bootstrap.Modal.getInstance(modalElement);
-                modalInstance.hide();
-            } else {
-                alert("Enter the panel member name.");
-            }
-        });
-
-        // Delete functionality for dynamically added panel members
-        document.addEventListener("click", function (event) {
-            if (event.target.closest(".delete-btn")) {
-                const memberDiv = event.target.closest(".panel-member");
-                const memberName = memberDiv.dataset.member;
-                memberDiv.remove();
-
-                // Remove the corresponding feedback field
-                document.querySelector(`.feedback-field[data-member="${memberName}"]`)?.remove();
-            }
-        });
-    });
-</script> -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("savePanel").addEventListener("click", function () {
+        const panelName = document.getElementById("panelName").value.trim();
+        const panelEmail = document.getElementById("panelEmail").value.trim();
         const panelList = document.getElementById("panelList");
         const feedbackSection = document.getElementById("feedbackSections");
+        const panelMembersInput = document.getElementById("panelMembersInput");
+        const panelPlaceholder = document.getElementById("panelPlaceholder");
 
-        // Function to load saved panel members from localStorage
-        function loadPanelMembers() {
-            const savedPanels = JSON.parse(localStorage.getItem("panelMembers")) || [];
-            panelList.innerHTML = "";  // Clear existing list
-            feedbackSection.innerHTML = "";  // Clear existing feedback
+        if (panelName && panelEmail) {
+            const panelInfo = `${panelName}, ${panelEmail}`;
 
-            savedPanels.forEach(panelName => {
-                addPanelMember(panelName);
-            });
-        }
-
-        // Function to add a panel member
-        function addPanelMember(panelName) {
-            if (!panelName) return;
-
-            // Check if panel member already exists
-            if (document.querySelector(`.panel-member[data-member="${panelName}"]`)) {
+            if (document.querySelector(`.panel-member[data-member="${panelInfo}"]`)) {
                 alert("Panel member already added!");
                 return;
             }
 
-            // Create panel member entry
+            // Create Panel Member Entry
             const newMember = document.createElement("div");
             newMember.className = "panel-member d-flex justify-content-between align-items-center";
-            newMember.dataset.member = panelName;
+            newMember.dataset.member = panelInfo;
             newMember.innerHTML = `
-                <span>${panelName}</span>
+                <span>${panelInfo}</span>
                 <button type="button" class="btn btn-danger btn-sm delete-btn">
                     <i class="fa-solid fa-trash"></i>
                 </button>
             `;
             panelList.appendChild(newMember);
+            panelPlaceholder.style.display = "none"; // Hide placeholder once member is added
 
-            // Add feedback field dynamically
+            // Create Feedback Field (ONLY NAME, NOT EMAIL)
             const newFeedback = document.createElement("div");
             newFeedback.className = "form-group feedback-field";
-            newFeedback.dataset.member = panelName;
+            newFeedback.dataset.member = panelInfo;
             newFeedback.innerHTML = `
-                <label>${panelName} Feedback:</label>
-                <textarea class="form-control" name="feedback_${panelName}" placeholder="Enter feedback for ${panelName}"></textarea>
+                <label>${panelName} Feedback:</label>  <!-- Changed this line to use ONLY the name -->
+                <textarea class="form-control" name="feedback_${panelName}" placeholder="Enter feedback for ${panelName}" required></textarea>
             `;
             feedbackSection.appendChild(newFeedback);
 
-            // Save updated panel members to localStorage
-            savePanelMembers();
+            // Store Data in Hidden Input
+            panelMembersInput.value += panelInfo + ";";
+
+            // Clear Inputs
+            document.getElementById("panelName").value = "";
+            document.getElementById("panelEmail").value = "";
+
+            // Close Modal
+            const modalElement = document.getElementById("panelModal");
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            modalInstance.hide();
+        } else {
+            alert("Enter both name and email.");
         }
-
-        // Function to save panel members in localStorage
-        function savePanelMembers() {
-            const panelNames = [...document.querySelectorAll(".panel-member")].map(div => div.dataset.member);
-            localStorage.setItem("panelMembers", JSON.stringify(panelNames));
-        }
-
-        // Handle Save button click
-        document.getElementById("savePanel").addEventListener("click", function () {
-            const panelName = document.getElementById("panelName").value.trim();
-            if (panelName) {
-                addPanelMember(panelName);
-                document.getElementById("panelName").value = ""; // Clear input
-
-                // Close the modal properly
-                const modalElement = document.getElementById("panelModal");
-                const modalInstance = bootstrap.Modal.getInstance(modalElement);
-                modalInstance.hide();
-            } else {
-                alert("Enter the panel member name.");
-            }
-        });
-
-        // Handle Delete button click
-        document.addEventListener("click", function (event) {
-            if (event.target.closest(".delete-btn")) {
-                const memberDiv = event.target.closest(".panel-member");
-                const memberName = memberDiv.dataset.member;
-                memberDiv.remove();
-
-                // Remove the corresponding feedback field
-                document.querySelector(`.feedback-field[data-member="${memberName}"]`)?.remove();
-
-                // Update localStorage
-                savePanelMembers();
-            }
-        });
-
-        // Load panel members when the page loads
-        loadPanelMembers();
     });
+
+    // Delete Panel Member and Associated Feedback
+    document.addEventListener("click", function (event) {
+        if (event.target.closest(".delete-btn")) {
+            const memberDiv = event.target.closest(".panel-member");
+            const memberName = memberDiv.dataset.member;
+            memberDiv.remove();
+
+            document.querySelector(`.feedback-field[data-member="${memberName}"]`)?.remove();
+
+            const panelMembersInput = document.getElementById("panelMembersInput");
+            panelMembersInput.value = panelMembersInput.value.replace(memberName + ";", "");
+
+            if (!panelList.hasChildNodes()) {
+                document.getElementById("panelPlaceholder").style.display = "block";
+            }
+        }
+    });
+});
 </script>
 
 
 </body>
 </html>
+
+

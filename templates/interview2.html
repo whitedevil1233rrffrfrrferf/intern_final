@@ -1,11 +1,10 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interview 2</title>
+    <title>Interview2</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -45,24 +44,6 @@
             border-radius: 5px;
             margin-bottom: 5px;
         }
-        .btn-danger {
-            background-color: rgb(8, 184, 197);
-            border-color: rgb(9, 195, 241);
-            color: white;
-        }
-        .add-button-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .dropdown-icon {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #666;
-            pointer-events: none;
-        }
     </style>
 </head>
 <body>
@@ -70,33 +51,36 @@
 <div class="container">
     <h1 class="text-center" style="background-color:#4699F9; color: white; padding: 10px;">Enter L2 Details</h1>
 
-    <form action="{{ url_for('interview1v', resume_id=resume.id) }}" method="post">
+    <form action="{{ url_for('interview2v', resume_id=resume.id) }}" method="post">
         <div class="form-group">
             <label for="selectedPanel">Panel Members</label>
-            <div style="flex: 1;" id="panelList"></div>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#panelModal">+ Add</button>
+            <div style="flex: 1;" id="panelList">
+                <input type="text" class="form-control" id="panelPlaceholder" readonly>
+            </div>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#panelModal">Add</button>
         </div>
+
+        <input type="hidden" name="panel_members" id="panelMembersInput">
 
         <div class="form-group">
             <label for="date">Date</label>
             <input type="date" class="form-control" name="date" id="date" required>
         </div>
 
-        <div class="form-group" style="position: relative;">
+        <div class="form-group">
             <label for="status">Status</label>
             <select id="status" name="status" class="form-control" required>
                 <option value="Rejected">Rejected</option>
-                <option value="Move to Interview 1">Move to Interview 1</option>
-               
+                <option value="Move to HR Round">Move to HR Round</option>
+                <option value="hold">On Hold</option>
             </select>
-            <i class="fa-solid fa-chevron-down dropdown-icon"></i>
         </div>
 
         <div class="form-group">
             <label for="comments">Comments</label>
-            <textarea class="form-control" name="comments" id="comments" placeholder="Enter your comments" required></textarea>
+            <input type="text" class="form-control" id="comments" name="comments" value="None" readonly required>
         </div>
-
+        
         <div id="feedbackSections"></div>
 
         <div class="text-center">
@@ -105,6 +89,8 @@
         </div>
     </form>
 </div>
+
+<!-- Add Panel Member Modal -->
 
 <div class="modal fade" id="panelModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -125,169 +111,85 @@
     </div>
 </div>
 
-<!-- Bootstrap Script -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- JavaScript Code -->
-<!-- <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("savePanel").addEventListener("click", function () {
-            const panelName = document.getElementById("panelName").value.trim();
-            const panelList = document.getElementById("panelList");
-            const feedbackSection = document.getElementById("feedbackSections");
-
-            if (panelName) {
-                // Check if panel member already exists
-                if (document.querySelector(`.panel-member[data-member="${panelName}"]`)) {
-                    alert("Panel member already added!");
-                    return;
-                }
-
-                // Create a panel member entry (only name)
-                const newMember = document.createElement("div");
-                newMember.className = "panel-member d-flex justify-content-between align-items-center";
-                newMember.dataset.member = panelName;
-                newMember.innerHTML = `
-                    <span>${panelName}</span>
-                    <button type="button" class="btn btn-danger btn-sm delete-btn">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                `;
-                panelList.appendChild(newMember);
-
-                // Add feedback field dynamically
-                const newFeedback = document.createElement("div");
-                newFeedback.className = "form-group feedback-field";
-                newFeedback.dataset.member = panelName;
-                newFeedback.innerHTML = `
-                    <label>${panelName} Feedback:</label>
-                    <textarea class="form-control" name="feedback_${panelName}" placeholder="Enter feedback for ${panelName}"></textarea>
-                `;
-                feedbackSection.appendChild(newFeedback);
-
-                // Clear input fields
-                document.getElementById("panelName").value = "";
-
-                // Close the modal properly
-                const modalElement = document.getElementById("panelModal");
-                const modalInstance = bootstrap.Modal.getInstance(modalElement);
-                modalInstance.hide();
-            } else {
-                alert("Enter the panel member name.");
-            }
-        });
-
-        // Delete functionality for dynamically added panel members
-        document.addEventListener("click", function (event) {
-            if (event.target.closest(".delete-btn")) {
-                const memberDiv = event.target.closest(".panel-member");
-                const memberName = memberDiv.dataset.member;
-                memberDiv.remove();
-
-                // Remove the corresponding feedback field
-                document.querySelector(`.feedback-field[data-member="${memberName}"]`)?.remove();
-            }
-        });
-    });
-</script> -->
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("savePanel").addEventListener("click", function () {
+        const panelName = document.getElementById("panelName").value.trim();
+        const panelEmail = document.getElementById("panelEmail").value.trim();
         const panelList = document.getElementById("panelList");
         const feedbackSection = document.getElementById("feedbackSections");
+        const panelMembersInput = document.getElementById("panelMembersInput");
+        const panelPlaceholder = document.getElementById("panelPlaceholder");
 
-        // Get unique key based on page URL
-        const pageKey = `panelMembers_${window.location.pathname}`;
+        if (panelName && panelEmail) {
+            const panelInfo = `${panelName}, ${panelEmail}`;
 
-        // Function to load saved panel members from localStorage for this page
-        function loadPanelMembers() {
-            const savedPanels = JSON.parse(localStorage.getItem(pageKey)) || [];
-            panelList.innerHTML = "";  // Clear existing list
-            feedbackSection.innerHTML = "";  // Clear existing feedback
-
-            savedPanels.forEach(panelName => {
-                addPanelMember(panelName);
-            });
-        }
-
-        // Function to add a panel member
-        function addPanelMember(panelName) {
-            if (!panelName) return;
-
-            // Check if panel member already exists
-            if (document.querySelector(`.panel-member[data-member="${panelName}"]`)) {
+            if (document.querySelector(`.panel-member[data-member="${panelInfo}"]`)) {
                 alert("Panel member already added!");
                 return;
             }
 
-            // Create panel member entry
+            // Create Panel Member Entry
             const newMember = document.createElement("div");
             newMember.className = "panel-member d-flex justify-content-between align-items-center";
-            newMember.dataset.member = panelName;
+            newMember.dataset.member = panelInfo;
             newMember.innerHTML = `
-                <span>${panelName}</span>
+                <span>${panelInfo}</span>
                 <button type="button" class="btn btn-danger btn-sm delete-btn">
                     <i class="fa-solid fa-trash"></i>
                 </button>
             `;
             panelList.appendChild(newMember);
+            panelPlaceholder.style.display = "none"; // Hide placeholder once member is added
 
-            // Add feedback field dynamically
+            // Create Feedback Field (ONLY NAME, NOT EMAIL)
             const newFeedback = document.createElement("div");
             newFeedback.className = "form-group feedback-field";
-            newFeedback.dataset.member = panelName;
+            newFeedback.dataset.member = panelInfo;
             newFeedback.innerHTML = `
-                <label>${panelName} Feedback:</label>
-                <textarea class="form-control" name="feedback_${panelName}" placeholder="Enter feedback for ${panelName}"></textarea>
+                <label>${panelName} Feedback:</label>  <!-- Changed this line to use ONLY the name -->
+                <textarea class="form-control" name="feedback_${panelName}" placeholder="Enter feedback for ${panelName}" required></textarea>
             `;
             feedbackSection.appendChild(newFeedback);
 
-            // Save updated panel members to localStorage
-            savePanelMembers();
+            // Store Data in Hidden Input
+            panelMembersInput.value += panelInfo + ";";
+
+            // Clear Inputs
+            document.getElementById("panelName").value = "";
+            document.getElementById("panelEmail").value = "";
+
+            // Close Modal
+            const modalElement = document.getElementById("panelModal");
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            modalInstance.hide();
+        } else {
+            alert("Enter both name and email.");
         }
-
-        // Function to save panel members in localStorage for this specific page
-        function savePanelMembers() {
-            const panelNames = [...document.querySelectorAll(".panel-member")].map(div => div.dataset.member);
-            localStorage.setItem(pageKey, JSON.stringify(panelNames));
-        }
-
-        // Handle Save button click
-        document.getElementById("savePanel").addEventListener("click", function () {
-            const panelName = document.getElementById("panelName").value.trim();
-            if (panelName) {
-                addPanelMember(panelName);
-                document.getElementById("panelName").value = ""; // Clear input
-
-                // Close the modal properly
-                const modalElement = document.getElementById("panelModal");
-                const modalInstance = bootstrap.Modal.getInstance(modalElement);
-                modalInstance.hide();
-            } else {
-                alert("Enter the panel member name.");
-            }
-        });
-
-        // Handle Delete button click
-        document.addEventListener("click", function (event) {
-            if (event.target.closest(".delete-btn")) {
-                const memberDiv = event.target.closest(".panel-member");
-                const memberName = memberDiv.dataset.member;
-                memberDiv.remove();
-
-                // Remove the corresponding feedback field
-                document.querySelector(`.feedback-field[data-member="${memberName}"]`)?.remove();
-
-                // Update localStorage
-                savePanelMembers();
-            }
-        });
-
-        // Load panel members when the page loads (only for this specific page)
-        loadPanelMembers();
     });
-</script>
 
+    // Delete Panel Member and Associated Feedback
+    document.addEventListener("click", function (event) {
+        if (event.target.closest(".delete-btn")) {
+            const memberDiv = event.target.closest(".panel-member");
+            const memberName = memberDiv.dataset.member;
+            memberDiv.remove();
+
+            document.querySelector(`.feedback-field[data-member="${memberName}"]`)?.remove();
+
+            const panelMembersInput = document.getElementById("panelMembersInput");
+            panelMembersInput.value = panelMembersInput.value.replace(memberName + ";", "");
+
+            if (!panelList.hasChildNodes()) {
+                document.getElementById("panelPlaceholder").style.display = "block";
+            }
+        }
+    });
+});
+
+</script>
 
 </body>
 </html>

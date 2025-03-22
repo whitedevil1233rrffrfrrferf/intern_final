@@ -1,28 +1,28 @@
-from flask import Flask, g, render_template,request,redirect,url_for,jsonify,send_from_directory,session,make_response,abort,flash,render_template_string
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import extract,func,or_,ForeignKey,text
-from sqlalchemy.sql.expression import extract
-from openpyxl import load_workbook,Workbook
+from flask import Flask, g, render_template,request,redirect,url_for,jsonify,send_from_directory,session,make_response,abort,flash,render_template_string # type: ignore
+from flask_sqlalchemy import SQLAlchemy # type: ignore
+from sqlalchemy import extract,func,or_,ForeignKey,text # type: ignore
+from sqlalchemy.sql.expression import extract # type: ignore
+from openpyxl import load_workbook,Workbook # type: ignore
 from datetime import date,datetime
-from dateutil.parser import parse
-from flask_migrate import Migrate
+from dateutil.parser import parse # type: ignore
+from flask_migrate import Migrate # type: ignore
 import logging
-from werkzeug.utils import secure_filename
+from werkzeug.utils import secure_filename # type: ignore
 import os
 import zipfile
 import shutil
 import subprocess
 import json
-from flask import current_app
-from google.oauth2 import id_token
-from google_auth_oauthlib.flow import Flow
-from google.auth.transport import requests
-from googleapiclient.discovery import build
-from google.oauth2.credentials import Credentials
-from googleapiclient.http import MediaFileUpload,MediaIoBaseUpload
-import requests as req
+from flask import current_app # type: ignore
+from google.oauth2 import id_token # type: ignore
+from google_auth_oauthlib.flow import Flow # type: ignore
+from google.auth.transport import requests # type: ignore
+from googleapiclient.discovery import build # type: ignore
+from google.oauth2.credentials import Credentials # type: ignore
+from googleapiclient.http import MediaFileUpload,MediaIoBaseUpload # type: ignore
+import requests as req # type: ignore
 import secrets
-from dotenv import load_dotenv
+from dotenv import load_dotenv # type: ignore
 import time
 import io
 import re
@@ -164,34 +164,96 @@ class Resume(db.Model):
 
         
     
-class Intro(db.Model):
-    __bind_key__="intro"
-    __tablename__ = 'intro'
-    id=db.Column(db.Integer,primary_key=True)
-    Date=db.Column(db.String(200))
-    Status=db.Column(db.String(200))
-    Comments=db.Column(db.String(200))
-    resumeId = db.Column(db.Integer)  
-    SelectedPanel=db.Column(db.String(200))  
+# class Intro(db.Model):
+#     __bind_key__="intro"
+#     __tablename__ = 'intro'
+#     id=db.Column(db.Integer,primary_key=True)
+#     Date=db.Column(db.String(200))
+#     Status=db.Column(db.String(200))
+#     Comments=db.Column(db.String(200))
+#     resumeId = db.Column(db.Integer)  
+#     SelectedPanel=db.Column(db.String(200))  
     
 
+class Intro(db.Model):
+    __bind_key__ = "intro"
+    __tablename__ = 'intro'
+    id = db.Column(db.Integer, primary_key=True)
+    Date = db.Column(db.String(200))
+    Status = db.Column(db.String(200))
+    Comments = db.Column(db.String(200))
+    resumeId = db.Column(db.Integer)
+    SelectedPanel = db.Column(db.String(200))  # Store panel names as a string
+    panel_members = db.relationship('PanelMembers1', backref='interview', cascade="all, delete-orphan")
+
+class PanelMembers1(db.Model):
+    __bind_key__ = "intro"
+    __tablename__ = 'panel_members1'
+    id = db.Column(db.Integer, primary_key=True)
+    interview_id = db.Column(db.Integer, db.ForeignKey('intro.id'))  # Foreign key to Intro table
+    name = db.Column(db.String(200), nullable=False)
+    email = db.Column(db.String(200), nullable=False)
+
+
+# class Interview1(db.Model):
+#     __bind_key__="interview1" 
+#     id=db.Column(db.Integer,primary_key=True)
+#     Date=db.Column(db.String(200))
+#     Status=db.Column(db.String(200))
+#     Comments=db.Column(db.String(200))
+#     resumeId=db.Column(db.Integer)  
+#     SelectedPanel=db.Column(db.String(200))  
+# 
 class Interview1(db.Model):
-    __bind_key__="interview1" 
-    id=db.Column(db.Integer,primary_key=True)
-    Date=db.Column(db.String(200))
-    Status=db.Column(db.String(200))
-    Comments=db.Column(db.String(200))
-    resumeId=db.Column(db.Integer)  
-    SelectedPanel=db.Column(db.String(200))     
+    __bind_key__ = "interview1"
+    id = db.Column(db.Integer, primary_key=True)
+    Date = db.Column(db.String(200))
+    Status = db.Column(db.String(200))
+    Comments = db.Column(db.String(200))
+    resumeId = db.Column(db.Integer)
+    SelectedPanel = db.Column(db.String(500))  # Keeping this for compatibility
+    panel_members = db.relationship('PanelMembers', backref='interview', cascade="all, delete-orphan")  # Relationship to PanelMembers
+
+
+class PanelMembers(db.Model):
+    __bind_key__ = "interview1"
+    id = db.Column(db.Integer, primary_key=True)
+    interview_id = db.Column(db.Integer, db.ForeignKey('interview1.id', ondelete="CASCADE"))  # Foreign key linking to Interview1
+    name = db.Column(db.String(200), nullable=False)
+    email = db.Column(db.String(200), nullable=False)
+  
+
+
+
+# class Interview2(db.Model):
+#     __bind_key__="interview2" 
+#     id=db.Column(db.Integer,primary_key=True)
+#     Date=db.Column(db.String(200))
+#     Status=db.Column(db.String(200))
+#     Comments=db.Column(db.String(200))
+#     resumeId=db.Column(db.Integer)  
+#     SelectedPanel=db.Column(db.String(200))    
+
+
+# i updated
+
 
 class Interview2(db.Model):
-    __bind_key__="interview2" 
-    id=db.Column(db.Integer,primary_key=True)
-    Date=db.Column(db.String(200))
-    Status=db.Column(db.String(200))
-    Comments=db.Column(db.String(200))
-    resumeId=db.Column(db.Integer)  
-    SelectedPanel=db.Column(db.String(200))    
+    __bind_key__ = "interview2"
+    id = db.Column(db.Integer, primary_key=True)
+    Date = db.Column(db.String(200))
+    Status = db.Column(db.String(200))
+    Comments = db.Column(db.String(200))
+    resumeId = db.Column(db.Integer)
+    panel_members = db.relationship('PanelMembers2', backref='interview', cascade="all, delete-orphan")
+
+class PanelMembers2(db.Model):
+    __bind_key__ = "interview2"
+    id = db.Column(db.Integer, primary_key=True)
+    interview_id = db.Column(db.Integer, db.ForeignKey('interview2.id'))  # Foreign Key to Interview2
+    name = db.Column(db.String(200), nullable=False)
+    email = db.Column(db.String(200), nullable=False)
+
 
 class Hr(db.Model):
     __bind_key__="hr" 
@@ -1689,50 +1751,135 @@ def zip():
         return redirect(url_for('zip'))            
     return render_template("zip.html")
 
+# @app.route("/introcall/<int:resume_id>", methods=['GET', 'POST'])
+# def introCall(resume_id):
+#     selected_panel=""
+#     resume=Resume.query.get(resume_id)
+#     existing_entry=Intro.query.filter_by(resumeId=resume.id).first()
+#     if existing_entry:
+#         status1 = existing_entry.Status
+#         comments1 = existing_entry.Comments
+#         selected_panel = existing_entry.SelectedPanel
+#         date = existing_entry.Date
+#     else:
+#         status1 = None
+#         comments1 = None
+#         selected_panel = ""
+#         date = None
+#     if request.method == 'POST':
+        
+        
+#         date=request.form["date"]
+#         status=request.form["status"]
+#         comments=request.form["comments"]
+#         selected_panel=request.form["selectedPanel"]
+#         existing_entry=Intro.query.filter_by(resumeId=resume.id).first()
+#         if existing_entry:
+#             existing_entry.Date = date
+#             existing_entry.Status = status
+#             existing_entry.Comments = comments
+#             existing_entry.SelectedPanel = selected_panel
+#             status1=existing_entry.Status
+#             comments1=existing_entry.Comments
+#         else:    
+#             entry=Intro( Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
+#             db.session.add(entry)
+#             status1=status
+#             comments1=comments
+
+#         db.session.commit()
+#         if status == "Rejected":
+#             flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
+#         elif status == "Move to Interview 1":
+#             flash("Candidate Moved to L1", "success")  # Using 'success' for a green flash message
+#             return redirect(url_for('interview1v', resume_id=resume_id))
+#         return redirect(url_for('introCall', resume_id=resume.id))
+#     return render_template("intro.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date)
+
+# i updtaed
+
 @app.route("/introcall/<int:resume_id>", methods=['GET', 'POST'])
 def introCall(resume_id):
-    selected_panel=""
-    resume=Resume.query.get(resume_id)
-    existing_entry=Intro.query.filter_by(resumeId=resume.id).first()
+    selected_panel = ""
+    resume = Resume.query.get(resume_id)
+    existing_entry = Intro.query.filter_by(resumeId=resume.id).first()
+
     if existing_entry:
         status1 = existing_entry.Status
         comments1 = existing_entry.Comments
         selected_panel = existing_entry.SelectedPanel
         date = existing_entry.Date
+        panel_members = [(pm.name, pm.email) for pm in existing_entry.panel_members]  # Retrieve existing panel members
     else:
         status1 = None
         comments1 = None
         selected_panel = ""
         date = None
+        panel_members = []
+
     if request.method == 'POST':
+        date = request.form["date"]
+        status = request.form["status"]
+        comments = request.form["comments"]
+        selected_panel = request.form["selectedPanel"]  # Store selected panel names
+        panel_names = request.form.getlist("panelNames[]")  # List of names from the form
+        panel_emails = request.form.getlist("panelEmails[]")  # List of emails from the form
+
+        existing_entry = Intro.query.filter_by(resumeId=resume.id).first()
         
-        
-        date=request.form["date"]
-        status=request.form["status"]
-        comments=request.form["comments"]
-        selected_panel=request.form["selectedPanel"]
-        existing_entry=Intro.query.filter_by(resumeId=resume.id).first()
         if existing_entry:
             existing_entry.Date = date
             existing_entry.Status = status
             existing_entry.Comments = comments
             existing_entry.SelectedPanel = selected_panel
-            status1=existing_entry.Status
-            comments1=existing_entry.Comments
-        else:    
-            entry=Intro( Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
+
+            # Remove existing panel members and add new ones
+            PanelMembers1.query.filter_by(interview_id=existing_entry.id).delete()
+            for name, email in zip(panel_names, panel_emails):
+                panel_member = PanelMembers1(interview_id=existing_entry.id, name=name, email=email)
+                db.session.add(panel_member)
+
+            status1 = existing_entry.Status
+            comments1 = existing_entry.Comments
+        else:
+            entry = Intro(Date=date, Status=status, Comments=comments, resumeId=resume.id, SelectedPanel=selected_panel)
             db.session.add(entry)
-            status1=status
-            comments1=comments
+            db.session.flush()  # Get the ID before committing
+
+            # Add panel members
+            for name, email in zip(panel_names, panel_emails):
+                panel_member = PanelMembers1(interview_id=entry.id, name=name, email=email)
+                db.session.add(panel_member)
+
+            status1 = status
+            comments1 = comments
 
         db.session.commit()
+
+        # Flash messages
         if status == "Rejected":
-            flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
+            flash("Candidate Rejected", "danger")
         elif status == "Move to Interview 1":
-            flash("Candidate Moved to L1", "success")  # Using 'success' for a green flash message
+            flash("Candidate Moved to L1", "success")
             return redirect(url_for('interview1v', resume_id=resume_id))
+
         return redirect(url_for('introCall', resume_id=resume.id))
-    return render_template("intro.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date)
+
+    return render_template("intro.html", resume=resume, comments1=comments1, status1=status1, 
+                           selected_panel=selected_panel, date=date, panel_members=panel_members)
+
+
+
+class Interview(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    resume_id = db.Column(db.Integer, nullable=False)
+    panel_members = db.Column(db.Text, nullable=False)  # Store as a single text field
+    date = db.Column(db.String(20), nullable=False)
+    status = db.Column(db.String(50), nullable=False)
+    comments = db.Column(db.Text, nullable=True)
+
+
+
 @app.route("/interview1")
 def interview1():
     return render_template("interview1.html")
@@ -1776,100 +1923,519 @@ def resume_details(resume_id):
         hr_status=hr_status,
         all_rounds_status=all_rounds_status)
 
+# @app.route("/interview1v/<int:resume_id>", methods=["GET", "POST"])
+# def interview1v(resume_id):
+#     resume=Resume.query.get(resume_id)
+#     existing_entry=Interview1.query.filter_by(resumeId=resume.id).first()
+#     if existing_entry:
+#         status1 = existing_entry.Status
+#         comments1 = existing_entry.Comments
+#         selected_panel=existing_entry.SelectedPanel
+#         date = existing_entry.Date
+#     else:
+#         status1 = None
+#         comments1 = None
+#         selected_panel=""
+#         date = None
+#     if request.method=="POST":
+#         date=request.form["date"]
+#         comments=request.form["comments"]
+#         status=request.form["status"]
+        
+#         selected_panel=request.form["selectedPanel"]
+#         existing_entry=Interview1.query.filter_by(resumeId=resume.id).first()
+#         if existing_entry:
+#             existing_entry.Date = date
+#             existing_entry.Status = status
+#             existing_entry.Comments = comments
+#             existing_entry.SelectedPanel = selected_panel
+#             existing_entry.Status = status
+#             existing_entry.Comments = comments
+#             status1=existing_entry.Status
+#             comments1=existing_entry.Comments
+#         else:    
+#             entry=Interview1(Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
+#             db.session.add(entry)
+#             status1=status
+#             comments1=comments
+#         db.session.commit()
+#         if status == "Rejected":
+#             flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
+#         elif status == "Move to Interview 2":
+#             flash("Candidate Moved to Interview 2", "success")  # Using 'success' for a green flash message
+#             return redirect(url_for('interview2v', resume_id=resume_id))
+#         elif status == "hold":
+#             flash("Candidate kept on hold", "warning")  # Using 'success' for a yellow flash message    
+
+#         return redirect(url_for('interview1v', resume_id=resume.id))
+#     resume = Resume.query.get(resume_id)
+#     return render_template("interview1.html", resume=resume,status1=status1,comments1=comments1,selected_panel=selected_panel,date=date)
+
+
+
+
+# @app.route("/interview1v/<int:resume_id>", methods=["GET", "POST"])
+# def interview1v(resume_id):
+#     resume = Resume.query.get(resume_id)
+#     existing_entry = Interview1.query.filter_by(resumeId=resume.id).first()
+
+#     if existing_entry:
+#         status1 = existing_entry.Status
+#         comments1 = existing_entry.Comments if existing_entry.Comments else "None"  # Default to "None"
+#         selected_panel = existing_entry.SelectedPanel  
+#         date = existing_entry.Date
+#     else:
+#         status1 = None
+#         comments1 = "None"  # Ensure default value
+#         selected_panel = ""
+#         date = None
+
+#     if request.method == "POST":
+#         try:
+#             date = request.form.get("date", "")
+#             comments = request.form.get("comments", "None").strip() or "None"  # Ensure "None" is set
+#             status = request.form.get("status", "Rejected")
+#             selected_panel = request.form.get("selectedPanel", "")
+
+#             if not date or not status:
+#                 flash("All fields (Panel Members, Date, Status, and Comments) must be filled.", "danger")
+#                 return redirect(url_for('interview1v', resume_id=resume.id))
+
+#             panel_members_list = [member.strip() for member in selected_panel.split(";") if member.strip()]
+
+#             if existing_entry:
+#                 existing_entry.Date = date
+#                 existing_entry.Status = status
+#                 existing_entry.Comments = comments  # Ensuring "None" if empty
+#                 existing_entry.SelectedPanel = selected_panel  
+
+#                 # Delete old panel members and add new ones
+#                 PanelMembers.query.filter_by(interview_id=existing_entry.id).delete()
+#                 for member in panel_members_list:
+#                     name, email = member.split(", ")
+#                     db.session.add(PanelMembers(interview_id=existing_entry.id, name=name, email=email))
+
+#             else:
+#                 entry = Interview1(Date=date, Status=status, Comments=comments, resumeId=resume.id, SelectedPanel=selected_panel)
+#                 db.session.add(entry)
+#                 db.session.flush()  # Get the ID of the newly created interview
+
+#                 for member in panel_members_list:
+#                     name, email = member.split(", ")
+#                     db.session.add(PanelMembers(interview_id=entry.id, name=name, email=email))
+
+#             db.session.commit()
+
+#             if status == "Rejected":
+#                 flash("Candidate Rejected", "danger")
+#             elif status == "Move to Interview 2":
+#                 flash("Candidate Moved to Interview 2", "success")
+#                 return redirect(url_for('interview2v', resume_id=resume_id))
+#             elif status == "hold":
+#                 flash("Candidate kept on hold", "warning")
+
+#             return redirect(url_for('interview1v', resume_id=resume.id))
+
+#         except Exception as e:
+#             flash(f"Error: {str(e)}", "danger")
+#             return redirect(url_for('interview1v', resume_id=resume.id))
+
+#     return render_template("interview1.html", resume=resume, status1=status1, comments1=comments1, selected_panel=selected_panel, date=date)
+
+# another try because pervious one not storing the details properly
+
+
+# shwetha updated
+
+# @app.route("/interview1v/<int:resume_id>", methods=["GET", "POST"])
+# def interview1v(resume_id):
+#     resume = Resume.query.get(resume_id)
+
+#     if not resume:
+#         flash("Resume not found!", "danger")
+#         return redirect(url_for("home"))
+
+#     existing_entry = Interview1.query.filter_by(resumeId=resume.id).first()
+    
+
+#     # Fetch existing interview details
+#     status1 = existing_entry.Status if existing_entry else None
+#     comments1 = existing_entry.Comments if existing_entry and existing_entry.Comments else "None"
+#     selected_panel = existing_entry.SelectedPanel if existing_entry else ""
+#     date = existing_entry.Date if existing_entry else None
+#     panel_members = PanelMembers.query.filter_by(interview_id=existing_entry.id).all() if existing_entry else []
+
+#     if request.method == "POST":
+#         try:
+#             date = request.form.get("date", "")
+#             comments = request.form.get("comments", "None").strip() or "None"
+#             status = request.form.get("status", "Rejected")
+#             selected_panel = request.form.get("panel_members", "")
+
+#             if not date or not status:
+#                 flash("All fields (Panel Members, Date, Status, and Comments) must be filled.", "danger")
+#                 return redirect(url_for('interview1v', resume_id=resume.id))
+
+#             # Convert panel members list into database entries
+#             panel_members_list = [member.strip() for member in selected_panel.split(";") if member.strip()]
+
+#             if existing_entry:
+#                 # Update existing interview details
+#                 existing_entry.Date = date
+#                 existing_entry.Status = status
+#                 existing_entry.Comments = comments
+#                 existing_entry.SelectedPanel = selected_panel  
+
+#                 # Remove existing panel members and add new ones
+#                 PanelMembers.query.filter_by(interview_id=existing_entry.id).delete()
+#                 db.session.commit()
+
+#                 for member in panel_members_list:
+#                     name_email = member.split(", ")
+#                     if len(name_email) == 2:
+#                         name, email = name_email
+#                         new_member = PanelMembers(interview_id=existing_entry.id, name=name, email=email)
+#                         db.session.add(new_member)
+
+#             else:
+#                 # Create a new interview record
+#                 entry = Interview1(Date=date, Status=status, Comments=comments, resumeId=resume.id, SelectedPanel=selected_panel)
+#                 db.session.add(entry)
+#                 db.session.flush()
+
+#                 for member in panel_members_list:
+#                     name_email = member.split(", ")
+#                     if len(name_email) == 2:
+#                         name, email = name_email
+#                         new_member = PanelMembers(interview_id=entry.id, name=name, email=email)
+#                         db.session.add(new_member)
+
+#             db.session.commit()
+
+#             #  Handle email sending based on status
+#             if status == "Rejected":
+#                 flash("Candidate Rejected", "danger")
+
+#             elif status == "Move to Interview 2":
+#                 candidate_name = resume.Name  
+#                 candidate_email = resume.Email  # Assuming email is stored in Resume table
+
+#                 print(f" Preparing to send email for candidate: {candidate_name}")
+
+#                 if send_email(candidate_name, candidate_email):
+#                     flash(" Candidate Moved to Interview 2. Email Sent Successfully!", "success")
+#                 else:
+#                     flash(" Candidate Moved to Interview 2. Email Sending Failed!", "danger")
+
+#                 return redirect(url_for('interview2v', resume_id=resume_id))
+
+#             elif status == "hold":
+#                 flash("Candidate kept on hold", "warning")
+
+#             return redirect(url_for('interview1v', resume_id=resume.id))
+
+#         except Exception as e:
+#             db.session.rollback()
+#             flash(f"Error: {str(e)}", "danger")
+#             return redirect(url_for('interview1v', resume_id=resume.id))
+
+#     return render_template(
+#         "interview1.html",
+#         resume=resume,
+#         status1=status1,
+#         comments1=comments1,
+#         selected_panel=selected_panel,
+#         panel_members=panel_members,
+#         date=date
+#     )
+
+
+# import requests
+
+# def send_email(candidate_name, candidate_email):
+#     """Send an email using EmailJS API when a candidate moves to Interview 2."""
+#     try:
+#         EMAILJS_SERVICE_ID = "service_qghdq8f"  # EmailJS service ID
+#         EMAILJS_TEMPLATE_ID = "template_1jyba8e"  # template ID
+#         EMAILJS_PUBLIC_KEY = "Y-IUMgYHei_SzaQci"  # public key
+
+#         email_data = {
+#             "service_id": EMAILJS_SERVICE_ID,
+#             "template_id": EMAILJS_TEMPLATE_ID,
+#             "user_id": EMAILJS_PUBLIC_KEY,
+#             "template_params": {
+#                 "to_email": "shwethaacharya829@gmail.com, shwetha.20cs084@sode-edu.in",  # Admins' emails
+#                 "candidate_name": candidate_name,
+#                 "candidate_email": candidate_email,
+#                 "message": f"Candidate {candidate_name} has been moved to Interview 2."
+#             }
+#         }
+
+#         # Call EmailJS API
+#         response = requests.post("https://api.emailjs.com/api/v1.0/email/send", json=email_data)
+
+#         if response.status_code == 200:
+#             print(f" Email sent to admin for candidate: {candidate_name}")
+#             return True
+#         else:
+#             print(f" Email sending failed: {response.text}")
+#             return False
+
+#     except Exception as e:
+#         print(f" Error sending email: {str(e)}")
+#         return False
+
+
 @app.route("/interview1v/<int:resume_id>", methods=["GET", "POST"])
 def interview1v(resume_id):
-    resume=Resume.query.get(resume_id)
-    existing_entry=Interview1.query.filter_by(resumeId=resume.id).first()
-    if existing_entry:
-        status1 = existing_entry.Status
-        comments1 = existing_entry.Comments
-        selected_panel=existing_entry.SelectedPanel
-        date = existing_entry.Date
-    else:
-        status1 = None
-        comments1 = None
-        selected_panel=""
-        date = None
-    if request.method=="POST":
-        date=request.form["date"]
-        comments=request.form["comments"]
-        status=request.form["status"]
-        
-        selected_panel=request.form["selectedPanel"]
-        existing_entry=Interview1.query.filter_by(resumeId=resume.id).first()
-        if existing_entry:
-            existing_entry.Date = date
-            existing_entry.Status = status
-            existing_entry.Comments = comments
-            existing_entry.SelectedPanel = selected_panel
-            existing_entry.Status = status
-            existing_entry.Comments = comments
-            status1=existing_entry.Status
-            comments1=existing_entry.Comments
-        else:    
-            entry=Interview1(Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
-            db.session.add(entry)
-            status1=status
-            comments1=comments
-        db.session.commit()
-        if status == "Rejected":
-            flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
-        elif status == "Move to Interview 2":
-            flash("Candidate Moved to Interview 2", "success")  # Using 'success' for a green flash message
-            return redirect(url_for('interview2v', resume_id=resume_id))
-        elif status == "hold":
-            flash("Candidate kept on hold", "warning")  # Using 'success' for a yellow flash message    
-
-        return redirect(url_for('interview1v', resume_id=resume.id))
     resume = Resume.query.get(resume_id)
-    return render_template("interview1.html", resume=resume,status1=status1,comments1=comments1,selected_panel=selected_panel,date=date)
 
-@app.route("/interview2v/<int:resume_id>",methods=["GET", "POST"])
+    if not resume:
+        flash("Resume not found!", "danger")
+        return redirect(url_for("home"))
+
+    existing_entry = Interview1.query.filter_by(resumeId=resume.id).first()
+    
+    # Extract emails from the SelectedPanel column
+    panel_emails = []
+    if existing_entry and existing_entry.SelectedPanel:
+        selected_panel = existing_entry.SelectedPanel  # Example: "John Doe, john@example.com; Jane Doe, jane@example.com"
+        panel_emails = [member.split(", ")[1] for member in selected_panel.split(";") if ", " in member]
+
+    # Fetch existing interview details
+    status1 = existing_entry.Status if existing_entry else None
+    comments1 = existing_entry.Comments if existing_entry and existing_entry.Comments else "None"
+    selected_panel = existing_entry.SelectedPanel if existing_entry else ""
+    date = existing_entry.Date if existing_entry else None
+    panel_members = PanelMembers.query.filter_by(interview_id=existing_entry.id).all() if existing_entry else []
+
+    if request.method == "POST":
+        try:
+            date = request.form.get("date", "")
+            comments = request.form.get("comments", "None").strip() or "None"
+            status = request.form.get("status", "Rejected")
+            selected_panel = request.form.get("panel_members", "")
+
+            if not date or not status:
+                flash("All fields (Panel Members, Date, Status, and Comments) must be filled.", "danger")
+                return redirect(url_for('interview1v', resume_id=resume.id))
+
+            # Convert panel members list into database entries
+            panel_members_list = [member.strip() for member in selected_panel.split(";") if member.strip()]
+
+            if existing_entry:
+                existing_entry.Date = date
+                existing_entry.Status = status
+                existing_entry.Comments = comments
+                existing_entry.SelectedPanel = selected_panel  
+
+                PanelMembers.query.filter_by(interview_id=existing_entry.id).delete()
+                db.session.commit()
+
+                for member in panel_members_list:
+                    name_email = member.split(", ")
+                    if len(name_email) == 2:
+                        name, email = name_email
+                        new_member = PanelMembers(interview_id=existing_entry.id, name=name, email=email)
+                        db.session.add(new_member)
+
+            else:
+                entry = Interview1(Date=date, Status=status, Comments=comments, resumeId=resume.id, SelectedPanel=selected_panel)
+                db.session.add(entry)
+                db.session.flush()
+
+                for member in panel_members_list:
+                    name_email = member.split(", ")
+                    if len(name_email) == 2:
+                        name, email = name_email
+                        new_member = PanelMembers(interview_id=entry.id, name=name, email=email)
+                        db.session.add(new_member)
+
+            db.session.commit()
+
+            # Handle email sending
+            if status == "Rejected":
+                flash("Candidate Rejected", "danger")
+            elif status == "Move to Interview 2":
+                candidate_name = resume.Name  
+                candidate_email = resume.Email  
+
+                print(f" Preparing to send email for candidate: {candidate_name}")
+
+                if send_email(candidate_name, candidate_email, panel_emails):
+                    flash(" Candidate Moved to Interview 2. Email Sent Successfully!", "success")
+                else:
+                    flash(" Candidate Moved to Interview 2. Email Sending Failed!", "danger")
+
+                return redirect(url_for('interview2v', resume_id=resume_id))
+            elif status == "hold":
+                flash("Candidate kept on hold", "warning")
+
+            return redirect(url_for('interview1v', resume_id=resume.id))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error: {str(e)}", "danger")
+            return redirect(url_for('interview1v', resume_id=resume.id))
+
+    return render_template(
+        "interview1.html",
+        resume=resume,
+        status1=status1,
+        comments1=comments1,
+        selected_panel=selected_panel,
+        panel_members=panel_members,
+        panel_emails=panel_emails,  # ✅ Pass extracted emails to frontend
+        date=date
+    )
+def send_email(candidate_name, candidate_email, cc_emails):
+    """Send an email using EmailJS API when a candidate moves to Interview 2."""
+    try:
+        EMAILJS_SERVICE_ID = "service_qghdq8f"
+        EMAILJS_TEMPLATE_ID = "template_1jyba8e"
+        EMAILJS_PUBLIC_KEY = "Y-IUMgYHei_SzaQci"
+
+        email_data = {
+            "service_id": EMAILJS_SERVICE_ID,
+            "template_id": EMAILJS_TEMPLATE_ID,
+            "user_id": EMAILJS_PUBLIC_KEY,
+            "template_params": {
+                "to_email": "shwethaacharya829@gmail.com, shwetha.20cs084@sode-edu.in",
+                "cc_email": ", ".join(cc_emails),  # ✅ Dynamically add CC emails
+                "candidate_name": candidate_name,
+                "candidate_email": candidate_email,
+                "message": f"Candidate {candidate_name} has been moved to Interview 2."
+            }
+        }
+
+        response = requests.post("https://api.emailjs.com/api/v1.0/email/send", json=email_data)
+
+        if response.status_code == 200:
+            print(f" Email sent to admin and panel members for candidate: {candidate_name}")
+            return True
+        else:
+            print(f" Email sending failed: {response.text}")
+            return False
+
+    except Exception as e:
+        print(f" Error sending email: {str(e)}")
+        return False
+
+
+
+
+
+
+# @app.route("/interview2v/<int:resume_id>",methods=["GET", "POST"])
+# def interview2v(resume_id):
+#     resume=Resume.query.get(resume_id)
+#     existing_entry=Interview2.query.filter_by(resumeId=resume.id).first()
+#     selected_panel=""
+#     if existing_entry:
+#         status1 = existing_entry.Status
+#         comments1 = existing_entry.Comments
+#         selected_panel=existing_entry.SelectedPanel
+#         date = existing_entry.Date
+#     else:
+#         status1 = None
+#         comments1 = None
+#         selected_panel = ""
+#         date=None
+#     if request.method=="POST":
+        
+#         date=request.form["date"]
+#         comments=request.form["comments"]
+#         status=request.form["status"]
+#         selected_panel=request.form["selectedPanel"]
+#         existing_entry=Interview2.query.filter_by(resumeId=resume.id).first()
+#         if existing_entry:
+#             existing_entry.Date = date
+#             existing_entry.Status = status
+#             existing_entry.Comments = comments
+#             selected_panel = existing_entry.SelectedPanel if existing_entry.SelectedPanel else ""
+#             status1 = existing_entry.Status
+#             comments1 = existing_entry.Comments
+#         else:    
+#             entry=Interview2(Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
+#             db.session.add(entry)
+#             status1=status
+#             selected_panel=selected_panel
+#             comments1=comments
+#         db.session.commit()
+#         if status == "Rejected":
+#             flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
+#         elif status == "Move to HR Round":
+#             flash("Candidate Moved to HR Round", "success")  # Using 'success' for a green flash message
+#             return redirect(url_for('hr', resume_id=resume_id))
+#         elif status == "hold":
+#             flash("Candidate kept on hold", "warning")  # Using 'success' for a yellow flash message    
+
+#         return redirect(url_for('interview2v', resume_id=resume.id))
+#     return render_template("interview2.html",resume=resume,status1=status1,comments1=comments1,selected_panel=selected_panel,date=date)
+
+
+
+# shwetha updated
+
+
+@app.route("/interview2v/<int:resume_id>", methods=["GET", "POST"])
 def interview2v(resume_id):
-    resume=Resume.query.get(resume_id)
-    existing_entry=Interview2.query.filter_by(resumeId=resume.id).first()
-    selected_panel=""
+    resume = Resume.query.get(resume_id)
+    existing_entry = Interview2.query.filter_by(resumeId=resume.id).first()
+    
     if existing_entry:
         status1 = existing_entry.Status
         comments1 = existing_entry.Comments
-        selected_panel=existing_entry.SelectedPanel
         date = existing_entry.Date
+        panel_members = PanelMembers2.query.filter_by(interview_id=existing_entry.id).all()
     else:
         status1 = None
         comments1 = None
-        selected_panel = ""
-        date=None
-    if request.method=="POST":
+        date = None
+        panel_members = []
+    
+    if request.method == "POST":
+        date = request.form.get("date")
+        comments = request.form.get("comments", "None")  # Default to "None" if empty
+        status = request.form.get("status")
+        panel_members_data = request.form.get("panel_members", "")  # Expected format: "John Doe, johndoe@example.com; Jane Doe, janedoe@example.com"
         
-        date=request.form["date"]
-        comments=request.form["comments"]
-        status=request.form["status"]
-        selected_panel=request.form["selectedPanel"]
-        existing_entry=Interview2.query.filter_by(resumeId=resume.id).first()
         if existing_entry:
             existing_entry.Date = date
             existing_entry.Status = status
             existing_entry.Comments = comments
-            selected_panel = existing_entry.SelectedPanel if existing_entry.SelectedPanel else ""
-            status1 = existing_entry.Status
-            comments1 = existing_entry.Comments
-        else:    
-            entry=Interview2(Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
-            db.session.add(entry)
-            status1=status
-            selected_panel=selected_panel
-            comments1=comments
+
+            # Delete old panel members before adding new ones
+            PanelMembers2.query.filter_by(interview_id=existing_entry.id).delete()
+            db.session.commit()
+        else:
+            existing_entry = Interview2(Date=date, Status=status, Comments=comments, resumeId=resume.id)
+            db.session.add(existing_entry)
+            db.session.commit()  # Save interview entry before adding panel members
+
+        # Store panel members
+        for panel_info in panel_members_data.split(";"):
+            panel_details = panel_info.strip().split(", ")
+            if len(panel_details) == 2:
+                name, email = panel_details
+                panel_member = PanelMembers2(interview_id=existing_entry.id, name=name, email=email)
+                db.session.add(panel_member)
+
         db.session.commit()
+
+        # Status handling messages
         if status == "Rejected":
-            flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
+            flash("Candidate Rejected", "danger")
         elif status == "Move to HR Round":
-            flash("Candidate Moved to HR Round", "success")  # Using 'success' for a green flash message
+            flash("Candidate Moved to HR Round", "success")
             return redirect(url_for('hr', resume_id=resume_id))
         elif status == "hold":
-            flash("Candidate kept on hold", "warning")  # Using 'success' for a yellow flash message    
+            flash("Candidate kept on hold", "warning")
 
         return redirect(url_for('interview2v', resume_id=resume.id))
-    return render_template("interview2.html",resume=resume,status1=status1,comments1=comments1,selected_panel=selected_panel,date=date)
+
+    return render_template("interview2.html", resume=resume, status1=status1, comments1=comments1, date=date, panel_members=panel_members)
+
 
 @app.route("/hr/<int:resume_id>",methods=["GET", "POST"])
 def hr(resume_id):
@@ -2651,6 +3217,19 @@ def srqaeng():
                 flash("Employee added successfully!", "success")
     
     return render_template("dmax_add_sr_qa.html")
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @app.route("/qa_requirements", methods=['GET', 'POST'])
 def qareq():

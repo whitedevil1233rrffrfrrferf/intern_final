@@ -121,7 +121,7 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        emailjs.init("Y-IUMgYHei_SzaQci");  // Replace with your EmailJS user ID
+        emailjs.init("Y-IUMgYHei_SzaQci");  //EmailJS user ID
     });
 
     function sendEmail(candidateName, candidateEmail, status, ccEmails, callback) {
@@ -131,7 +131,7 @@
 
         const templateParams = {
             to_email: 'shwethaacharya829@gmail.com, sourav.20cs089@sode-edu.in',
-            cc_email: ccEmails.join(", "),  // ✅ Include CC emails
+            cc_email: ccEmails.join(", "),  //  Include CC emails
             candidate_name: candidateName,
             candidate_email: candidateEmail,
             status: status,
@@ -168,7 +168,7 @@
             const candidateName = "{{ resume.Name }}";
             const candidateEmail = "{{ resume.Email }}";
             const panelEmails = JSON.parse('{{ panel_emails | tojson | safe }}');
-            console.log("Panel Emails:", panelEmails); // ✅ Get CC emails
+            console.log("Panel Emails:", panelEmails); //  Get CC emails
 
             if (status !== "Rejected") {
                 event.preventDefault(); 

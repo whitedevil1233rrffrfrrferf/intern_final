@@ -2199,7 +2199,7 @@ def interview1v(resume_id):
     # Extract emails from the SelectedPanel column
     panel_emails = []
     if existing_entry and existing_entry.SelectedPanel:
-        selected_panel = existing_entry.SelectedPanel  # Example: "John Doe, john@example.com; Jane Doe, jane@example.com"
+        selected_panel = existing_entry.SelectedPanel  
         panel_emails = [member.split(", ")[1] for member in selected_panel.split(";") if ", " in member]
 
     # Fetch existing interview details
@@ -2285,7 +2285,7 @@ def interview1v(resume_id):
         comments1=comments1,
         selected_panel=selected_panel,
         panel_members=panel_members,
-        panel_emails=panel_emails,  # ✅ Pass extracted emails to frontend
+        panel_emails=panel_emails,  #  Pass extracted emails to frontend
         date=date
     )
 def send_email(candidate_name, candidate_email, cc_emails):
@@ -2301,7 +2301,7 @@ def send_email(candidate_name, candidate_email, cc_emails):
             "user_id": EMAILJS_PUBLIC_KEY,
             "template_params": {
                 "to_email": "shwethaacharya829@gmail.com, shwetha.20cs084@sode-edu.in",
-                "cc_email": ", ".join(cc_emails),  # ✅ Dynamically add CC emails
+                "cc_email": ", ".join(cc_emails),  #  Dynamically add CC emails
                 "candidate_name": candidate_name,
                 "candidate_email": candidate_email,
                 "message": f"Candidate {candidate_name} has been moved to Interview 2."

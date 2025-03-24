@@ -8,12 +8,115 @@
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='intro.css') }}">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
       .accordion-body {
           max-height: 200px; /* Adjust as needed */
           overflow: auto;
         }
+        .form-group {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          position: relative;
+          margin-bottom:3rem;
+      }
+
+      .label-container {
+          display: flex;
+          flex-direction: column; /* Stack label and star vertically */
+          align-items: center; /* Center align the text and icon */
+          position: relative;
+      }
+
+      .form-group label {
+          font-size: 17px !important;
+          font-weight: bold;
+          gap: 2rem !important;
+          color: #1AACAC;
+          width:5rem;
+      }
+
+      .required-icon {
+          font-size: 8px;
+          color: red;
+          position: absolute;
+          top: -2.5rem; /* Moves the star above the label */
+          left: 70%;
+          transform: translateX(-50%);
+      }
+      input{
+        height:3rem;
+      }  
+      .custom-select-box {
+        
+            background: #fff;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            cursor: pointer;
+            position: relative;
+            width: 100%;
+            text-align: left;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: white;
+            border: 1px solid #ced4da;
+            width: 80%;
+            z-index: 100;
+            top: 60px;
+            left:90px;
+            padding: 10px;
+             /* Limit height */
+            overflow-y: auto; /* Add scroll if too many options */
+        }
+
+        .dropdown-content label {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            cursor: pointer;
+            gap: 10px; /* Space between checkbox and text */
+        }
+
+        .dropdown-content input[type="checkbox"] {
+            margin: 0; /* Remove extra margin */
+            transform: scale(1.2); /* Make checkbox slightly larger */
+        }
+
+        .dropdown-content label:hover {
+            background: #f1f1f1;
+        }
+
+        .show {
+            display: block;
+        }
+        .panel-item {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* Space between checkbox, label, and button */
+            padding: 5px 0;
+        }
+
+        .panel-item label {
+            flex-grow: 1; /* Makes the label take available space */
+            font-size: 17px;
+            font-weight: bold;
+            color: #1AACAC;
+        }
+
+        .delete-btn {
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 5px 8px;
+        }
+
     </style>
+    
   </head>
 <body>
   <script>
@@ -21,19 +124,39 @@
     var comments1="{{comments1}}"
     var selected_panel="{{selected_panel}}"
     var date="{{date}}"
-    
+    var addPanelUrl="{{ url_for('add_panel_member') }}"
   </script>
   <div style="display: flex;">
     {% include 'sidemenu.html'%}
     <div class="container" style="width: 950px;">
         <h1 style="text-align: center; background-color:#4699F9; color: white;">Enter Intro call details</h1>
-        <div style="margin-top:50px;">
+        <div style="margin-top:50px; width: 90%; margin-left:4%;">
             <form id="panelForm" action="{{ url_for('introCall', resume_id=resume.id) }}" method="post" >
-                
-                <div style="display: flex; gap: 2rem; align-items: center;">
-                    <input type="text" id="selectedPanel" name="selectedPanel" class="form-control"  value="{{selected_panel}}" ">
-                    <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#panelModal">Add</button>  
+              <div class="form-group">
+                    <label for="selectedPanel">Panel</label>
+                    
+                    <!-- Fake select box -->
+                    <div class="custom-select-box form-control" onclick="togglePanelDropdown()">
+                        <span id="selectedPanelText">Select Panel</span>
+                    </div>
+                    
+                    <!-- Hidden multi-checkbox dropdown -->
+                    <div id="panelDropdown" class="dropdown-content">
+                        {% for panel in all_panels %}
+                            <div class="panel-item">
+                                <input type="checkbox" class="panel-checkbox" value="{{ panel.name }}" 
+                                    {% if panel.name in selected_panels %} checked {% endif %}>
+                                <label for="panel_{{ panel.name }}">{{ panel.name }} ({{ panel.email }})</label>
+                                <button type="button" class="btn btn-danger btn-sm delete-btn" data-panel="{{ panel.name }}">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#panelModal">Add</button>  
+                    <input type="hidden" id="selectedPanel" name="selectedPanel">
                 </div>
+                 
                 <div class="modal fade" id="panelModal" tabindex="-1" aria-hidden="true">
                   <div class="modal-dialog modal-dialog-centered">
                       <div class="modal-content">
@@ -52,26 +175,37 @@
                       </div>
                   </div>
               </div>
-                <div class="mb-3">
-                    <label for="date" class="form-label" style="font-size:20px; color:#1AACAC;">Date</label>
-                    <i class="fa-solid fa-star" style="font-size:8px;position: relative;bottom:10px; color: red;"></i>
+                <div class="form-group">
+                    
+                      <label for="date" class="form-label" style="font-size:20px; color:#1AACAC;">Date</label>
+                      
                     <input type="date" class="form-control" id="date" name="date" value="{{ date or '' }}" required>
                 </div>
-                <div class="mb-3">
-                    <label for="status" style="font-size:20px; color:#1AACAC; margin-top: 20px;">Status</label>
-                    <i class="fa-solid fa-star" style="font-size:8px;position: relative;bottom:10px; color: red;"></i>
+                <div class=" form-group">
+                    <label for="status" >Status</label>
                     <select id="status" name="status" required>
                         
                         <option value="Rejected" {{ 'selected' if status1 == 'Rejected' else '' }}>Rejected</option>
                         <option value="Move to Interview 1" {{ 'selected' if status1 == 'Move to Interview 1' else '' }}>Move to Interview 1</option>
                     </select>
                 </div>
-                <div class="mb-3">
-                    <label for="comments" style="font-size:20px; color:#1AACAC; margin-top: 20px;">Comments</label>
-                    <i class="fa-solid fa-star" style="font-size:8px;position: relative;bottom:10px; color: red;"></i>
+                <div class="form-group" style="display: none;">
+                    <label for="comments" class="form-label" style="font-size:15px !important;">Comments</label>
                     <input class="form-control" type="text" name="comments" value="{{comments1}}" placeholder="Enter your comments" required>
                 </div>
-                
+                <div id="commentsSection">
+                    {% for panel in selected_panels %}
+                        <div class="form-group">
+                            <label for="comment_{{ panel }}">{{ panel }} comments</label>
+                            <input 
+                            type="text" 
+                            id="comment_{{ panel }}" 
+                            name="comment_{{ panel }}" 
+                            class="form-control"
+                            value="{{ comments_dict.get(panel, '') }}">
+                        </div>
+                    {% endfor %}
+                </div>   
                 <div style="display: flex; align-items: center; justify-content:center;">
                   <button type="submit" class="btn btn-primary" style="width:6rem; height:3rem; margin-right: 2rem;">Submit</button>
                   <a class="btn btn-outline-secondary" href="{{url_for('employee')}}" style=" padding:10px;width:6rem; height:3rem;">
@@ -103,7 +237,168 @@
       </div>
   </div>
     <script src="{{ url_for('static', filename='intro.js') }}"></script> 
-    <script src="{{ url_for('static', filename='modal.js') }}"></script> 
+    <script src="{{ url_for('static', filename='modal.js') }}"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const checkboxes = document.querySelectorAll(".panel-checkbox");
+        const hiddenInput = document.getElementById("selectedPanel");
+        const selectedPanelText = document.getElementById("selectedPanelText");
+        const commentsSection = document.getElementById("commentsSection");
+        const commentsDict = {{ comments_dict | tojson }};
+
+        function updateSelectedPanels() {
+            let selectedValues = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+
+            hiddenInput.value = selectedValues.join(",");
+            selectedPanelText.textContent = selectedValues.length > 0 ? selectedValues.join(", ") : "Select Panel";
+
+            // Clear existing comment boxes
+            let existingComments = {};
+        document.querySelectorAll("#commentsSection input").forEach(input => {
+            existingComments[input.id] = input.value;
+        });
+
+        // Clear previous comment fields
+        commentsSection.innerHTML = "";
+
+        // Add new comment fields dynamically with preserved values
+        selectedValues.forEach(panel => {
+            let commentBox = document.createElement("div");
+            commentBox.classList.add("form-group");
+            commentBox.innerHTML = `
+                <label for="comment_${panel}">${panel} comments</label>
+                <input 
+                  type="text" 
+                  id="comment_${panel}" 
+                  name="comment_${panel}" 
+                  class="form-control"
+                  value="${existingComments[`comment_${panel}`] || ''}">
+            `;
+            commentsSection.appendChild(commentBox);
+        });
+    }
+
+        // Attach event listeners to checkboxes
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", updateSelectedPanels);
+        });
+
+        // Initialize with already selected values (if any)
+        updateSelectedPanels();
+    });
+
+    // Toggle dropdown visibility
+    function togglePanelDropdown() {
+        let dropdown = document.getElementById("panelDropdown");
+        dropdown.style.display = (dropdown.style.display === "block") ? "none" : "block";
+    }
+
+    // Close dropdown if clicking outside
+    document.addEventListener("click", function (event) {
+        let dropdown = document.getElementById("panelDropdown");
+        let selectBox = document.querySelector(".custom-select-box");
+        if (!dropdown.contains(event.target) && !selectBox.contains(event.target)) {
+            dropdown.style.display = "none";
+        }
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".delete-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            let panelName = this.getAttribute("data-panel");
+
+            if (confirm(`Are you sure you want to delete ${panelName}?`)) {
+                fetch("/delete_panel", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ panel: panelName })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove from UI
+                        this.parentElement.remove();
+                    } else {
+                        alert("Failed to delete panel.");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            }
+        });
+    });
+});
+</script>
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+            emailjs.init("Y-IUMgYHei_SzaQci"); // EmailJS User ID
+        });
+    
+        function sendEmail(candidateName, candidateEmail, status, callback) {
+            const submitButton = document.querySelector("button[type='submit']");
+            submitButton.innerHTML = "Sending Email...";
+            submitButton.disabled = true;
+    
+            // 🔹 Define main recipient and CC recipients
+            const toEmail = "varunrram2003@gmail.com";  // Replace with actual recipient
+            const ccEmails = ["vivabrothers9703@gmail.com", "asowmyadc@gmail.com"];  // CC recipients
+    
+            // 🔹 Email parameters
+            const templateParams = {
+                to_email: toEmail,
+                cc_email: ccEmails.join(", "),  // Convert array to string
+                candidate_name: candidateName,
+                status: status,
+                message: `Candidate ${candidateName} has been marked as '${status}'.`
+            };
+    
+            console.log("📤 Sending email with params:", templateParams); // Log details before sending
+    
+            // 🔹 Send Email using EmailJS
+            emailjs.send("service_qghdq8f", "template_1jyba8e", templateParams)
+                .then(function(response) {
+                    console.log("📨 Email sent successfully", response);
+                    alert("✅ Email sent successfully!");
+    
+                    setTimeout(() => {
+                        if (callback) callback();  // Proceed with form submission
+                    }, 2000);
+                })
+                .catch(function(error) {
+                    console.error("❌ Error sending email", error);
+                    alert("⚠️ Failed to send email. Please try again.");
+                    submitButton.innerHTML = "Submit";
+                    submitButton.disabled = false;
+                });
+        }
+    
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelector("form").addEventListener("submit", function (event) {
+                
+                const status = document.getElementById("status").value;
+                const candidateName = "summa"
+                const candidateEmail = "test"
+                
+                console.log("📝 Candidate Info:", { candidateName, candidateEmail, status });
+    
+                if (status !== "Rejected") {
+                    event.preventDefault(); 
+                    sendEmail(candidateName, candidateEmail, status, () => {
+                        this.submit();
+                    });
+                }
+            });
+        });
+    </script>
+
+
+
+
+    
 </body>
 </html> 
 

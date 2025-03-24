@@ -50,7 +50,8 @@ app.config['SQLALCHEMY_BINDS']={'login':"sqlite:///login.db",
                                 'dmax_jrqaeng':"sqlite:///dmax_jrqaeg.db",
                                 'dmax_qaeng':"sqlite:///dmax_qaeg.db",
                                 'dmax_srqaeng':"sqlite:///dmax_srqaeg.db",
-                                'week':"sqlite:///week.db"
+                                'week':"sqlite:///week.db",
+                                'panels':"sqlite:///panels.db"
                                 
                                 }
                                   
@@ -172,7 +173,7 @@ class Intro(db.Model):
     Comments=db.Column(db.String(200))
     resumeId = db.Column(db.Integer)  
     SelectedPanel=db.Column(db.String(200))  
-    
+    Json_comments = db.Column(db.Text, default='{}')
 
 class Interview1(db.Model):
     __bind_key__="interview1" 
@@ -267,6 +268,7 @@ class Dmax_qa_eng(db.Model):
     Skill = db.Column(db.Float)
     New_initiatives= db.Column(db.Float) 
     OverallDmaxScore = db.Column(db.Float)    
+
 class Dmax_sr_qa_eng(db.Model):
     __bind_key__="dmax_srqaeng"
     id = db.Column(db.Integer, primary_key=True)
@@ -284,6 +286,12 @@ class Dmax_sr_qa_eng(db.Model):
     Skill = db.Column(db.Float)
     New_initiatives= db.Column(db.Float) 
     OverallDmaxScore = db.Column(db.Float)    
+
+class Panel(db.Model):
+    __bind_key__="panels"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    email = db.Column(db.String(100), nullable=False, unique=True)    
 
 def get_distinct_statistics():
     # Querying distinct roles from the Resume table
@@ -1693,16 +1701,22 @@ def introCall(resume_id):
     selected_panel=""
     resume=Resume.query.get(resume_id)
     existing_entry=Intro.query.filter_by(resumeId=resume.id).first()
+    all_panels = Panel.query.all()
     if existing_entry:
         status1 = existing_entry.Status
         comments1 = existing_entry.Comments
         selected_panel = existing_entry.SelectedPanel
         date = existing_entry.Date
+        selected_panels = selected_panel.split(",") if selected_panel else []
+        comments_dict = json.loads(existing_entry.Json_comments) if existing_entry.Json_comments else {}
     else:
         status1 = None
         comments1 = None
         selected_panel = ""
         date = None
+        selected_panels = []
+        comments_dict = {}
+        
     if request.method == 'POST':
         
         
@@ -1710,19 +1724,26 @@ def introCall(resume_id):
         status=request.form["status"]
         comments=request.form["comments"]
         selected_panel=request.form["selectedPanel"]
+        selected_panels = selected_panel.split(",") if selected_panel else []
+        
+        panel_comments = {panel: request.form.get(f"comment_{panel}", "") for panel in selected_panels}
+        
         existing_entry=Intro.query.filter_by(resumeId=resume.id).first()
         if existing_entry:
             existing_entry.Date = date
             existing_entry.Status = status
             existing_entry.Comments = comments
             existing_entry.SelectedPanel = selected_panel
+            existing_entry.Json_comments = json.dumps(panel_comments)
             status1=existing_entry.Status
             comments1=existing_entry.Comments
+             
         else:    
-            entry=Intro( Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
+            entry=Intro( Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel,Json_comments=json.dumps(panel_comments))
             db.session.add(entry)
             status1=status
             comments1=comments
+            comments_dict = panel_comments
 
         db.session.commit()
         if status == "Rejected":
@@ -1731,7 +1752,7 @@ def introCall(resume_id):
             flash("Candidate Moved to L1", "success")  # Using 'success' for a green flash message
             return redirect(url_for('interview1v', resume_id=resume_id))
         return redirect(url_for('introCall', resume_id=resume.id))
-    return render_template("intro.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date)
+    return render_template("intro.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date,selected_panels=selected_panels,comments_dict=comments_dict,all_panels=all_panels)
 @app.route("/interview1")
 def interview1():
     return render_template("interview1.html")
@@ -2983,6 +3004,57 @@ def form_test():
         return f"Received Name: {name}, Email: {email}"
     return render_template("form_test.html")
 
+
+@app.route('/add_panel_member', methods=['POST'])
+def add_panel_member():
+    data = request.json
+    name = data.get('name')
+    email = data.get('email')
+    print(name,email)
+    existing_member = Panel.query.filter_by(name=name).first()
+    if existing_member:
+        return jsonify({"error": "Panel member already exists!"}), 409
+    new_member = Panel(name=name, email=email)
+    db.session.add(new_member)
+    db.session.commit()
+
+    return jsonify({"message": "Panel member added successfully!", "name": name, "email": email}), 201
+
+    # data = request.json
+    # name = data.get('name')
+    # email = data.get('email')
+
+    # if not name or not email:
+    #     return jsonify({"error": "Name and email are required!"}), 400
+
+    # # Check if the panel member already exists
+    # existing_member = PanelMember.query.filter_by(name=name).first()
+    # if existing_member:
+    #     return jsonify({"error": "Panel member already exists!"}), 409
+
+    # # Add new panel member
+    # new_member = PanelMember(name=name, email=email)
+    # db.session.add(new_member)
+    # db.session.commit()
+
+    # return jsonify({"message": "Panel member added successfully!", "name": name, "email": email}), 201
+
+
+@app.route("/delete_panel", methods=["POST"])
+def delete_panel():
+    data = request.get_json()
+    panel_name = data.get("panel")
+
+    if not panel_name:
+        return jsonify({"success": False, "error": "Invalid panel name"}), 400
+
+    panel = Panel.query.filter_by(name=panel_name).first()
+    if panel:
+        db.session.delete(panel)
+        db.session.commit()
+        return jsonify({"success": True})
+    else:
+        return jsonify({"success": False, "error": "Panel not found"}), 404  
 
 if __name__ == "__main__":
     

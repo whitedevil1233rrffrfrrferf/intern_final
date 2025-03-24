@@ -58,7 +58,7 @@ app.config['SQLALCHEMY_BINDS']={'login':"sqlite:///login.db",
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['UPLOAD_FOLDER']=general_upload_folder
 app.config['PROFILE_IMAGE_UPLOAD_FOLDER'] = 'static/profile_images'
-app.secret_key = os.environ.get('SECRET_KEY')
+app.secret_key = "your_secret_key_here"
 db = SQLAlchemy(app)
 migrate=Migrate(app,db)
 

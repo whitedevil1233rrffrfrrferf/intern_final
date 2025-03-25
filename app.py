@@ -1696,12 +1696,71 @@ def zip():
         return redirect(url_for('zip'))            
     return render_template("zip.html")
 
+# @app.route("/introcall/<int:resume_id>", methods=['GET', 'POST'])
+# def introCall(resume_id):
+#     selected_panel=""
+#     resume=Resume.query.get(resume_id)
+#     existing_entry=Intro.query.filter_by(resumeId=resume.id).first()
+#     all_panels = Panel.query.all()
+#     if existing_entry:
+#         status1 = existing_entry.Status
+#         comments1 = existing_entry.Comments
+#         selected_panel = existing_entry.SelectedPanel
+#         date = existing_entry.Date
+#         selected_panels = selected_panel.split(",") if selected_panel else []
+#         comments_dict = json.loads(existing_entry.Json_comments) if existing_entry.Json_comments else {}
+#     else:
+#         status1 = None
+#         comments1 = None
+#         selected_panel = ""
+#         date = None
+#         selected_panels = []
+#         comments_dict = {}
+        
+#     if request.method == 'POST':
+        
+        
+#         date=request.form["date"]
+#         status=request.form["status"]
+#         comments=request.form["comments"]
+#         selected_panel=request.form["selectedPanel"]
+#         selected_panels = selected_panel.split(",") if selected_panel else []
+        
+#         panel_comments = {panel: request.form.get(f"comment_{panel}", "") for panel in selected_panels}
+        
+#         existing_entry=Intro.query.filter_by(resumeId=resume.id).first()
+#         if existing_entry:
+#             existing_entry.Date = date
+#             existing_entry.Status = status
+#             existing_entry.Comments = comments
+#             existing_entry.SelectedPanel = selected_panel
+#             existing_entry.Json_comments = json.dumps(panel_comments)
+#             status1=existing_entry.Status
+#             comments1=existing_entry.Comments
+             
+#         else:    
+#             entry=Intro( Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel,Json_comments=json.dumps(panel_comments))
+#             db.session.add(entry)
+#             status1=status
+#             comments1=comments
+#             comments_dict = panel_comments
+
+#         db.session.commit()
+#         if status == "Rejected":
+#             flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
+#         elif status == "Move to Interview 1":
+#             flash("Candidate Moved to L1", "success")  # Using 'success' for a green flash message
+#             return redirect(url_for('interview1v', resume_id=resume_id))
+#         return redirect(url_for('introCall', resume_id=resume.id))
+#     return render_template("intro.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date,selected_panels=selected_panels,comments_dict=comments_dict,all_panels=all_panels)
+
 @app.route("/introcall/<int:resume_id>", methods=['GET', 'POST'])
 def introCall(resume_id):
-    selected_panel=""
-    resume=Resume.query.get(resume_id)
-    existing_entry=Intro.query.filter_by(resumeId=resume.id).first()
+    selected_panel = ""
+    resume = Resume.query.get(resume_id)
+    existing_entry = Intro.query.filter_by(resumeId=resume.id).first()
     all_panels = Panel.query.all()
+
     if existing_entry:
         status1 = existing_entry.Status
         comments1 = existing_entry.Comments
@@ -1716,43 +1775,74 @@ def introCall(resume_id):
         date = None
         selected_panels = []
         comments_dict = {}
-        
+
     if request.method == 'POST':
-        
-        
-        date=request.form["date"]
-        status=request.form["status"]
-        comments=request.form["comments"]
-        selected_panel=request.form["selectedPanel"]
+        date = request.form["date"]
+        status = request.form["status"]
+        comments = request.form["comments"]
+        selected_panel = request.form["selectedPanel"]
         selected_panels = selected_panel.split(",") if selected_panel else []
-        
-        panel_comments = {panel: request.form.get(f"comment_{panel}", "") for panel in selected_panels}
-        
-        existing_entry=Intro.query.filter_by(resumeId=resume.id).first()
+
+        # Get all feedback fields
+        panel_comments = {panel: request.form.get(f"comment_{panel}", "").strip() for panel in selected_panels}
+
+        # **Validation: Check if all fields are filled**
+        missing_fields = []
+        if not date:
+            missing_fields.append("Date")
+        if not status:
+            missing_fields.append("Status")
+        if not selected_panel:
+            missing_fields.append("Panel Member")
+        for panel, comment in panel_comments.items():
+            if comment == "":
+                missing_fields.append(f"{panel} feedback")
+
+        # If any field is missing, show flash message and return
+        if missing_fields:
+            flash(f"Please fill in all required fields: {', '.join(missing_fields)}", "danger")
+            return redirect(url_for('introCall', resume_id=resume.id))
+
+        # **Update or Insert into the database**
+        existing_entry = Intro.query.filter_by(resumeId=resume.id).first()
         if existing_entry:
             existing_entry.Date = date
             existing_entry.Status = status
             existing_entry.Comments = comments
             existing_entry.SelectedPanel = selected_panel
             existing_entry.Json_comments = json.dumps(panel_comments)
-            status1=existing_entry.Status
-            comments1=existing_entry.Comments
-             
-        else:    
-            entry=Intro( Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel,Json_comments=json.dumps(panel_comments))
+            status1 = existing_entry.Status
+            comments1 = existing_entry.Comments
+        else:
+            entry = Intro(
+                Date=date,
+                Status=status,
+                Comments=comments,
+                resumeId=resume.id,
+                SelectedPanel=selected_panel,
+                Json_comments=json.dumps(panel_comments)
+            )
             db.session.add(entry)
-            status1=status
-            comments1=comments
+            status1 = status
+            comments1 = comments
             comments_dict = panel_comments
 
         db.session.commit()
+
+        # **Flash messages and Redirect**
         if status == "Rejected":
-            flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
+            flash("Candidate Rejected", "danger")
         elif status == "Move to Interview 1":
-            flash("Candidate Moved to L1", "success")  # Using 'success' for a green flash message
+            flash("Candidate Moved to L1", "success")
             return redirect(url_for('interview1v', resume_id=resume_id))
+
         return redirect(url_for('introCall', resume_id=resume.id))
-    return render_template("intro.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date,selected_panels=selected_panels,comments_dict=comments_dict,all_panels=all_panels)
+
+    return render_template("intro.html", resume=resume, comments1=comments1, status1=status1, 
+                           selected_panel=selected_panel, date=date, selected_panels=selected_panels,
+                           comments_dict=comments_dict, all_panels=all_panels)
+
+
 @app.route("/interview1")
 def interview1():
     return render_template("interview1.html")

@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='intro.css') }}">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
-      .accordion-body {
+ .accordion-body {
           max-height: 200px; /* Adjust as needed */
           overflow: auto;
         }
@@ -94,31 +94,165 @@
             display: block;
         }
         .panel-item {
-            display: flex;
-            align-items: center;
-            gap: 15px; /* Space between checkbox, label, and button */
-            padding: 5px 0;
-        }
+    display: flex;
+    align-items: center;
+    padding: 5px 8px; /* Adjust padding */
+    gap: 8px; /* Reduce gap between elements */
+}
 
-        .panel-item label {
-            flex-grow: 1; /* Makes the label take available space */
-            font-size: 17px;
-            font-weight: bold;
-            color: #1AACAC;
-        }
+.panel-checkbox {
+    margin-right: 5px; /* Reduce space between checkbox and text */
+}
 
-        .delete-btn {
-            background-color: red;
-            color: white;
-            border: none;
-            cursor: pointer;
-            padding: 5px 8px;
-        }
+.panel-item label {
+    flex-grow: 1; /* Ensures label takes remaining space */
+    font-size: 16px;
+    font-weight: bold;
+    color: #1AACAC;
+    white-space: nowrap; /* Prevents text from wrapping */
+}
+
+.delete-btn {
+    background-color: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 3px 6px; /* Reduce button size */
+    font-size: 14px;
+    margin-left: auto; /* Pushes delete button to the right */
+}
+
+        #status {
+    width: 100%; /* Same as Date input */
+    height: 3rem; /* Match height */
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    padding: 0 10px;
+     }
+     .status-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+.status-container select {
+    width: 100%;
+    padding-right: 30px; /* Space for the arrow */
+    appearance: none; /* Hide default arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+/* .custom-select-box {
+    position: relative;  /*  Keeps dropdown inside the parent */
+    /* display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    cursor: pointer;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    background-color: white;
+    width: 100%;  Matches the input field */
+/* } */ 
+
+
+.arrow {
+    position: absolute;
+    pointer-events: none;
+    right: 10px;
+    font-size: 16px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.custom-select-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    cursor: pointer;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    background-color: white;
+    width: 100%; /* Ensure parent container is full width */
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background: white;
+    border: 0.1rem solid #ced4da;
+    width: 80%;
+    max-width: 80%;
+    z-index: 100;
+    padding: 1rem;
+    max-height: 12.5rem; /* Equivalent to 200px */
+    overflow-y: auto;
+    left: 50%; /* Moves the dropdown to the center */
+    transform: translateX(-50%); /* Adjust back to center */
+    box-shadow: 0rem 0.25rem 0.375rem rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+
+/* Rotating Arrow when Open */
+.arrow-up {
+    transform: rotate(180deg);
+}
+
+/* Flash Message Style */
+.flash-message {
+    text-align: center;
+    background: linear-gradient(to right, #ffecd2, #fcb69f); /* Gradient background */
+    color: #5a3f37; /* Elegant dark brown text */
+    padding: 12px 20px;
+    font-size: 15px;
+    font-weight: bold;
+    margin: 15px auto;
+    border-radius: 8px;
+    width: 60%; /* Adjust width */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    position: relative;
+}
+
+/* Add a fade-in effect */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.flash-message {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Close Button */
+.flash-message::after {
+    content: "×";
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    cursor: pointer;
+    color: #5a3f37;
+    font-weight: bold;
+}
+
+.flash-message::after:hover {
+    color: red;
+}
 
     </style>
     
   </head>
 <body>
+
+ 
+    
   <script>
     var status1="{{status1}}"
     var comments1="{{comments1}}"
@@ -129,19 +263,24 @@
   <div style="display: flex;">
     {% include 'sidemenu.html'%}
     <div class="container" style="width: 950px;">
+
+<!-- only after all the fields are filled -->
+<div id="flash-messages"></div>
+
         <h1 style="text-align: center; background-color:#4699F9; color: white;">Enter Intro call details</h1>
         <div style="margin-top:50px; width: 90%; margin-left:4%;">
             <form id="panelForm" action="{{ url_for('introCall', resume_id=resume.id) }}" method="post" >
               <div class="form-group">
-                    <label for="selectedPanel">Panel</label>
+                    <label for="selectedPanel">Panel Member</label>
                     
                     <!-- Fake select box -->
-                    <div class="custom-select-box form-control" onclick="togglePanelDropdown()">
-                        <span id="selectedPanelText">Select Panel</span>
-                    </div>
+                    <!-- <div class="custom-select-box form-control" onclick="togglePanelDropdown()">
+                        <span id="selectedPanelText">Add panel </span>
+                        <span id="panelArrow" class="arrow-down">&#9660;</span> <!-- Down Arrow -->
+                    <!-- </div> -->
                     
                     <!-- Hidden multi-checkbox dropdown -->
-                    <div id="panelDropdown" class="dropdown-content">
+                    <!-- <div id="panelDropdown" class="dropdown-content">
                         {% for panel in all_panels %}
                             <div class="panel-item">
                                 <input type="checkbox" class="panel-checkbox" value="{{ panel.name }}" 
@@ -152,7 +291,29 @@
                                 </button>
                             </div>
                         {% endfor %}
-                    </div>
+                    </div> --> 
+
+                    <!-- Fake select box -->
+<!-- Custom Select Box -->
+<div class="custom-select-box form-control" id="panelSelectBox">
+    <span id="selectedPanelText">Add panel</span>
+    <span id="panelArrow" class="arrow">&#9660;</span> <!-- Default Down Arrow -->
+</div>
+
+<!-- Hidden Multi-Checkbox Dropdown -->
+<div id="panelDropdown" class="dropdown-content">
+    {% for panel in all_panels %}
+        <div class="panel-item">
+            <input type="checkbox" class="panel-checkbox" id="panel_{{ panel.name }}" value="{{ panel.name }}"
+                {% if panel.name in selected_panels %} checked {% endif %}>
+            <label for="panel_{{ panel.name }}">{{ panel.name }} ({{ panel.email }})</label>
+            <button type="button" class="btn btn-danger btn-sm delete-btn" data-panel="{{ panel.name }}">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </div>
+    {% endfor %}
+</div>
+
                     <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#panelModal">Add</button>  
                     <input type="hidden" id="selectedPanel" name="selectedPanel">
                 </div>
@@ -181,22 +342,35 @@
                       
                     <input type="date" class="form-control" id="date" name="date" value="{{ date or '' }}" required>
                 </div>
-                <div class=" form-group">
+                <!-- <div class=" form-group" id="panelDropdown" class="dropdown-content">
                     <label for="status" >Status</label>
-                    <select id="status" name="status" required>
+                    <select id="status" name="status" class="form-control" required>
+                    <span id="panelArrow" class="arrow">&#9660;</span> <!-Default Down Arrow -->
                         
-                        <option value="Rejected" {{ 'selected' if status1 == 'Rejected' else '' }}>Rejected</option>
+                        <!-- <option value="Rejected" {{ 'selected' if status1 == 'Rejected' else '' }}>Rejected</option>
                         <option value="Move to Interview 1" {{ 'selected' if status1 == 'Move to Interview 1' else '' }}>Move to Interview 1</option>
                     </select>
+                </div> --> 
+
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <div class="status-container" onclick="toggleStatusDropdown()">
+                        <select id="status" name="status" class="form-control" required>
+                            <option value="Rejected" {{ 'selected' if status1 == 'Rejected' else '' }}>Rejected</option>
+                            <option value="Move to Interview 1" {{ 'selected' if status1 == 'Move to Interview 1' else '' }}>Move to Interview 1</option>
+                        </select>
+                        <span id="statusArrow" class="arrow">&#9660;</span> <!-- Default Down Arrow -->
+                    </div>
                 </div>
+                
                 <div class="form-group" style="display: none;">
-                    <label for="comments" class="form-label" style="font-size:15px !important;">Comments</label>
+                    <label for="comments" class="form-label" style="font-size:15px !important;">Feedback</label>
                     <input class="form-control" type="text" name="comments" value="{{comments1}}" placeholder="Enter your comments" required>
                 </div>
                 <div id="commentsSection">
                     {% for panel in selected_panels %}
                         <div class="form-group">
-                            <label for="comment_{{ panel }}">{{ panel }} comments</label>
+                            <label for="comment_{{ panel }}">{{ panel }} feedback </label>
                             <input 
                             type="text" 
                             id="comment_{{ panel }}" 
@@ -238,6 +412,59 @@
   </div>
     <script src="{{ url_for('static', filename='intro.js') }}"></script> 
     <script src="{{ url_for('static', filename='modal.js') }}"></script>
+<script>
+document.getElementById("panelSelectBox").addEventListener("click", function () {
+    let dropdown = document.getElementById("panelDropdown");
+    let arrow = document.getElementById("panelArrow");
+
+    if (dropdown.style.display === "block") {
+        dropdown.style.display = "none";
+        arrow.classList.remove("arrow-up"); // Reset arrow direction
+    } else {
+        dropdown.style.display = "block";
+        arrow.classList.add("arrow-up"); // Rotate arrow
+    }
+});
+
+// Close dropdown when clicking outside
+document.addEventListener("click", function (event) {
+    let dropdown = document.getElementById("panelDropdown");
+    let selectBox = document.getElementById("panelSelectBox");
+    let arrow = document.getElementById("panelArrow");
+
+    if (!dropdown.contains(event.target) && !selectBox.contains(event.target)) {
+        dropdown.style.display = "none";
+        arrow.classList.remove("arrow-up"); // Reset arrow
+    }
+});
+
+
+
+
+// status toggle
+function toggleStatusDropdown() {
+    const statusSelect = document.getElementById("status");
+    const statusArrow = document.getElementById("statusArrow");
+
+    if (statusSelect.classList.contains("open")) {
+        statusSelect.classList.remove("open");
+        statusArrow.classList.remove("arrow-up");
+    } else {
+        statusSelect.classList.add("open");
+        statusArrow.classList.add("arrow-up");
+    }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener("click", function (event) {
+    const statusContainer = document.querySelector(".status-container");
+    if (!statusContainer.contains(event.target)) {
+        document.getElementById("status").classList.remove("open");
+        document.getElementById("statusArrow").classList.remove("arrow-up");
+    }
+});
+
+</script>
     <script>
     document.addEventListener("DOMContentLoaded", function () {
         const checkboxes = document.querySelectorAll(".panel-checkbox");
@@ -252,7 +479,7 @@
                 .map(cb => cb.value);
 
             hiddenInput.value = selectedValues.join(",");
-            selectedPanelText.textContent = selectedValues.length > 0 ? selectedValues.join(", ") : "Select Panel";
+            selectedPanelText.textContent = selectedValues.length > 0 ? selectedValues.join(", ") : "Add Panel";
 
             // Clear existing comment boxes
             let existingComments = {};
@@ -268,7 +495,7 @@
             let commentBox = document.createElement("div");
             commentBox.classList.add("form-group");
             commentBox.innerHTML = `
-                <label for="comment_${panel}">${panel} comments</label>
+                <label for="comment_${panel}">${panel} feedback</label>
                 <input 
                   type="text" 
                   id="comment_${panel}" 
@@ -335,7 +562,7 @@
 </script>
 <script>
         document.addEventListener("DOMContentLoaded", function () {
-            emailjs.init("qdP1EAfow-fwPes6j"); // EmailJS User ID
+            emailjs.init("Y-IUMgYHei_SzaQci"); // EmailJS User ID
         });
     
         function sendEmail(candidateName, candidateEmail, status, callback) {
@@ -344,8 +571,8 @@
             submitButton.disabled = true;
     
             // 🔹 Define main recipient and CC recipients
-            const toEmail = "shwetha@qaoncloud.com";  // Replace with actual recipient
-            const ccEmails = ["shwethaacharya829@gmail.com", "shwetha.20cs084@sode-edu.in"];  // CC recipients
+            const toEmail = "varunrram2003@gmail.com";  // Replace with actual recipient
+            const ccEmails = ["vivabrothers9703@gmail.com", "asowmyadc@gmail.com"];  // CC recipients
     
             // 🔹 Email parameters
             const templateParams = {
@@ -395,11 +622,71 @@
         });
     </script>
 
+<!-- all the fields are filled then only click submit button -->
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("panelForm").addEventListener("submit", function (event) {
+        event.preventDefault(); // Stop form submission
+
+        let isValid = true;
+        let errorMessage = [];
+
+        // Get form fields
+        let panelMember = document.getElementById("selectedPanel");
+        let date = document.getElementById("date");
+        let status = document.getElementById("status");
+        let feedbacks = document.querySelectorAll("input[name^='comment_']"); // Select all feedback fields
+
+        // Function to check and highlight empty fields
+        function validateField(field, fieldName) {
+            if (!field || field.value.trim() === "") {
+                isValid = false;
+                errorMessage.push(`${fieldName} is required.`);
+            }
+        }
+
+        // Validate all fields
+        validateField(date, "Date");
+        validateField(status, "Status");
+
+        // Validate at least one panel member is selected
+        if (!panelMember || panelMember.value.trim() === "") {
+            isValid = false;
+            errorMessage.push("Panel Member is required.");
+        }
+
+        // Validate all feedback fields
+        feedbacks.forEach(function (feedback) {
+            validateField(feedback, feedback.getAttribute("name"));
+        });
+
+        // Show error or submit form
+        if (!isValid) {
+            showFlashMessage(errorMessage.join("<br>"));
+        } else {
+            this.submit(); // Submit the form if all fields are filled
+        }
+    });
+
+    function showFlashMessage(message) {
+        let flashDiv = document.createElement("div");
+        flashDiv.className = `flash-message`;
+        flashDiv.innerHTML = `${message}`;
+
+        document.getElementById("flash-messages").appendChild(flashDiv);
+
+        // Remove the message after 2 seconds
+        setTimeout(function () {
+            flashDiv.remove();
+        }, 2000);
+    }
+});
+</script>
+
 
 
 
     
 </body>
 </html> 
-
-

@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -89,96 +89,5 @@
         }
     </script>
 </body>
-=======
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='reg.css') }}">
-</head>
-<body>
-    <div class="container">
-        <h1 class="mt-5">Complete Registration</h1>
-        <form method="POST" action="{{ url_for('complete_registration') }}" onsubmit="return validateForm(event)">
-            
-           <div class="form_inputs">
-            <div class="mb-3 color">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control form-input" id="name" name="name" oninput="validateName()">
-                <p id="nameError" class="error-message" style="color: red;font-size: 0.875em;"></p>
-            </div>
-            <div class="mb-3 color">
-                <label for="mobile" class="form-label">Mobile Number</label>
-                <input type="text" class="form-control form-input" id="mobile" name="mobile" oninput="restrictToDigits(event); validateMobileNumber()">
-                <p id="mobileError" class="error-message" style="color: red;font-size: 0.875em;"></p>
-            </div>
-            <div class="mb-3">
-                <label for="role" class="form-label color">Role</label>
-                <select name="role" class="form-select role color" style="width: 200px;" required>
-                    <option value="">Select</option>
-                    <option value="admin">Admin</option>
-                    <option value="user">User</option>
-                    <option value="interviewer">Interviewer</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Complete Registration</button>
-           </div>
-        </form>
-    </div>
-    <script>
-        function restrictToDigits(event) {
-            const input = event.target;
-            input.value = input.value.replace(/\D/g, ''); // Remove any non-digit characters
-        }
-        function validateName() {
-            const nameInput = document.getElementById('name');
-            const errorMessage = document.getElementById('nameError');
-            const value = nameInput.value;
 
-            
-            if (value.length >50) {
-                errorMessage.textContent = 'Name cannot exceed 50 characters.';
-            } else {
-                errorMessage.textContent = '';
-            }
-        }
-        function validateMobileNumber() {
-            const mobileInput = document.getElementById('mobile');
-            const errorMessage = document.getElementById('mobileError');
-            const value = mobileInput.value;
-
-            // Check if the mobile number is exactly 10 digits
-            if (value.length !== 10) {
-                errorMessage.textContent = 'Mobile number must be exactly 10 digits.';
-            } else {
-                errorMessage.textContent = '';
-            }
-        }
-        function validateForm(event) {
-            const mobileInput = document.getElementById('mobile');
-            const errorMessage = document.getElementById('mobileError');
-            const value = mobileInput.value;
-
-            // Check if mobile number is exactly 10 digits on form submission
-            if (value.length !== 10) {
-                
-                errorMessage.textContent = 'Mobile number must be exactly 10 digits.';
-                event.preventDefault(); // Prevent form submission
-                return false; // Ensure the form does not submit
-            }
-            if (nameValue.length > 50) {
-                
-                nameError.textContent = 'Name cannot exceed 50 characters.';
-                event.preventDefault(); // Prevent form submission
-                return false; // Ensure the form does not submit
-            }
-
-            return true; // Allow the form to be submitted if valid
-        }
-    </script>
-</body>
->>>>>>> 71c6430a (updated)
 </html>

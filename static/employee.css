@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *{
     margin: 0 ;
     font-family: "poppins";
@@ -115,3 +116,122 @@ select{
     vertical-align: middle;
     margin-left: 8px; /* Reduce margin */
 }
+=======
+*{
+    margin: 0 ;
+    font-family: "poppins";
+}
+.btn{
+    width:5rem !important;
+}
+th{
+    font-size:15px;
+    font-family: 'poppins';
+    text-align: center;
+    background-color:#00ACFF !important;
+    color:white !important;
+    font-weight: bold !important;
+}
+th,td{
+    padding:4px;
+    border: 1px solid #ddd;
+    
+}
+td{
+    text-align: center;
+       /* Modern browsers */
+    white-space: normal; 
+    
+}
+.main_div{
+    margin: 0%;
+    width:24%; 
+    height: 100%;
+    background-color:#4699F9;
+}
+.sidemenu_items{
+    display: flex;
+    align-items: center;
+    justify-content:center;
+    margin-bottom:40px;
+}
+.sidemenu_items:hover{
+    transform: scale(0.9);
+}
+.icon{
+    margin-right:30px;
+    color: white;
+}
+.main_icon{
+    margin-left:10px;
+    margin-bottom:30px;
+}
+.first_div{
+    display: flex;
+}
+a{
+    text-decoration: none;
+}
+
+.filename-cell {
+    font-size: 22px;
+    word-wrap: break-word;  /* This property allows long words to be broken and wrap onto the next line */
+    overflow-wrap: break-word; /* For browsers that support the newer property name */
+}
+td{
+    padding:0.5rem !important;
+}
+.option{
+    width: 2rem!important;
+}
+.button-container {
+    display: flex;
+    
+    flex-wrap: wrap;
+}
+
+.btn{
+    width:4.8rem!important;
+    height:2.6rem !important;
+}
+td{
+    padding:7px!important;
+}
+i{
+    font-size: 15px;
+}
+.sub{
+    margin-left: auto !important;
+    margin-right:auto!important ;
+    width:5rem !important;
+    margin-top:1rem;
+}
+label{
+    font-size:16px; 
+    color: #4699F9 ;
+}
+.wrap-text{
+    
+    max-width:5.3rem!important;
+    overflow-wrap: break-word !important; /* Breaks long words */
+    word-wrap: break-word; /* For older browsers */
+    white-space: normal; 
+}
+.inner_filter{
+    display: flex;
+    flex-direction: column;
+}
+select{
+    width:7.5rem;
+}
+.wrap-text a {
+    display: inline-block;
+    vertical-align: middle; /* Ensures inline elements align properly */
+}
+
+.wrap-text i {
+    font-size: 20px; /* Make icon size consistent */
+    vertical-align: middle;
+    margin-left: 8px; /* Reduce margin */
+}
+>>>>>>> 71c6430a (updated)

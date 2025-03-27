@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -276,7 +277,7 @@
                     <!-- Fake select box -->
                     <!-- <div class="custom-select-box form-control" onclick="togglePanelDropdown()">
                         <span id="selectedPanelText">Add panel </span>
-                        <span id="panelArrow" class="arrow-down">&#9660;</span> <!-- Down Arrow -->
+                        <span id="panelArrow" class="arrow-down">&#9660;</span> <!- Down Arrow -->
                     <!-- </div> -->
                     
                     <!-- Hidden multi-checkbox dropdown -->
@@ -560,7 +561,7 @@ document.addEventListener("click", function (event) {
     });
 });
 </script>
-<script>
+<!-- <script>
         document.addEventListener("DOMContentLoaded", function () {
             emailjs.init("Y-IUMgYHei_SzaQci"); // EmailJS User ID
         });
@@ -571,8 +572,8 @@ document.addEventListener("click", function (event) {
             submitButton.disabled = true;
     
             // 🔹 Define main recipient and CC recipients
-            const toEmail = "varunrram2003@gmail.com";  // Replace with actual recipient
-            const ccEmails = ["vivabrothers9703@gmail.com", "asowmyadc@gmail.com"];  // CC recipients
+            const toEmail = "shwethaacharya2815@gmail.com";  // Replace with actual recipient
+            const ccEmails = ["shwetha.20cs084@sode-edu.in", "sourav.20cs089@sode-edu.in"];  // CC recipients
     
             // 🔹 Email parameters
             const templateParams = {
@@ -620,7 +621,225 @@ document.addEventListener("click", function (event) {
                 }
             });
         });
-    </script>
+    </script> -->
+
+
+<!-- validation to ensure candidateName and candidateEmail are not null, undefined, or empty 
+before sending the email. If either of them is missing, the script will show an alert and prevent email sending. -->
+<!-- <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        emailjs.init("Y-IUMgYHei_SzaQci"); // EmailJS User ID
+        console.log("✅ EmailJS Initialized");
+    });
+
+    function sendEmail(candidateName, candidateEmail, status) {
+        const submitButton = document.querySelector("button[type='submit']");
+        submitButton.innerHTML = "Sending Email...";
+        submitButton.disabled = true;
+
+        // 🔹 Final Validation: Ensure candidate name & email exist
+        if (!candidateName || !candidateEmail) {
+            alert("⚠️ Candidate name and email cannot be empty!");
+            console.error("❌ Validation failed: Candidate name or email missing.");
+            submitButton.innerHTML = "Submit";
+            submitButton.disabled = false;
+            return;  // ⛔ Stops execution, does NOT send email or move to next page
+        }
+
+        // 🔹 Define main recipient and CC recipients
+        const toEmail = "shwethaacharya2815@gmail.com"; // Main recipient
+        const ccEmails = ["shwetha.20cs084@sode-edu.in", "sourav.20cs089@sode-edu.in"]; // CC recipients
+
+        // 🔹 Email parameters
+        const templateParams = {
+            to_email: toEmail,
+            cc_email: ccEmails.join(", "), // Convert array to string
+            candidate_name: candidateName,
+            candidate_email: candidateEmail,
+            status: status,
+            message: `Candidate ${candidateName} (${candidateEmail}) has been marked as '${status}'.`
+        };
+
+        console.log("📤 Sending email with params:", templateParams); // Log details before sending
+
+        // 🔹 Send Email using EmailJS
+        emailjs.send("service_qghdq8f", "template_1jyba8e", templateParams)
+            .then(function (response) {
+                console.log("📨 Email sent successfully", response);
+                alert("✅ Email sent successfully!");
+                submitButton.innerHTML = "Submit";
+                submitButton.disabled = false;
+            })
+            .catch(function (error) {
+                console.error("❌ Error sending email", error);
+                alert("⚠️ Failed to send email. Please try again.");
+                submitButton.innerHTML = "Submit";
+                submitButton.disabled = false;
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector("form").addEventListener("submit", function (event) {
+            event.preventDefault(); // Always prevent default submission initially
+
+            const status = document.getElementById("status").value;
+            const selectedCandidate = document.getElementById("candidateSelect")?.value; // Assuming a <select> element for candidates
+
+            if (!selectedCandidate) {
+                alert("⚠️ Please select a candidate before submitting!");
+                console.error("❌ No candidate selected.");
+                return;
+            }
+
+            console.log("🔍 Fetching candidate details for ID:", selectedCandidate);
+
+            // 🔹 Fetch Candidate Data from the Database
+            fetch(`/getCandidateDetails?candidateId=${selectedCandidate}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("📥 Database Response:", data); // Log the full database response
+
+                    // 🔹 Use correct keys: "Name" and "Email" (case-sensitive)
+                    let candidateName = data.Name?.trim() || ""; // Ensure it's not empty
+                    let candidateEmail = data.Email?.trim() || ""; // Ensure it's not empty
+
+                    console.log("📝 Candidate Details (Processed):", { candidateName, candidateEmail });
+
+                    // 🔹 Check if candidate details are missing
+                    if (!candidateName || !candidateEmail) {
+                        alert("⚠️ Candidate name and email are missing in the database!");
+                        console.error("❌ Database returned empty candidate details.");
+                        return;
+                    }
+
+                    // 🔹 If status is not "Rejected", send an email
+                    if (status !== "Rejected") {
+                        sendEmail(candidateName, candidateEmail, status);
+                    } else {
+                        console.log("🚫 Status is 'Rejected', skipping email.");
+                        event.target.submit(); // Allow form submission when rejected
+                    }
+                })
+                .catch(error => {
+                    console.error("❌ Error fetching candidate details from database:", error);
+                    alert("⚠️ Failed to fetch candidate details. Please try again.");
+                });
+        });
+    });
+</script> -->
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        emailjs.init("Y-IUMgYHei_SzaQci"); // Initialize EmailJS
+        console.log("✅ EmailJS Initialized");
+    });
+
+    // Function to show a popup message
+    function showPopup(message, type) {
+        const popup = document.createElement("div");
+        popup.innerText = message;
+        popup.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: ${type === "success" ? "green" : "red"};
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 9999;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        `;
+        document.body.appendChild(popup);
+
+        setTimeout(() => popup.remove(), 3000); // Hide after 3 sec
+    }
+
+    function sendEmail(candidateName, candidateEmail, status) {
+        const submitButton = document.querySelector("button[type='submit']");
+        submitButton.innerHTML = "Sending Email...";
+        submitButton.disabled = true;
+
+        // ✅ Prevent email sending if name/email is missing
+        if (!candidateName || !candidateEmail || candidateName.trim() === "" || candidateEmail.trim() === "") {
+            showPopup("⚠️ Candidate name and email are required!", "error");
+            console.error("❌ Email not sent: Candidate name or email is missing.");
+            submitButton.innerHTML = "Submit";
+            submitButton.disabled = false;
+            return; // ⛔ Stops execution, no email sent
+        }
+
+        // 🔹 Define main recipient and CC recipients
+        const toEmail = "shwethaacharya2815@gmail.com"; // Main recipient
+        const ccEmails = ["shwetha.20cs084@sode-edu.in", "sourav.20cs089@sode-edu.in"]; // CC recipients
+
+        // 🔹 Email parameters
+        const templateParams = {
+            to_email: toEmail,
+            cc_email: ccEmails.join(", "), // Convert array to string
+            candidate_name: candidateName,
+            candidate_email: candidateEmail,
+            status: status,
+            message: `Candidate ${candidateName} (${candidateEmail}) has been marked as '${status}'.`
+        };
+
+        console.log("📤 Sending email with params:", templateParams);
+
+        // 🔹 Send Email using EmailJS
+        emailjs.send("service_qghdq8f", "template_1jyba8e", templateParams)
+            .then(function (response) {
+                console.log("✅ Email sent successfully!", response);
+                showPopup("✅ Email sent successfully!", "success");
+                submitButton.innerHTML = "Submit";
+                submitButton.disabled = false;
+            })
+            .catch(function (error) {
+                console.error("❌ Error sending email", error);
+                showPopup("❌ Email failed to send!", "error");
+                submitButton.innerHTML = "Submit";
+                submitButton.disabled = false;
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector("form").addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const status = document.getElementById("status").value;
+
+            // ✅ Replace with actual dynamic values (fetch from backend)
+            const candidateName = "";  // Example static value
+            const candidateEmail = "";  // Example static value
+
+            console.log("📝 Candidate Info:", { candidateName, candidateEmail, status });
+
+            // 🔹 Prevent email if candidate name/email is missing
+            if (!candidateName || !candidateEmail || candidateName.trim() === "" || candidateEmail.trim() === "") {
+                showPopup("⚠️ Candidate name and email are required!", "error");
+                console.error("❌ Missing candidate details. Email not sent.");
+                return;
+            }
+
+            // 🔹 Send email only if status is NOT "Rejected"
+            if (status !== "Rejected") {
+                sendEmail(candidateName, candidateEmail, status);
+            } else {
+                console.log("🚫 Status is 'Rejected', skipping email.");
+                event.target.submit(); // Allow form submission when rejected
+            }
+        });
+    });
+</script>
+
+
+
+
+
+
 
 <!-- all the fields are filled then only click submit button -->
 
@@ -690,3 +909,4 @@ document.addEventListener("DOMContentLoaded", function () {
     
 </body>
 </html> 
+

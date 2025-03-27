@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -72,4 +73,80 @@
    
    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" rel="stylesheet" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"> 
 </body>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dmax upload</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='resume.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
+</head>
+<body>
+   <div class="first_div">
+    {% include 'sidemenu.html'%}
+     <div style="margin-left: auto; margin-right: auto;">
+      <h1 class="heading">Upload Dmax</h1>
+      
+      <div class="upload" style="border: 1px solid black;padding:10px; width:49rem;">
+       
+        <div>
+          <form action="/dmax_upload" enctype="multipart/form-data" method="POST" style="margin-left:6rem;">
+            <div style="margin-bottom: 1rem;">
+              <label for="month" class="select_month label" >Month:</label>
+                <select name="month" id="month" class="select_month_value" required>
+                  <option value="">Select</option>
+                  <option value="Jan">January</option>
+                  <option value="Feb">February</option>
+                  <option value="Mar">March</option>
+                  <option value="Apr">April</option>  
+                  <option value="May">May</option>
+                  <option value="June">June</option>
+                  <option value="July">July</option>
+                  <option value="Aug">August</option>
+                  <option value="Sep">September</option>
+                  <option value="Oct">October</option>
+                  <option value="Nov">November</option>
+                  <option value="Dec">December</option>
+                  </select>
+            </div>
+            <label for="file" class="label">Upload a File:</label>
+            <input type="file" id="file" name="file" class="file-input" accept=".xlsx" required multiple style="width:40%;">
+            <button type="submit" class="btn btn-primary submit" style="margin-left: 0px;">Upload</button>
+          </form>
+          <div style="display: flex; align-items: center; margin-top:2rem; margin-left:13%; gap: 1rem;">
+            <p style="font-size:27px;">Download Excel format: </p>
+            <a href="static/Dmax_sample/Dmax_sample.xlsx" download class="btn btn-info icon" style="margin-bottom:0.6rem;">Download <i
+              class="fa-solid fa-download"></i></a>
+          </div>
+        </div>
+        
+          
+        
+      </div>
+      <div style="margin-top: 4rem; margin-left: auto; margin-right: auto; width:70%;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              {% if category == 'error' %}
+                <div class="alert alert-danger add_flash_message" role="alert" >
+                  {{ message }}
+                </div>
+              {% elif category == 'success' %}
+                <div class="alert alert-success add_flash_message" role="alert" >
+                  {{ message }}
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+      </div>
+     </div>
+   </div>
+   
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" rel="stylesheet" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"> 
+</body>
+>>>>>>> 71c6430a (updated)
 </html>

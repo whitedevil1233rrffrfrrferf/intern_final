@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -157,4 +158,165 @@
         });
     </script>
 </body>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hr</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='interview1.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  </head>
+<body>
+    <script>
+      var status1="{{status1}}"
+      var comments1="{{comments1}}"
+      var selected_panel="{{selected_panel}}"
+      var date="{{date}}"
+    </script>
+    <div>
+      {% include 'sidemenu.html'%}
+      <div class="container main">
+        <h1 style="text-align: center;  background-color:#4699F9; color: white;">Enter HR details</h1>
+        <div style="margin-top:50px;">
+            <form action="{{ url_for('hr', resume_id=resume.id) }}" method="post" >
+              <div style="display: flex; gap: 2rem; align-items: center;">
+                    <input type="text" id="selectedPanel" name="selectedPanel" class="form-control"  value="{{selected_panel}}" ">
+                    <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#panelModal">Add</button>  
+                </div>
+                <div class="modal fade" id="panelModal" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h5 class="modal-title">Add Panel Member</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                          </div>
+                          <div class="modal-body">
+                              <input type="text" id="panelName" placeholder="Enter Name" class="form-control mb-2" value="">
+                              <input type="email" id="panelEmail" placeholder="Enter Email" class="form-control mb-2" value=" ">
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                              <button type="button" class="btn btn-success" id="savePanel">Save</button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+                <div class="mb-3">
+                  <label for="date" class="form-label"  style="font-size:20px; color:#1AACAC;">Date</label>
+                  <i class="fa-solid fa-star" style="font-size:8px;position: relative;bottom:10px; color: red;"></i>
+                  <input type="date" class="form-control" name="date" id="date" value="{{ date or '' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="status"  style="font-size:20px; color:#1AACAC; margin-top: 20px;">Status</label>
+                    <i class="fa-solid fa-star" style="font-size:8px;position: relative;bottom:10px; color: red;"></i>
+                    <select id="status" name="status" required>
+                      
+                      <option value="Rejected" {{ 'selected' if status1 == 'Rejected' else '' }}>Rejected</option>
+                      <option value="Move to HR Process" {{ 'selected' if status1 == 'Move to HR Process' else '' }}>Move to HR Process</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="comments"  style="font-size:20px; color:#1AACAC; margin-top: 20px;">Comments:</label>
+                    <input class="form-control" type="text" name="comments" value="{{comments1}}" placeholder="Enter your comments" required>
+                </div>
+                
+                <input type="hidden" id="selectedPanel" name="selectedPanel" value="{{selected_panel}}">
+                <div style="display: flex; align-items: center; justify-content: center; margin-top:5rem;">
+                  <button type="submit" class="btn btn-primary" style="width:6rem; height:3rem; margin-right: 3rem;">Submit</button>
+                  <a class="btn btn-outline-secondary" href="{{url_for('employee')}}" style="padding:10px ;width:6rem; height:3rem;"><div style="display: flex; justify-content: space-between; padding:5px;">
+                    <div>
+                      <i class="fa-solid fa-backward" style="margin-right: 10px;"></i>
+                    </div>
+                    <div>
+                      Back
+                    </div>
+                  </div>
+                  </a>
+                </div>
+              </form>
+        </div>
+        <div style="margin-top: 20px;text-align: center; width: 75%; margin-left:15%;">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                  {% for category, message in messages %}
+                      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                          {{ message }}
+                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                  {% endfor %}
+              {% endif %}
+          {% endwith %}
+        </div>
+      </div>
+    </div>
+    
+      <script src="{{ url_for('static', filename='intro.js') }}"></script> 
+      <script src="{{ url_for('static', filename='modal.js') }}"></script> 
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            emailjs.init("Y-IUMgYHei_SzaQci"); // EmailJS User ID
+        });
+    
+        function sendEmail(candidateName, candidateEmail, status, callback) {
+            const submitButton = document.querySelector("button[type='submit']");
+            submitButton.innerHTML = "Sending Email...";
+            submitButton.disabled = true;
+    
+            // 🔹 Define main recipient and CC recipients
+            const toEmail = "varunrram2003@gmail.com";  // Replace with actual recipient
+            const ccEmails = ["vivabrothers9703@gmail.com", "asowmyadc@gmail.com"];  // CC recipients
+    
+            // 🔹 Email parameters
+            const templateParams = {
+                to_email: toEmail,
+                cc_email: ccEmails.join(", "),  // Convert array to string
+                candidate_name: candidateName,
+                status: status,
+                message: `Candidate ${candidateName} has been marked as '${status}'.`
+            };
+    
+            console.log("📤 Sending email with params:", templateParams); // Log details before sending
+    
+            // 🔹 Send Email using EmailJS
+            emailjs.send("service_qghdq8f", "template_1jyba8e", templateParams)
+                .then(function(response) {
+                    console.log("📨 Email sent successfully", response);
+                    alert("✅ Email sent successfully!");
+    
+                    setTimeout(() => {
+                        if (callback) callback();  // Proceed with form submission
+                    }, 2000);
+                })
+                .catch(function(error) {
+                    console.error("❌ Error sending email", error);
+                    alert("⚠️ Failed to send email. Please try again.");
+                    submitButton.innerHTML = "Submit";
+                    submitButton.disabled = false;
+                });
+        }
+    
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelector("form").addEventListener("submit", function (event) {
+                
+                const status = document.getElementById("status").value;
+                const candidateName = "summa"
+                const candidateEmail = "test"
+                
+                console.log("📝 Candidate Info:", { candidateName, candidateEmail, status });
+    
+                if (status !== "Rejected") {
+                    event.preventDefault(); 
+                    sendEmail(candidateName, candidateEmail, status, () => {
+                        this.submit();
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+>>>>>>> 71c6430a (updated)
 </html>

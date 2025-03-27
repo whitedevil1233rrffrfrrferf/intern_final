@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *{
     
 }
@@ -21,4 +22,29 @@ input{
 } 
 .color{
     color: #00ACFF;
+=======
+*{
+    
+}
+h1{
+    text-align: center;
+}
+.form-label{
+    margin-top: 2rem;
+}
+input{
+    width:70% !important;
+}
+.form_inputs{
+    margin-left:25% !important;
+    }
+.role{
+    margin-bottom:5rem;
+}   
+.btn{
+    margin-left:20%;
+} 
+.color{
+    color: #00ACFF;
+>>>>>>> 71c6430a (updated)
 }

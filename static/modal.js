@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", function() {
     let savePanelBtn = document.getElementById("savePanel");
     let panelModalElement = document.getElementById("panelModal");
@@ -37,4 +38,5 @@ document.addEventListener("DOMContentLoaded", function() {
             alert("Please enter both Name and Email!");
         }
     });
+>>>>>>> 71c6430a (updated)
 });

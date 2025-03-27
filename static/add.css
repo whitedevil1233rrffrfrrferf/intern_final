@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *{
     margin:0;
     padding: 0;
@@ -14,4 +15,22 @@
 .title{
    background-color:#00A9FF;
     color:white;
+=======
+*{
+    margin:0;
+    padding: 0;
+    
+    
+}
+.label{
+    font-size:20px;
+    color:#00A9FF;
+}
+.form{
+    background-color:#9EDDFF
+}
+.title{
+   background-color:#00A9FF;
+    color:white;
+>>>>>>> 71c6430a (updated)
 }

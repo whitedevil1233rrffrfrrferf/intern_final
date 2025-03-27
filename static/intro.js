@@ -1,3 +1,5 @@
+
+
 // document.getElementById("savePanel").addEventListener("click", function () {
 //     let name = document.getElementById("panelName").value.trim();
 //     let email = document.getElementById("panelEmail").value.trim();
@@ -86,3 +88,4 @@ document.getElementById("savePanel").addEventListener("click", function () {
     })
     .catch(error => console.error("Error:", error));
 });
+

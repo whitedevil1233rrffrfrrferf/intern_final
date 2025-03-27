@@ -1,0 +1,43 @@
+/* .table .table_header {
+    background-color:#00A9FF;
+    color:white;
+    } */
+.heading{
+    background-color:#00A9FF;
+    color:white;
+}    
+.btn{
+    width:2rem !important;
+    
+}
+.cng_btn{
+    width:9rem!important;
+    
+}
+.page_num_option{
+    height:2.5rem;
+}
+.record {
+    width: 100%;
+    max-width: 800px;
+    margin: auto;
+    border-collapse: separate;  /* Ensure borders collapse into a single border */
+    border: 1px solid black;   /* Table border */
+}
+
+.record th, .record td {
+    border: 1px solid black;  /* Cell borders */
+    padding: 10px;            /* Add some padding for spacing */
+    text-align: left;         /* Align text to the left */
+}
+.record th {
+    background-color: #F5F5F5;
+    color: #333333;
+}
+.record th:hover {
+    background-color: white; /* Different color for header cells */
+}
+
+.record td:hover {
+    background-color: #F0F0F0; /* Different color for data cells */
+}

@@ -40,6 +40,7 @@ document.getElementById("savePanel").addEventListener("click", function () {
         modalInstance.hide();
 
         alert("Panel member added successfully!");
+        window.location.reload();
     })
     .catch(error => console.error("Error:", error));
 });

@@ -219,6 +219,7 @@ class Dmax_tl(db.Model):
     Skill = db.Column(db.Float)  
     DmaxSharing = db.Column(db.Float)
     OverallDmaxScore = db.Column(db.Float) 
+
 class Dmax_intern(db.Model):
     __bind_key__="dmax_interns"
     id = db.Column(db.Integer, primary_key=True)
@@ -234,7 +235,8 @@ class Dmax_intern(db.Model):
     Quality = db.Column(db.Float)  
     Attendance = db.Column(db.Float)  
     Skill = db.Column(db.Float)  
-    OverallDmaxScore = db.Column(db.Float) 
+    OverallDmaxScore = db.Column(db.Float)
+
 class Dmax_jr_qa_eng(db.Model):
     __bind_key__="dmax_jrqaeng"
     id = db.Column(db.Integer, primary_key=True)
@@ -251,6 +253,7 @@ class Dmax_jr_qa_eng(db.Model):
     Attendance = db.Column(db.Float)  
     Skill = db.Column(db.Float)  
     OverallDmaxScore = db.Column(db.Float)
+
 class Dmax_qa_eng(db.Model):
     __bind_key__="dmax_qaeng"
     id = db.Column(db.Integer, primary_key=True)
@@ -1700,6 +1703,19 @@ def zip():
 def introCall(resume_id):
     selected_panel=""
     resume=Resume.query.get(resume_id)
+    def safe_get(value):
+        return value if value else "N/A"
+    candidate_name=safe_get(resume.Name)
+    candidate_email = safe_get(resume.Email)
+    candidate_phone = safe_get(resume.Phone)
+    candidate_role = safe_get(resume.Role)
+    candidate_experience = safe_get(resume.Experience)
+    candidate_location = safe_get(resume.Location)
+    candidate_notice_period = safe_get(resume.Notice_period)
+    candidate_actual_ctc = safe_get(resume.Actual_CTC)
+    candidate_expected_ctc = safe_get(resume.Expected_CTC)
+    candidate_current_link = url_for('introCall', resume_id=resume_id, _external=True)
+    candidate_next_link = url_for('interview1v', resume_id=resume_id, _external=True)
     existing_entry=Intro.query.filter_by(resumeId=resume.id).first()
     all_panels = Panel.query.all()
     if existing_entry:
@@ -1752,7 +1768,7 @@ def introCall(resume_id):
             flash("Candidate Moved to L1", "success")  # Using 'success' for a green flash message
             return redirect(url_for('interview1v', resume_id=resume_id))
         return redirect(url_for('introCall', resume_id=resume.id))
-    return render_template("intro.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date,selected_panels=selected_panels,comments_dict=comments_dict,all_panels=all_panels)
+    return render_template("intro.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date,selected_panels=selected_panels,comments_dict=comments_dict,all_panels=all_panels,candidate_name=candidate_name,candidate_email = candidate_email,candidate_phone=candidate_phone,candidate_role=candidate_role,candidate_experience=candidate_experience,candidate_location=candidate_location,candidate_notice_period=candidate_notice_period,candidate_actual_ctc=candidate_actual_ctc,candidate_expected_ctc=candidate_expected_ctc,candidate_current_link=candidate_current_link,candidate_next_link=candidate_next_link)
 @app.route("/interview1")
 def interview1():
     return render_template("interview1.html")
@@ -3010,7 +3026,7 @@ def add_panel_member():
     data = request.json
     name = data.get('name')
     email = data.get('email')
-    print(name,email)
+    
     existing_member = Panel.query.filter_by(name=name).first()
     if existing_member:
         return jsonify({"error": "Panel member already exists!"}), 409

@@ -285,8 +285,8 @@
 <div id="panelDropdown" class="dropdown-content">
     {% for panel in all_panels %}
         <div class="panel-item">
-            <input type="checkbox" class="panel-checkbox" id="panel_{{ panel.name }}" value="{{ panel.name }}"
-                {% if panel.name in selected_panels %} checked {% endif %}>
+            <input type="checkbox" class="panel-checkbox" id="panel_{{ panel.name }}" data-email="{{ panel.email }}" value="{{ panel.name }}"
+            {% if panel.name in selected_panels %} checked {% endif %}>
             <label for="panel_{{ panel.name }}">{{ panel.name }} ({{ panel.email }})</label>
             <button type="button" class="btn btn-danger btn-sm delete-btn" data-panel="{{ panel.name }}">
                 <i class="fa-solid fa-trash"></i>
@@ -321,7 +321,7 @@
                     
                       <label for="date" class="form-label" style="font-size:20px; color:#1AACAC;">Date</label>
                       
-                    <input type="date" class="form-control" id="date" name="date" value="{{ date or '' }}" required>
+                    <input type="date" class="form-control" id="date" name="date" value="{{ date or '' }}" min="" required>
                 </div>
               
 
@@ -388,7 +388,39 @@
       <script src="{{ url_for('static', filename='intro.js') }}"></script> 
       <script src="{{ url_for('static', filename='modal.js') }}"></script> 
 
+      <!-- date picker -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    let today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+    document.getElementById("date").setAttribute("min", today);
+});
 
+</script>
+
+
+<!-- The email should auto-fill and stay locked even if the user types multiple words -->
+<script>
+
+    document.getElementById("panelName").addEventListener("input", function () {
+        let nameInput = this.value.trim();
+        let namePattern = /^[a-zA-Z\s]+$/; // Allow alphabets and spaces only
+        let emailField = document.getElementById("panelEmail");
+    
+        if (namePattern.test(nameInput) && nameInput.length > 0) {
+            let firstName = nameInput.split(" ")[0].toLowerCase(); // Extract only first word
+    
+            // If email is empty OR already auto-generated, lock it and set value
+            if (!emailField.value || emailField.value.endsWith("@qaoncloud.com")) {
+                emailField.value = firstName + "@qaoncloud.com";
+                emailField.setAttribute("readonly", true); // Lock email field
+            }
+        } else {
+            emailField.value = ""; // Clear email only if input is invalid
+            emailField.removeAttribute("readonly"); // Unlock email if input is invalid
+        }
+    });
+    
+    </script>
 
       
 <script>

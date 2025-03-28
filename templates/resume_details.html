@@ -9,6 +9,131 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='resume_details.css') }}">
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
+
+    <style>
+      /* Enhanced UI with Animation Effects */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f7fc;
+    margin: 0;
+    padding: 20px;
+    overflow-x: hidden;
+}
+
+.container {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    animation: fadeInUp 0.6s ease-in-out;
+}
+
+.container:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.heading {
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    border-bottom: 4px solid #ff9800;
+    padding-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-family: 'Montserrat', sans-serif;
+    opacity: 0;
+    animation: slideDown 0.8s ease-in-out forwards;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+    animation: fadeInUp 0.7s ease-in-out;
+}
+
+.table thead {
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    text-transform: uppercase;
+    font-family: 'Poppins', sans-serif;
+}
+
+.table th, .table td {
+    padding: 14px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.table-striped tbody tr {
+    transition: background-color 0.3s ease-in-out;
+}
+
+.table-striped tbody tr:hover {
+    background-color: #d6e4ff;
+}
+
+.btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 160px;
+    margin: 20px auto;
+    background-color: #007bff;
+    border: none;
+    padding: 12px 18px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
+    text-transform: uppercase;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0px 4px 6px rgba(0, 123, 255, 0.2);
+    font-family: 'Roboto', sans-serif;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    box-shadow: 0px 6px 12px rgba(0, 123, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.btn-primary i {
+    margin-right: 10px;
+}
+
+/* Keyframe Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+    </style>
   </head>
 <body>
   <div>

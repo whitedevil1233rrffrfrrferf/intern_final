@@ -1763,7 +1763,20 @@ def zip():
 def introCall(resume_id):
     selected_panel = ""
     resume = Resume.query.get(resume_id)
-    existing_entry = Intro.query.filter_by(resumeId=resume.id).first()
+    def safe_get(value):
+        return value if value else "N/A"
+    candidate_name=safe_get(resume.Name)
+    candidate_email = safe_get(resume.Email)
+    candidate_phone = safe_get(resume.Phone)
+    candidate_role = safe_get(resume.Role)
+    candidate_experience = safe_get(resume.Experience)
+    candidate_location = safe_get(resume.Location)
+    candidate_notice_period = safe_get(resume.Notice_period)
+    candidate_actual_ctc = safe_get(resume.Actual_CTC)
+    candidate_expected_ctc = safe_get(resume.Expected_CTC)
+    candidate_current_link = url_for('introCall', resume_id=resume_id, _external=True)
+    candidate_next_link = url_for('interview1v', resume_id=resume_id, _external=True)
+    existing_entry=Intro.query.filter_by(resumeId=resume.id).first()
     all_panels = Panel.query.all()
 
     if existing_entry:
@@ -1837,15 +1850,24 @@ def introCall(resume_id):
         # **Flash messages and Redirect**
         if status == "Rejected":
             flash("Candidate Rejected", "danger")
-        elif status == "Move to Interview 1":
+        elif status == "Move to L1":
             flash("Candidate Moved to L1", "success")
             return redirect(url_for('interview1v', resume_id=resume_id))
 
         return redirect(url_for('introCall', resume_id=resume.id))
 
-    return render_template("intro.html", resume=resume, comments1=comments1, status1=status1, 
-                           selected_panel=selected_panel, date=date, selected_panels=selected_panels,
-                           comments_dict=comments_dict, all_panels=all_panels)
+    return render_template("intro.html",resume=resume,comments1=comments1,status1=status1,
+                           selected_panel=selected_panel,date=date,selected_panels=selected_panels,
+                           comments_dict=comments_dict,all_panels=all_panels,
+                           candidate_name=candidate_name,candidate_email = candidate_email,
+                           candidate_phone=candidate_phone,candidate_role=candidate_role,
+                           candidate_experience=candidate_experience,
+                           candidate_location=candidate_location,
+                           candidate_notice_period=candidate_notice_period,
+                           candidate_actual_ctc=candidate_actual_ctc,
+                           candidate_expected_ctc=candidate_expected_ctc,
+                           candidate_current_link=candidate_current_link,
+                           candidate_next_link=candidate_next_link)
 
 
 @app.route("/interview1")
@@ -1946,7 +1968,20 @@ def resume_details(resume_id):
 def interview1v(resume_id):
     selected_panel = ""
     resume = Resume.query.get(resume_id)
-    existing_entry = Interview1.query.filter_by(resumeId=resume.id).first()
+    def safe_get(value):
+        return value if value else "N/A"
+    candidate_name=safe_get(resume.Name)
+    candidate_email = safe_get(resume.Email)
+    candidate_phone = safe_get(resume.Phone)
+    candidate_role = safe_get(resume.Role)
+    candidate_experience = safe_get(resume.Experience)
+    candidate_location = safe_get(resume.Location)
+    candidate_notice_period = safe_get(resume.Notice_period)
+    candidate_actual_ctc = safe_get(resume.Actual_CTC)
+    candidate_expected_ctc = safe_get(resume.Expected_CTC)
+    candidate_current_link = url_for('interview1v', resume_id=resume_id, _external=True)
+    candidate_next_link = url_for('interview2v', resume_id=resume_id, _external=True)
+    existing_entry=Intro.query.filter_by(resumeId=resume.id).first()
     all_panels = Panel.query.all()
 
     if existing_entry:
@@ -2020,25 +2055,47 @@ def interview1v(resume_id):
         # **Flash messages and Redirect**
         if status == "Rejected":
             flash("Candidate Rejected", "danger")
-        elif status == "Move to Interview 2":
-            flash("Candidate Moved to Interview 2", "success")
+        elif status == "Move to L2":
+            flash("Candidate Moved to L2", "success")
             return redirect(url_for('interview2v', resume_id=resume_id))
-        elif status == "hold":
+        elif status == "On Hold":
             flash("Candidate kept on hold", "warning")
 
         return redirect(url_for('interview1v', resume_id=resume.id))
 
-    return render_template("interview1.html", resume=resume, comments1=comments1, status1=status1, 
-                           selected_panel=selected_panel, date=date, selected_panels=selected_panels,
-                           comments_dict=comments_dict, all_panels=all_panels)
+    return render_template("interview1.html",resume=resume,comments1=comments1,status1=status1,
+                           selected_panel=selected_panel,date=date,
+                           selected_panels=selected_panels,comments_dict=comments_dict,
+                           all_panels=all_panels,candidate_name=candidate_name,
+                           candidate_email = candidate_email,candidate_phone=candidate_phone,
+                           candidate_role=candidate_role,candidate_experience=candidate_experience,
+                           candidate_location=candidate_location,
+                           candidate_notice_period=candidate_notice_period,
+                           candidate_actual_ctc=candidate_actual_ctc,
+                           candidate_expected_ctc=candidate_expected_ctc,
+                           candidate_current_link=candidate_current_link,
+                           candidate_next_link=candidate_next_link)
 
 
 @app.route("/interview2v/<int:resume_id>", methods=["GET", "POST"])
 def interview2v(resume_id):
     selected_panel = ""
     resume = Resume.query.get(resume_id)
-    existing_entry = Interview2.query.filter_by(resumeId=resume.id).first()
-    all_panels = Panel.query.all()  # Fetch all panels
+    def safe_get(value):
+        return value if value else "N/A"
+    candidate_name=safe_get(resume.Name)
+    candidate_email = safe_get(resume.Email)
+    candidate_phone = safe_get(resume.Phone)
+    candidate_role = safe_get(resume.Role)
+    candidate_experience = safe_get(resume.Experience)
+    candidate_location = safe_get(resume.Location)
+    candidate_notice_period = safe_get(resume.Notice_period)
+    candidate_actual_ctc = safe_get(resume.Actual_CTC)
+    candidate_expected_ctc = safe_get(resume.Expected_CTC)
+    candidate_current_link = url_for('interview2v', resume_id=resume_id, _external=True)
+    candidate_next_link = url_for('hr', resume_id=resume_id, _external=True)
+    existing_entry=Intro.query.filter_by(resumeId=resume.id).first()
+    all_panels = Panel.query.all()
 
     if existing_entry:
         status1 = existing_entry.Status
@@ -2114,23 +2171,45 @@ def interview2v(resume_id):
         elif status == "Move to HR Round":
             flash("Candidate Moved to HR Round", "success")
             return redirect(url_for('hr', resume_id=resume_id))
-        elif status == "hold":
+        elif status == "On Hold":
             flash("Candidate kept on hold", "warning")
 
         return redirect(url_for('interview2v', resume_id=resume.id))
 
-    return render_template(
-        "interview2.html", resume=resume, comments1=comments1, status1=status1, 
-        selected_panel=selected_panel, date=date, selected_panels=selected_panels,
-        comments_dict=comments_dict, all_panels=all_panels)
+    return render_template("interview2.html",resume=resume,comments1=comments1,status1=status1,
+                            selected_panel=selected_panel,date=date,
+                            selected_panels=selected_panels,
+                            comments_dict=comments_dict,all_panels=all_panels,
+                            candidate_name=candidate_name,
+                            candidate_email = candidate_email,candidate_phone=candidate_phone,
+                            candidate_role=candidate_role,candidate_experience=candidate_experience,
+                            candidate_location=candidate_location,
+                            candidate_notice_period=candidate_notice_period,
+                            candidate_actual_ctc=candidate_actual_ctc,
+                            candidate_expected_ctc=candidate_expected_ctc,
+                            candidate_current_link=candidate_current_link,
+                            candidate_next_link=candidate_next_link)
 
 
 @app.route("/hr/<int:resume_id>", methods=["GET", "POST"])
 def hr(resume_id):
     selected_panel = ""
     resume = Resume.query.get(resume_id)
-    existing_entry = Hr.query.filter_by(resumeId=resume.id).first()
-    all_panels = Panel.query.all()  # Fetch all panel members
+    def safe_get(value):
+        return value if value else "N/A"
+    candidate_name=safe_get(resume.Name)
+    candidate_email = safe_get(resume.Email)
+    candidate_phone = safe_get(resume.Phone)
+    candidate_role = safe_get(resume.Role)
+    candidate_experience = safe_get(resume.Experience)
+    candidate_location = safe_get(resume.Location)
+    candidate_notice_period = safe_get(resume.Notice_period)
+    candidate_actual_ctc = safe_get(resume.Actual_CTC)
+    candidate_expected_ctc = safe_get(resume.Expected_CTC)
+    candidate_current_link = url_for('hr', resume_id=resume_id, _external=True)
+    candidate_next_link = url_for('hr', resume_id=resume_id, _external=True)
+    existing_entry=Intro.query.filter_by(resumeId=resume.id).first()
+    all_panels = Panel.query.all()
 
     if existing_entry:
         status1 = existing_entry.Status
@@ -2208,10 +2287,18 @@ def hr(resume_id):
 
         return redirect(url_for('hr', resume_id=resume.id))
 
-    return render_template(
-        "hr.html", resume=resume, comments1=comments1, status1=status1, 
-        selected_panel=selected_panel, date=date, selected_panels=selected_panels,
-        comments_dict=comments_dict, all_panels=all_panels)
+    return render_template("hr.html",resume=resume,comments1=comments1,status1=status1,
+                           selected_panel=selected_panel,date=date,
+                           selected_panels=selected_panels,comments_dict=comments_dict,
+                           all_panels=all_panels,candidate_name=candidate_name,
+                           candidate_email = candidate_email,candidate_phone=candidate_phone,
+                           candidate_role=candidate_role,candidate_experience=candidate_experience,
+                           candidate_location=candidate_location,
+                           candidate_notice_period=candidate_notice_period,
+                           candidate_actual_ctc=candidate_actual_ctc,
+                           candidate_expected_ctc=candidate_expected_ctc,
+                           candidate_current_link=candidate_current_link,
+                           candidate_next_link=candidate_next_link)
 
 
 @app.route("/get_interview_status/<int:resume_id>")

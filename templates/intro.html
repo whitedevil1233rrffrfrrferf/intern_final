@@ -190,7 +190,9 @@
 
 
 <!-- The email should auto-fill and stay locked even if the user types multiple words -->
-<script>
+
+
+<!-- <script>
 
 document.getElementById("panelName").addEventListener("input", function () {
     let nameInput = this.value.trim();
@@ -211,9 +213,32 @@ document.getElementById("panelName").addEventListener("input", function () {
     }
 });
 
-</script>
+</script> -->
 
-
+<script>
+    document.getElementById("panelName").addEventListener("input", function () {
+        let nameInput = this.value.trim();
+        let namePattern = /^[a-zA-Z\s]+$/; // Allow alphabets and spaces only
+        let emailField = document.getElementById("panelEmail");
+    
+        if (namePattern.test(nameInput) && nameInput.length > 0) {
+            let firstName = nameInput.split(" ")[0].toLowerCase(); // Extract only first word
+            
+            // Only auto-fill if the field is empty or was previously auto-generated
+            if (!emailField.dataset.userEdited) {
+                emailField.value = firstName + "@qaoncloud.com";
+            }
+        } else {
+            emailField.value = ""; // Clear email only if input is invalid
+        }
+    });
+    
+    // Mark email field as manually edited if changed by user
+    document.getElementById("panelEmail").addEventListener("input", function () {
+        this.dataset.userEdited = true;
+    });
+    </script>
+    
 <script>
 document.getElementById("panelSelectBox").addEventListener("click", function () {
     let dropdown = document.getElementById("panelDropdown");

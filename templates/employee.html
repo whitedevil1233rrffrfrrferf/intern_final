@@ -1,5 +1,6 @@
 
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -41,6 +42,60 @@
         }
     </style>
 
+
+<script>
+// function searchAndHandleCheckbox() {
+//     const searchInput = document.getElementById('search_bar');
+//     const qaLeadCheckbox = document.getElementById('qaLeadCheckbox');
+
+//     if (!searchInput || !qaLeadCheckbox) {
+//         console.error("Error: Required elements not found!");
+//         return;
+//     }
+
+//     const searchText = searchInput.value.toLowerCase();
+//     qaLeadCheckbox.checked = searchText.includes("qa");
+
+//     // Safe execution of filterTable
+//     try {
+//         filterTable();
+//     } catch (error) {
+//         console.error("Error in filterTable():", error);
+//     }
+// }
+
+
+function searchAndHandleCheckbox() {
+    const searchInput = document.getElementById('search_bar');
+    const qaLeadCheckbox = document.getElementById('qaLeadCheckbox');
+
+    if (!searchInput || !qaLeadCheckbox) {
+        console.error("Error: Required elements not found!");
+        return;
+    }
+
+    const searchText = searchInput.value.trim().toLowerCase();
+    console.log("Search Query:", searchText); // Debugging log
+
+    // Check if "QA" is in searchText
+    if (searchText.includes("qa")) {
+        qaLeadCheckbox.checked = true;
+        console.log("QA Lead checkbox is now checked ");
+    } else {
+        qaLeadCheckbox.checked = false;
+        console.log("QA Lead checkbox remains unchecked ");
+    }
+
+    // Safe execution of filterTable
+    try {
+        filterTable();
+    } catch (error) {
+        console.error("Error in filterTable():", error);
+    }
+}
+
+</script>
+
     
 </head>
 <body>
@@ -71,8 +126,11 @@
               <div class="collapse navbar-collapse" id="navbarSupportedContent" style="display: flex; flex-direction: column;height: 4rem;">
                 
                 <form class="d-flex col-10 my-2" action="{{ url_for('employee') }}" role="search" method="GET">
-                  <input class="form-control me-2" type="search" id="search_bar" placeholder="Search by Name / QA Lead" name="search" aria-label="Search" value="{{ search_query }}"  style="margin-right:2rem!important;">
-                  <button class="btn btn-primary" type="submit" onclick="filterTable()">Search</button>
+                  <input class="form-control me-2" type="search" id="search_bar" placeholder="Search by Name / QA Lead" name="search" aria-label="Search" value="{{ search_query }}"   style="margin-right:2rem!important;" >
+                  <!-- <button class="btn btn-primary" type="submit" onclick="filterTable()" onclick="handleSearch()">Search</button> -->
+                  <button class="btn btn-primary" type="button" onclick="searchAndHandleCheckbox()">Search</button>
+
+
                   <button type="button" class="btn btn-danger" id="clearSearch" style="margin-left: 10px;">Clear</button>
                 </form>
                 <form class="d-flex col-10 my-2" action="{{ url_for('employee') }}" role="search" method="GET" style="visibility: hidden;">
@@ -163,7 +221,7 @@
                                 <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="candidate_name" checked style="color: black !important;">Name</label>
                                 <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="contact_number" checked>Contact Num</label>
                                 <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="experience" checked> Experience</label>
-                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="qa_lead" > QA Lead</label>
+                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="qa_lead" id="qaLeadCheckbox"> QA Lead</label>
                                 <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="role" checked> Role</label>
                                 <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="month" > Month</label>
                                 <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="week" > Week</label>
@@ -505,7 +563,12 @@
                 alert('Failed to send email.');
             });
     }
+
 </script>
+
+
+<!-- To make the checkbox for "QALead" checked when you search for the term "QA"  -->
+
+
 </body>
 </html>
-

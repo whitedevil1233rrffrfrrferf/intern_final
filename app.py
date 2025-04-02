@@ -183,6 +183,7 @@ class Interview1(db.Model):
     Comments=db.Column(db.String(200))
     resumeId=db.Column(db.Integer)  
     SelectedPanel=db.Column(db.String(200))     
+    Json_comments = db.Column(db.Text, default='{}')
 
 class Interview2(db.Model):
     __bind_key__="interview2" 
@@ -191,7 +192,8 @@ class Interview2(db.Model):
     Status=db.Column(db.String(200))
     Comments=db.Column(db.String(200))
     resumeId=db.Column(db.Integer)  
-    SelectedPanel=db.Column(db.String(200))    
+    SelectedPanel=db.Column(db.String(200))
+    Json_comments = db.Column(db.Text, default='{}')    
 
 class Hr(db.Model):
     __bind_key__="hr" 
@@ -201,7 +203,8 @@ class Hr(db.Model):
     Comments=db.Column(db.String(200))
     resumeId=db.Column(db.Integer)  
     SelectedPanel=db.Column(db.String(200)) 
-          
+    Json_comments = db.Column(db.Text, default='{}')
+
 class Dmax_tl(db.Model):
     __bind_key__="dmax_team_leads"
     id = db.Column(db.Integer, primary_key=True)
@@ -1707,6 +1710,7 @@ def introCall(resume_id):
         return value if value else "N/A"
     candidate_name=safe_get(resume.Name)
     candidate_email = safe_get(resume.Email)
+    is_mandatory_missing = candidate_name == "N/A" or candidate_email == "N/A"
     candidate_phone = safe_get(resume.Phone)
     candidate_role = safe_get(resume.Role)
     candidate_experience = safe_get(resume.Experience)
@@ -1763,12 +1767,12 @@ def introCall(resume_id):
 
         db.session.commit()
         if status == "Rejected":
-            flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
+            flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message    
         elif status == "Move to Interview 1":
             flash("Candidate Moved to L1", "success")  # Using 'success' for a green flash message
             return redirect(url_for('interview1v', resume_id=resume_id))
         return redirect(url_for('introCall', resume_id=resume.id))
-    return render_template("intro.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date,selected_panels=selected_panels,comments_dict=comments_dict,all_panels=all_panels,candidate_name=candidate_name,candidate_email = candidate_email,candidate_phone=candidate_phone,candidate_role=candidate_role,candidate_experience=candidate_experience,candidate_location=candidate_location,candidate_notice_period=candidate_notice_period,candidate_actual_ctc=candidate_actual_ctc,candidate_expected_ctc=candidate_expected_ctc,candidate_current_link=candidate_current_link,candidate_next_link=candidate_next_link)
+    return render_template("intro.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date,selected_panels=selected_panels,comments_dict=comments_dict,all_panels=all_panels,candidate_name=candidate_name,candidate_email = candidate_email,candidate_phone=candidate_phone,candidate_role=candidate_role,candidate_experience=candidate_experience,candidate_location=candidate_location,candidate_notice_period=candidate_notice_period,candidate_actual_ctc=candidate_actual_ctc,candidate_expected_ctc=candidate_expected_ctc,candidate_current_link=candidate_current_link,candidate_next_link=candidate_next_link,is_mandatory_missing=is_mandatory_missing)
 @app.route("/interview1")
 def interview1():
     return render_template("interview1.html")
@@ -1812,141 +1816,317 @@ def resume_details(resume_id):
         hr_status=hr_status,
         all_rounds_status=all_rounds_status)
 
+# @app.route("/interview1v/<int:resume_id>", methods=["GET", "POST"])
+# def interview1v(resume_id):
+#     resume=Resume.query.get(resume_id)
+#     existing_entry=Interview1.query.filter_by(resumeId=resume.id).first()
+#     if existing_entry:
+#         status1 = existing_entry.Status
+#         comments1 = existing_entry.Comments
+#         selected_panel=existing_entry.SelectedPanel
+#         date = existing_entry.Date
+#     else:
+#         status1 = None
+#         comments1 = None
+#         selected_panel=""
+#         date = None
+#     if request.method=="POST":
+#         date=request.form["date"]
+#         comments=request.form["comments"]
+#         status=request.form["status"]
+        
+#         selected_panel=request.form["selectedPanel"]
+#         existing_entry=Interview1.query.filter_by(resumeId=resume.id).first()
+#         if existing_entry:
+#             existing_entry.Date = date
+#             existing_entry.Status = status
+#             existing_entry.Comments = comments
+#             existing_entry.SelectedPanel = selected_panel
+#             existing_entry.Status = status
+#             existing_entry.Comments = comments
+#             status1=existing_entry.Status
+#             comments1=existing_entry.Comments
+#         else:    
+#             entry=Interview1(Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
+#             db.session.add(entry)
+#             status1=status
+#             comments1=comments
+#         db.session.commit()
+#         if status == "Rejected":
+#             flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
+#         elif status == "Move to Interview 2":
+#             flash("Candidate Moved to Interview 2", "success")  # Using 'success' for a green flash message
+#             return redirect(url_for('interview2v', resume_id=resume_id))
+#         elif status == "hold":
+#             flash("Candidate kept on hold", "warning")  # Using 'success' for a yellow flash message    
+
+#         return redirect(url_for('interview1v', resume_id=resume.id))
+#     resume = Resume.query.get(resume_id)
+#     return render_template("interview1.html", resume=resume,status1=status1,comments1=comments1,selected_panel=selected_panel,date=date)
+
 @app.route("/interview1v/<int:resume_id>", methods=["GET", "POST"])
 def interview1v(resume_id):
+    selected_panel=""
     resume=Resume.query.get(resume_id)
+    def safe_get(value):
+        return value if value else "N/A"
+    candidate_name=safe_get(resume.Name)
+    candidate_email = safe_get(resume.Email)
+    is_mandatory_missing = candidate_name == "N/A" or candidate_email == "N/A"
+    candidate_phone = safe_get(resume.Phone)
+    candidate_role = safe_get(resume.Role)
+    candidate_experience = safe_get(resume.Experience)
+    candidate_location = safe_get(resume.Location)
+    candidate_notice_period = safe_get(resume.Notice_period)
+    candidate_actual_ctc = safe_get(resume.Actual_CTC)
+    candidate_expected_ctc = safe_get(resume.Expected_CTC)
+    candidate_current_link = url_for('interview1v', resume_id=resume_id, _external=True)
+    candidate_next_link = url_for('interview2v', resume_id=resume_id, _external=True)
     existing_entry=Interview1.query.filter_by(resumeId=resume.id).first()
+    all_panels = Panel.query.all()
     if existing_entry:
         status1 = existing_entry.Status
         comments1 = existing_entry.Comments
-        selected_panel=existing_entry.SelectedPanel
+        selected_panel = existing_entry.SelectedPanel
         date = existing_entry.Date
+        selected_panels = selected_panel.split(",") if selected_panel else []
+        comments_dict = json.loads(existing_entry.Json_comments) if existing_entry.Json_comments else {}
     else:
         status1 = None
         comments1 = None
-        selected_panel=""
+        selected_panel = ""
         date = None
-    if request.method=="POST":
-        date=request.form["date"]
-        comments=request.form["comments"]
-        status=request.form["status"]
+        selected_panels = []
+        comments_dict = {}
         
+    if request.method == 'POST':
+        
+        
+        date=request.form["date"]
+        status=request.form["status"]
+        comments=request.form["comments"]
         selected_panel=request.form["selectedPanel"]
+        selected_panels = selected_panel.split(",") if selected_panel else []
+        
+        panel_comments = {panel: request.form.get(f"comment_{panel}", "") for panel in selected_panels}
+        
         existing_entry=Interview1.query.filter_by(resumeId=resume.id).first()
         if existing_entry:
             existing_entry.Date = date
             existing_entry.Status = status
             existing_entry.Comments = comments
             existing_entry.SelectedPanel = selected_panel
-            existing_entry.Status = status
-            existing_entry.Comments = comments
+            existing_entry.Json_comments = json.dumps(panel_comments)
             status1=existing_entry.Status
             comments1=existing_entry.Comments
+             
         else:    
-            entry=Interview1(Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
+            entry=Interview1( Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel,Json_comments=json.dumps(panel_comments))
             db.session.add(entry)
             status1=status
             comments1=comments
+            comments_dict = panel_comments
+
         db.session.commit()
         if status == "Rejected":
             flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
+        if status == "On Hold":
+            flash("Candidate Kept on hold", "warning") 
         elif status == "Move to Interview 2":
-            flash("Candidate Moved to Interview 2", "success")  # Using 'success' for a green flash message
+            flash("Candidate Moved to L2", "success")  # Using 'success' for a green flash message
             return redirect(url_for('interview2v', resume_id=resume_id))
-        elif status == "hold":
-            flash("Candidate kept on hold", "warning")  # Using 'success' for a yellow flash message    
-
         return redirect(url_for('interview1v', resume_id=resume.id))
-    resume = Resume.query.get(resume_id)
-    return render_template("interview1.html", resume=resume,status1=status1,comments1=comments1,selected_panel=selected_panel,date=date)
+    return render_template("interview1.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date,selected_panels=selected_panels,comments_dict=comments_dict,all_panels=all_panels,candidate_name=candidate_name,candidate_email = candidate_email,candidate_phone=candidate_phone,candidate_role=candidate_role,candidate_experience=candidate_experience,candidate_location=candidate_location,candidate_notice_period=candidate_notice_period,candidate_actual_ctc=candidate_actual_ctc,candidate_expected_ctc=candidate_expected_ctc,candidate_current_link=candidate_current_link,candidate_next_link=candidate_next_link,is_mandatory_missing=is_mandatory_missing)
 
-@app.route("/interview2v/<int:resume_id>",methods=["GET", "POST"])
+@app.route("/interview2v/<int:resume_id>", methods=["GET", "POST"])
 def interview2v(resume_id):
-    resume=Resume.query.get(resume_id)
-    existing_entry=Interview2.query.filter_by(resumeId=resume.id).first()
     selected_panel=""
+    resume=Resume.query.get(resume_id)
+    def safe_get(value):
+        return value if value else "N/A"
+    candidate_name=safe_get(resume.Name)
+    candidate_email = safe_get(resume.Email)
+    is_mandatory_missing = candidate_name == "N/A" or candidate_email == "N/A"
+    candidate_phone = safe_get(resume.Phone)
+    candidate_role = safe_get(resume.Role)
+    candidate_experience = safe_get(resume.Experience)
+    candidate_location = safe_get(resume.Location)
+    candidate_notice_period = safe_get(resume.Notice_period)
+    candidate_actual_ctc = safe_get(resume.Actual_CTC)
+    candidate_expected_ctc = safe_get(resume.Expected_CTC)
+    candidate_current_link = url_for('interview2v', resume_id=resume_id, _external=True)
+    candidate_next_link = url_for('hr', resume_id=resume_id, _external=True)
+    existing_entry=Interview2.query.filter_by(resumeId=resume.id).first()
+    all_panels = Panel.query.all()
     if existing_entry:
         status1 = existing_entry.Status
         comments1 = existing_entry.Comments
-        selected_panel=existing_entry.SelectedPanel
+        selected_panel = existing_entry.SelectedPanel
         date = existing_entry.Date
+        selected_panels = selected_panel.split(",") if selected_panel else []
+        comments_dict = json.loads(existing_entry.Json_comments) if existing_entry.Json_comments else {}
     else:
         status1 = None
         comments1 = None
         selected_panel = ""
-        date=None
-    if request.method=="POST":
+        date = None
+        selected_panels = []
+        comments_dict = {}
+        
+    if request.method == 'POST':
+        
         
         date=request.form["date"]
-        comments=request.form["comments"]
         status=request.form["status"]
+        comments=request.form["comments"]
         selected_panel=request.form["selectedPanel"]
+        selected_panels = selected_panel.split(",") if selected_panel else []
+        
+        panel_comments = {panel: request.form.get(f"comment_{panel}", "") for panel in selected_panels}
+        
         existing_entry=Interview2.query.filter_by(resumeId=resume.id).first()
         if existing_entry:
             existing_entry.Date = date
             existing_entry.Status = status
             existing_entry.Comments = comments
-            selected_panel = existing_entry.SelectedPanel if existing_entry.SelectedPanel else ""
-            status1 = existing_entry.Status
-            comments1 = existing_entry.Comments
+            existing_entry.SelectedPanel = selected_panel
+            existing_entry.Json_comments = json.dumps(panel_comments)
+            status1=existing_entry.Status
+            comments1=existing_entry.Comments
+             
         else:    
-            entry=Interview2(Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
+            entry=Interview2( Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel,Json_comments=json.dumps(panel_comments))
             db.session.add(entry)
             status1=status
-            selected_panel=selected_panel
             comments1=comments
+            comments_dict = panel_comments
+
         db.session.commit()
         if status == "Rejected":
             flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
+        if status == "On Hold":
+            flash("Candidate Kept on hold", "warning")     
         elif status == "Move to HR Round":
             flash("Candidate Moved to HR Round", "success")  # Using 'success' for a green flash message
             return redirect(url_for('hr', resume_id=resume_id))
-        elif status == "hold":
-            flash("Candidate kept on hold", "warning")  # Using 'success' for a yellow flash message    
-
         return redirect(url_for('interview2v', resume_id=resume.id))
-    return render_template("interview2.html",resume=resume,status1=status1,comments1=comments1,selected_panel=selected_panel,date=date)
+    return render_template("interview2.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date,selected_panels=selected_panels,comments_dict=comments_dict,all_panels=all_panels,candidate_name=candidate_name,candidate_email = candidate_email,candidate_phone=candidate_phone,candidate_role=candidate_role,candidate_experience=candidate_experience,candidate_location=candidate_location,candidate_notice_period=candidate_notice_period,candidate_actual_ctc=candidate_actual_ctc,candidate_expected_ctc=candidate_expected_ctc,candidate_current_link=candidate_current_link,candidate_next_link=candidate_next_link,is_mandatory_missing=is_mandatory_missing)
 
-@app.route("/hr/<int:resume_id>",methods=["GET", "POST"])
+@app.route("/hr/<int:resume_id>", methods=["GET", "POST"])
 def hr(resume_id):
-    resume=Resume.query.get(resume_id)
+    selected_panel = ""
+    resume = Resume.query.get(resume_id)
+    def safe_get(value):
+        return value if value else "N/A"
+    candidate_name=safe_get(resume.Name)
+    candidate_email = safe_get(resume.Email)
+    is_mandatory_missing = candidate_name == "N/A" or candidate_email == "N/A"
+    candidate_phone = safe_get(resume.Phone)
+    candidate_role = safe_get(resume.Role)
+    candidate_experience = safe_get(resume.Experience)
+    candidate_location = safe_get(resume.Location)
+    candidate_notice_period = safe_get(resume.Notice_period)
+    candidate_actual_ctc = safe_get(resume.Actual_CTC)
+    candidate_expected_ctc = safe_get(resume.Expected_CTC)
+    candidate_current_link = url_for('hr', resume_id=resume_id, _external=True)
+    candidate_next_link = url_for('hr', resume_id=resume_id, _external=True)
     existing_entry=Hr.query.filter_by(resumeId=resume.id).first()
+    all_panels = Panel.query.all()
+
     if existing_entry:
         status1 = existing_entry.Status
         comments1 = existing_entry.Comments
-        selected_panel=existing_entry.SelectedPanel
+        selected_panel = existing_entry.SelectedPanel
         date = existing_entry.Date
+        selected_panels = selected_panel.split(",") if selected_panel else []
+        comments_dict = json.loads(existing_entry.Json_comments) if existing_entry.Json_comments else {}
     else:
         status1 = None
         comments1 = None
-        selected_panel=""
-        date=None
-    if request.method=="POST":
-        date=request.form["date"]
-        comments=request.form["comments"]
-        status=request.form["status"]
-        selected_panel=request.form["selectedPanel"]
-        existing_entry=Hr.query.filter_by(resumeId=resume.id).first()
+        selected_panel = ""
+        date = None
+        selected_panels = []
+        comments_dict = {}
+
+    if request.method == "POST":
+        date = request.form["date"]
+        status = request.form["status"]
+        comments = request.form["comments"]
+        selected_panel = request.form["selectedPanel"]
+        selected_panels = selected_panel.split(",") if selected_panel else []
+
+        # Capture panel feedback comments
+        panel_comments = {panel: request.form.get(f"comment_{panel}", "").strip() for panel in selected_panels}
+
+        # **Validation: Ensure all fields are filled**
+        missing_fields = []
+        if not date:
+            missing_fields.append("Date")
+        if not status:
+            missing_fields.append("Status")
+        if not selected_panel:
+            missing_fields.append("Panel Member")
+        for panel, comment in panel_comments.items():
+            if comment == "":
+                missing_fields.append(f"{panel} feedback")
+
+        # If any required field is missing, show flash message and prevent submission
+        if missing_fields:
+            flash(f"Please fill in all required fields: {', '.join(missing_fields)}", "danger")
+            return redirect(url_for('hr', resume_id=resume.id))
+
+        # **Insert or Update Interview 2 Data**
+        existing_entry = Hr.query.filter_by(resumeId=resume.id).first()
         if existing_entry:
             existing_entry.Date = date
             existing_entry.Status = status
             existing_entry.Comments = comments
             existing_entry.SelectedPanel = selected_panel
+            existing_entry.Json_comments = json.dumps(panel_comments)
             status1 = existing_entry.Status
             comments1 = existing_entry.Comments
-        else:     
-            entry=Hr(Date=date, Status=status, Comments=comments,resumeId=resume.id,SelectedPanel=selected_panel)
+        else:
+            entry = Hr(
+                Date=date,
+                Status=status,
+                Comments=comments,
+                resumeId=resume.id,
+                SelectedPanel=selected_panel,
+                Json_comments=json.dumps(panel_comments)
+            )
             db.session.add(entry)
-            status1=status
-            comments1=comments
+            status1 = status
+            comments1 = comments
+            comments_dict = panel_comments
+
         db.session.commit()
+
+        # **Redirect Based on Status**
         if status == "Rejected":
-            flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message
+            flash("Candidate Rejected", "danger")
         elif status == "Move to HR Process":
-            flash("Candidate Moved to HR Process", "success")  # Using 'success' for a green flash message
+            flash("Candidate Moved to HR Process", "success")
+            return redirect(url_for('hr', resume_id=resume_id))
+        elif status == "On Hold":
+            flash("Candidate kept on hold", "warning")
 
         return redirect(url_for('hr', resume_id=resume.id))
-    return render_template("hr.html",resume=resume,status1=status1,comments1=comments1,selected_panel=selected_panel,date=date)
+
+    return render_template("hr.html",resume=resume,comments1=comments1,status1=status1,
+                            selected_panel=selected_panel,date=date,
+                            selected_panels=selected_panels,
+                            comments_dict=comments_dict,all_panels=all_panels,
+                            candidate_name=candidate_name,
+                            candidate_email = candidate_email,candidate_phone=candidate_phone,
+                            candidate_role=candidate_role,candidate_experience=candidate_experience,
+                            candidate_location=candidate_location,
+                            candidate_notice_period=candidate_notice_period,
+                            candidate_actual_ctc=candidate_actual_ctc,
+                            candidate_expected_ctc=candidate_expected_ctc,
+                            candidate_current_link=candidate_current_link,
+                            candidate_next_link=candidate_next_link,
+                            is_mandatory_missing=is_mandatory_missing
+                            )
 
 @app.route("/get_interview_status/<int:resume_id>")
 def get_intro_status(resume_id):

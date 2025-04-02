@@ -10,241 +10,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='intro.css') }}">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
-        .accordion-body {
-                 max-height: 200px; /* Adjust as needed */
-                 overflow: auto;
-               }
-               .form-group {
-                 display: flex;
-                 align-items: center;
-                 gap: 15px;
-                 position: relative;
-                 margin-bottom:3rem;
-             }
-       
-             .label-container {
-                 display: flex;
-                 flex-direction: column; /* Stack label and star vertically */
-                 align-items: center; /* Center align the text and icon */
-                 position: relative;
-             }
-       
-             .form-group label {
-                 font-size: 17px !important;
-                 font-weight: bold;
-                 gap: 2rem !important;
-                 color: #1AACAC;
-                 width:5rem;
-             }
-       
-             .required-icon {
-                 font-size: 8px;
-                 color: red;
-                 position: absolute;
-                 top: -2.5rem; /* Moves the star above the label */
-                 left: 70%;
-                 transform: translateX(-50%);
-             }
-             input{
-               height:3rem;
-             }  
-             .custom-select-box {
-               
-                   background: #fff;
-                   padding: 10px;
-                   border: 1px solid #ced4da;
-                   cursor: pointer;
-                   position: relative;
-                   width: 100%;
-                   text-align: left;
-               }
-       
-               .dropdown-content {
-                   display: none;
-                   position: absolute;
-                   background: white;
-                   border: 1px solid #ced4da;
-                   width: 80%;
-                   z-index: 100;
-                   top: 60px;
-                   left:90px;
-                   padding: 10px;
-                    /* Limit height */
-                   overflow-y: auto; /* Add scroll if too many options */
-               }
-       
-               .dropdown-content label {
-                   display: flex;
-                   align-items: center;
-                   padding: 5px;
-                   cursor: pointer;
-                   gap: 10px; /* Space between checkbox and text */
-               }
-       
-               .dropdown-content input[type="checkbox"] {
-                   margin: 0; /* Remove extra margin */
-                   transform: scale(1.2); /* Make checkbox slightly larger */
-               }
-       
-               .dropdown-content label:hover {
-                   background: #f1f1f1;
-               }
-       
-               .show {
-                   display: block;
-               }
-               .panel-item {
-           display: flex;
-           align-items: center;
-           padding: 5px 8px; /* Adjust padding */
-           gap: 8px; /* Reduce gap between elements */
-       }
-       
-       .panel-checkbox {
-           margin-right: 5px; /* Reduce space between checkbox and text */
-       }
-       
-       .panel-item label {
-           flex-grow: 1; /* Ensures label takes remaining space */
-           font-size: 16px;
-           font-weight: bold;
-           color: #1AACAC;
-           white-space: nowrap; /* Prevents text from wrapping */
-       }
-       
-       .delete-btn {
-           background-color: red;
-           color: white;
-           border: none;
-           cursor: pointer;
-           padding: 3px 6px; /* Reduce button size */
-           font-size: 14px;
-           margin-left: auto; /* Pushes delete button to the right */
-       }
-       
-           #status {
-           width: 100%; /* Same as Date input */
-           height: 3rem; /* Match height */
-           border: 1px solid #ced4da;
-           border-radius: 5px;
-           padding: 0 10px;
-            }
-            .status-container {
-           position: relative;
-           display: flex;
-           align-items: center;
-           width: 100%;
-       }
-       .status-container select {
-           width: 100%;
-           padding-right: 30px; /* Space for the arrow */
-           appearance: none; /* Hide default arrow */
-           -webkit-appearance: none;
-           -moz-appearance: none;
-       }
-       
-       /* .custom-select-box {
-           position: relative;  /*  Keeps dropdown inside the parent */
-           /* display: flex;
-           align-items: center;
-           justify-content: space-between;
-           padding: 10px;
-           cursor: pointer;
-           border: 1px solid #ced4da;
-           border-radius: 5px;
-           background-color: white;
-           width: 100%;  Matches the input field */
-       /* } */ 
-       
-       
-       .arrow {
-           position: absolute;
-           pointer-events: none;
-           right: 10px;
-           font-size: 16px;
-           transition: transform 0.3s ease-in-out;
-       }
-       
-       .custom-select-box {
-           position: relative;
-           display: flex;
-           align-items: center;
-           justify-content: space-between;
-           padding: 10px;
-           cursor: pointer;
-           border: 1px solid #ced4da;
-           border-radius: 5px;
-           background-color: white;
-           width: 100%; /* Ensure parent container is full width */
-       }
-       
-       .dropdown-content {
-           display: none;
-           position: absolute;
-           background: white;
-           border: 0.1rem solid #ced4da;
-           width: 80%;
-           max-width: 80%;
-           z-index: 100;
-           padding: 1rem;
-           max-height: 12.5rem; /* Equivalent to 200px */
-           overflow-y: auto;
-           left: 50%; /* Moves the dropdown to the center */
-           transform: translateX(-50%); /* Adjust back to center */
-           box-shadow: 0rem 0.25rem 0.375rem rgba(0, 0, 0, 0.1);
-       }
-       
-       
-       
-       
-       
-       /* Rotating Arrow when Open */
-       .arrow-up {
-           transform: rotate(180deg);
-       }
-       
-       /* Flash Message Style */
-       .flash-message {
-           text-align: center;
-           background: linear-gradient(to right, #ffecd2, #fcb69f); /* Gradient background */
-           color: #5a3f37; /* Elegant dark brown text */
-           padding: 12px 20px;
-           font-size: 15px;
-           font-weight: bold;
-           margin: 15px auto;
-           border-radius: 8px;
-           width: 60%; /* Adjust width */
-           box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-           transition: all 0.3s ease-in-out;
-           position: relative;
-       }
-       
-       /* Add a fade-in effect */
-       @keyframes fadeIn {
-           from { opacity: 0; transform: translateY(-10px); }
-           to { opacity: 1; transform: translateY(0); }
-       }
-       
-       .flash-message {
-           animation: fadeIn 0.5s ease-in-out;
-       }
-       
-       /* Close Button */
-       .flash-message::after {
-           content: "×";
-           position: absolute;
-           right: 15px;
-           top: 50%;
-           transform: translateY(-50%);
-           font-size: 18px;
-           cursor: pointer;
-           color: #5a3f37;
-           font-weight: bold;
-       }
-       
-       .flash-message::after:hover {
-           color: red;
-       }
+        
        
            </style>
     
@@ -262,6 +28,7 @@
     {% include 'sidemenu.html'%}
     <div class="container" style="width: 950px;">
         <h1 style="text-align: center; background-color:#4699F9; color: white;">Enter Intro call details</h1>
+        
         <div style="margin-top:50px; width: 90%; margin-left:4%;">
             <form id="panelForm" action="{{ url_for('introCall', resume_id=resume.id) }}" method="post" >
               <div class="form-group">
@@ -343,7 +110,7 @@
                     {% endfor %}
                 </div>   
                 <div style="display: flex; align-items: center; justify-content:center;">
-                  <button type="submit" class="btn btn-primary" style="width:6rem; height:3rem; margin-right: 2rem;">Submit</button>
+                  <button type="submit" class="btn btn-primary" style="width:6rem; height:3rem; margin-right: 2rem;" {% if is_mandatory_missing %} disabled {% endif %}>Submit</button>
                   <a class="btn btn-outline-secondary" href="{{url_for('employee')}}" style=" padding:10px;width:6rem; height:3rem;">
                       <div style="display: flex; justify-content: space-between; padding:5px;">
                           <div>
@@ -374,6 +141,17 @@
   </div>
     <script src="{{ url_for('static', filename='intro.js') }}"></script> 
     <script src="{{ url_for('static', filename='modal.js') }}"></script>
+    <script>
+        var candidateName = "{{ candidate_name }}";
+        var candidateEmail = "{{ candidate_email }}";
+    </script>
+    <script>
+    window.onload = function() {
+        {% if is_mandatory_missing %}
+            alert("Candidate name and email are mandatory to send mail.");
+        {% endif %}
+    }
+</script>
     <script>
 document.getElementById("panelSelectBox").addEventListener("click", function () {
     let dropdown = document.getElementById("panelDropdown");
@@ -525,80 +303,90 @@ document.addEventListener("click", function (event) {
 
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        emailjs.init("Nce5bwHWE3-gXvm-9"); // EmailJS User ID
 
-        document.addEventListener("DOMContentLoaded", function () {
-            emailjs.init("qdP1EAfow-fwPes6j"); // EmailJS User ID
-        });
+        // Ensure candidate details are set from Jinja
+        const candidateName = "{{ candidate_name or 'N/A' }}";
+        const candidateEmail = "{{ candidate_email or 'N/A' }}";
 
-
-        function sendEmail(candidateName, candidateEmail, status, callback) {
-            const submitButton = document.querySelector("button[type='submit']");
-            submitButton.innerHTML = "Sending Email...";
-            submitButton.disabled = true;
-
-            // 🔹 Define main recipient and CC recipients
-            const toEmail = "varunrram2003@gmail.com"; // Replace with actual recipient
-            let ccEmails = Array.from(document.querySelectorAll(".panel-checkbox:checked"))
-                        .map(checkbox => checkbox.getAttribute("data-email"));
+        document.querySelector("form").addEventListener("submit", function (event) {
+            const status = document.getElementById("status").value;
+            console.log("📝 Selected Status:", status);
             
-            // 🔹 Dummy values for testing
-            const templateParams = {
-                to_email: toEmail,
-                cc_email: ccEmails.join(", "),  // Convert array to string
-                candidate_name: "{{ candidate_name or 'N/A' }}",
-                interview_round: "Intro",
-                Panel_feedback: "Positive",
-                candidate_email:"{{ candidate_email or 'N/A' }}",
-                candidate_phone: "{{ candidate_phone or 'N/A' }}",
-                candidate_role: "{{ candidate_role or 'N/A' }}",
-                candidate_experience: "{{ candidate_experience or 'N/A' }} years",
-                candidate_location: "{{ candidate_location or 'N/A' }}",
-                candidate_notice_period: "{{ candidate_notice_period or 'N/A' }}",
-                candidate_actc: "{{ candidate_actual_ctc or 'N/A' }}",
-                candidate_ectc: "{{ candidate_expected_ctc or 'N/A' }}",
-                status: status,
-                Panel_feedback: "{{ candidate_current_link or 'N/A' }}",
-                link:"{{ candidate_next_link or 'N/A' }}",
-                message: `Candidate John Doe has been marked as '${status}'.`
-            };
 
-            console.log("📤 Sending email with params:", templateParams); // Log details before sending
+            if (!candidateName || !candidateEmail || candidateName === "N/A" || candidateEmail === "N/A") {
+                alert("⚠️ Candidate name and email are required!");
+                console.error("❌ Email not sent: Candidate name or email is missing.");
+                event.preventDefault();  // 🚨 Stops form submission
+                return;
+            }
 
-            // 🔹 Send Email using EmailJS
-            emailjs.send("service_qghdq8f", "template_1jyba8e", templateParams)
-                .then(function(response) {
-                    console.log("📨 Email sent successfully", response);
-                    alert("✅ Email sent successfully!");
+            console.log("📝 Candidate Info:", { candidateName, candidateEmail, status });
 
-                    setTimeout(() => {
-                        if (callback) callback();  // Proceed with form submission
-                    }, 2000);
-                })
-                .catch(function(error) {
-                    console.error("❌ Error sending email", error);
-                    alert("⚠️ Failed to send email. Please try again.");
-                    submitButton.innerHTML = "Submit";
-                    submitButton.disabled = false;
+            // ✅ Move this condition inside the event listener
+            if (status === "Move to Interview 1") {
+                event.preventDefault(); // Stop the default form submission
+                
+                sendEmail(candidateName, candidateEmail, status, function() {
+                    console.log("📨 Email sent! Submitting form...");
+                    document.querySelector("form").submit();  // ✅ Corrected form submission
                 });
-        }
-
-        document.addEventListener("DOMContentLoaded", function () {
-            document.querySelector("form").addEventListener("submit", function (event) {
-                const status = document.getElementById("status").value;
-                const candidateName = "John Doe";  // Dummy Value
-                const candidateEmail = "johndoe@example.com";  // Dummy Value
-
-                console.log("📝 Candidate Info:", { candidateName, candidateEmail, status });
-
-                if (status !== "Rejected") {
-                    event.preventDefault(); 
-                    sendEmail(candidateName, candidateEmail, status, () => {
-                        this.submit();
-                    });
-                }
-            });
+            }
         });
-</script>    
+    });
+
+    function sendEmail(candidateName, candidateEmail, status, callback) {
+        const submitButton = document.querySelector("button[type='submit']");
+        submitButton.disabled = true;
+
+        const toEmail = "varunrram2003@gmail.com"; // Replace with actual recipient
+        let ccEmails = Array.from(document.querySelectorAll(".panel-checkbox:checked"))
+            .map(checkbox => checkbox.getAttribute("data-email"));
+
+        const templateParams = {
+            to_email: toEmail,
+            cc_email: ccEmails.join(", "),
+            candidate_name: candidateName,
+            interview_round: "L1",
+            Panel_feedback: "Positive",
+            candidate_email: candidateEmail,
+            candidate_phone: "{{ candidate_phone or 'N/A' }}",
+            candidate_role: "{{ candidate_role or 'N/A' }}",
+            candidate_experience: "{{ candidate_experience or 'N/A' }} years",
+            candidate_location: "{{ candidate_location or 'N/A' }}",
+            candidate_notice_period: "{{ candidate_notice_period or 'N/A' }}",
+            candidate_actc: "{{ candidate_actual_ctc or 'N/A' }}",
+            candidate_ectc: "{{ candidate_expected_ctc or 'N/A' }}",
+            status: status,
+            panel_feedback: "{{ candidate_current_link or 'N/A' }}",
+            next_interview_round: "L1",
+            link: "{{ candidate_next_link or 'N/A' }}",
+            message: `Candidate ${candidateName} has been marked as '${status}'.`
+        };
+
+        console.log("📤 Sending email with params:", templateParams);
+
+        emailjs.send("service_q2j2eqc", "template_4vc45jq", templateParams)
+            .then(function(response) {
+                console.log("✅ Email sent successfully!", response);
+                submitButton.disabled = false;
+
+                setTimeout(() => {
+                    if (callback) {
+                        console.log("➡️ Calling callback function...");
+                        callback(); // Proceed with form submission
+                    }
+                }, 2000);
+            })
+            .catch(function(error) {
+                console.error("❌ Error sending email:", error);
+                alert("⚠️ Failed to send email. Please try again.");
+                submitButton.disabled = false;
+            });
+    }
+</script>
+    
 
 
 

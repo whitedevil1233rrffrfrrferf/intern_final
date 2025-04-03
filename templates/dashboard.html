@@ -172,7 +172,7 @@
                 
               </tr>
               <tr>
-                <td><strong>Interview 1 Selected</strong></td>
+                <td><strong>L1 Selected</strong></td>
                 <td>{{ statistics.get('Jr. QA Engineer', {}).get('interview1', {}).get('selected', 0) }}</td>
                 <td>
                   {{ statistics.get('QA Engineer', {}).get('interview1', {}).get('selected', 0) }}
@@ -188,7 +188,7 @@
                 </td>
               </tr>
               <tr>
-                <td><strong>Interview 1 Rejected</strong></td>
+                <td><strong>L1 Rejected</strong></td>
                 <td>{{ statistics.get('Jr. QA Engineer', {}).get('interview1', {}).get('rejected', 0) }}</td>
                 <td>
                   {{ statistics.get('QA Engineer', {}).get('interview1', {}).get('rejected', 0) }}
@@ -204,7 +204,7 @@
                 </td>
               </tr>
               <tr>
-                <td><strong>Interview 1 Hold</strong></td>
+                <td><strong>L1 Hold</strong></td>
                 <td>{{ statistics.get('Jr. QA Engineer', {}).get('interview1', {}).get('hold', 0) }}</td>
                 <td>
                   {{ statistics.get('QA Engineer', {}).get('interview1', {}).get('hold', 0) }}
@@ -220,7 +220,7 @@
                 </td>
               </tr>
               <tr>
-                <td><strong>Interview 2 Selected</strong></td>
+                <td><strong>L2 Selected</strong></td>
                 <td>{{ statistics.get('Jr. QA Engineer', {}).get('interview2', {}).get('selected', 0) }}</td>
                 <td>
                   {{ statistics.get('QA Engineer', {}).get('interview2', {}).get('selected', 0) }}
@@ -236,7 +236,7 @@
                 </td>
               </tr>
               <tr>
-                <td><strong>Interview 2 Rejected</strong></td>
+                <td><strong>L2 Rejected</strong></td>
                 <td>{{ statistics.get('Jr. QA Engineer', {}).get('interview2', {}).get('rejected', 0) }}</td>
                 <td>
                   {{ statistics.get('QA Engineer', {}).get('interview2', {}).get('rejected', 0) }}
@@ -252,7 +252,7 @@
                 </td>
               </tr>
               <tr>
-                <td><strong>Interview 2 Hold</strong></td>
+                <td><strong>L2 Hold</strong></td>
                 <td>{{ statistics.get('Jr. QA Engineer', {}).get('interview2', {}).get('hold', 0) }}</td>
                 <td>
                   {{ statistics.get('QA Engineer', {}).get('interview2', {}).get('hold', 0) }}
@@ -345,37 +345,37 @@
               {% endfor %}
           </tr>
             <tr>
-              <th>Interview 1 Selected</th>
+              <th>L1 Selected</th>
               {% for lead in statistics_leads.keys() %}
                   <td>{{statistics_leads[lead].interview1.selected}}</td>
               {% endfor %}
             </tr>
             <tr>
-              <th>Interview 1 Rejected</th>
+              <th>L1 Rejected</th>
               {% for lead in statistics_leads.keys() %}
                   <td>{{statistics_leads[lead].interview1.rejected}}</td>
               {% endfor %}
             </tr>
             <tr>
-              <th>Interview 1 Hold</th>
+              <th>L1 Hold</th>
               {% for lead in statistics_leads.keys() %}
                   <td>{{statistics_leads[lead].interview1.hold}}</td>
               {% endfor %}
             </tr>
             <tr>
-              <th>Interview 2 Selected</th>
+              <th>L2 Selected</th>
               {% for lead in statistics_leads.keys() %}
                   <td>{{statistics_leads[lead].interview2.selected}}</td>
               {% endfor %}
             </tr>
             <tr>
-              <th>Interview 2 Rejected</th>
+              <th>L2 Rejected</th>
               {% for lead in statistics_leads.keys() %}
                   <td>{{statistics_leads[lead].interview2.rejected}}</td>
               {% endfor %}
             </tr>
             <tr>
-              <th>Interview 2 Hold</th>
+              <th>L2 Hold</th>
               {% for lead in statistics_leads.keys() %}
                   <td>{{statistics_leads[lead].interview2.hold}}</td>
               {% endfor %}
@@ -434,27 +434,27 @@
               <td>{{ overall_counts['intro']['hold'] }}</td>
           </tr>
             <tr>
-              <th>Interview 1 Selected</th>
+              <th>L1 Selected</th>
               <td>{{ overall_counts['interview1']['selected'] }}</td>
             </tr>
             <tr>
-              <th>Interview 1 Rejected</th>
+              <th>L1 Rejected</th>
               <td>{{ overall_counts['interview1']['rejected'] }}</td>
             </tr>
             <tr>
-              <th>Interview 1 Hold</th>
+              <th>L1 Hold</th>
               <td>{{ overall_counts['interview1']['hold'] }}</td>
             </tr>
             <tr>
-              <th>Interview 2 Selected</th>
+              <th>L2 Selected</th>
               <td>{{ overall_counts['interview2']['selected'] }}</td>
             </tr>
             <tr>
-              <th>Interview 2 Rejected</th>
+              <th>L2 Rejected</th>
               <td>{{ overall_counts['interview2']['rejected'] }}</td>
             </tr>
             <tr>
-              <th>Interview 2 Hold</th>
+              <th>L2 Hold</th>
               <td>{{ overall_counts['interview2']['hold'] }}</td>
             </tr>
             <tr>
@@ -490,9 +490,9 @@
                     <th scope="col" class="head">Week</th>
                     <th scope="col" class="head">Intro round</th>
                     <th scope="col" class="head">Count</th>
-                    <th scope="col" class="head">Interview1 round</th>
+                    <th scope="col" class="head">L1 round</th>
                     <th scope="col" class="head">Count</th>
-                    <th scope="col" class="head">Interview2 round</th>
+                    <th scope="col" class="head">L2 round</th>
                     <th scope="col" class="head">Count</th>
                     <th scope="col" class="head">HR round</th>
                     <th scope="col" class="head">Count</th>
@@ -507,9 +507,9 @@
                         <th rowspan="2">{{ week_label }}</th>  <!-- Week in one row -->
                         <td>Intro Selected</td>
                         <td>{{ week_data.intro.selected }}</td>
-                        <td>Interview1 Selected</td>
+                        <td>L1 Selected</td>
                         <td>{{ week_data.interview1.selected }}</td>
-                        <td>Interview2 Selected</td>
+                        <td>L2 Selected</td>
                         <td>{{ week_data.interview2.selected }}</td>
                         <td>HR Selected</td>
                         <td>{{ week_data.hr.selected }}</td>
@@ -517,9 +517,9 @@
                     <tr>
                         <td>Intro Rejected</td>
                         <td>{{ week_data.intro.rejected }}</td>
-                        <td>Interview1 Rejected</td>
+                        <td>L1 Rejected</td>
                         <td>{{ week_data.interview1.rejected }}</td>
-                        <td>Interview2 Rejected</td>
+                        <td>L2 Rejected</td>
                         <td>{{ week_data.interview2.rejected }}</td>
                         <td>HR Rejected</td>
                         <td>{{ week_data.hr.rejected }}</td>

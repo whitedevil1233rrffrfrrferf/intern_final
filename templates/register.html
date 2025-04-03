@@ -13,7 +13,7 @@
       <div>
         <h1 class="heading"><center>Register</center></h1>
     <div class="container sign_div">
-      <form action="/register" method="post" class="form_div container" enctype="multipart/form-data" style="padding: 10px;margin-left: 3rem;" onsubmit="return validateForm(event)">
+      <form action="{{ url_for('register') }}" method="post" class="form_div container" enctype="multipart/form-data" style="padding: 10px;margin-left: 3rem;" onsubmit="return validateForm(event)">
           <div class="mb-3 my-3">
               <label for="exampleInputEmail1" class="form-label">Email address</label>
               <input type="email" class="form-control form-input" id="exampleInputEmail1" name="email" aria-describedby="emailHelp">
@@ -47,7 +47,7 @@
         </div>
          <div style="display: flex; justify-content: center;">
           <button type="submit" class="btn btn-primary" style="width: 8rem;height:3rem; margin-right: 3rem;">Register</button>
-          <a class="btn btn-outline-secondary" href="/home" style="color:black; width: 6rem; height: 3rem;"><div style="display: flex; justify-content: space-between; padding:5px; text-align: center;">
+          <a class="btn btn-outline-secondary" href="{{url_for('Home')}}" style="color:black; width: 6rem; height: 3rem;"><div style="display: flex; justify-content: space-between; padding:5px; text-align: center;">
             <div>
               <i class="fa-solid fa-backward" style="margin-right: 10px;"></i>
               

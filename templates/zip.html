@@ -14,7 +14,7 @@
     <div class="container">
       <center><h1 style="text-align: center; background-color: #00A9FF; color: white; width:48rem; ">Upload multiple zip folders</h1></center>
       <div class="container" style="padding:10px; width:51rem; margin-top:15%;">
-          <form action="/zip" method="POST" enctype="multipart/form-data" style=" border: 1px solid black; padding:10px;">
+          <form action="{{ url_for('zip') }}" method="POST" enctype="multipart/form-data" style=" border: 1px solid black; padding:10px;">
               <div class="filter" style="margin-bottom:40px; margin-left:20%;">
                   <label for="tag"  style="font-size:25px;">Select Role:</label>
                   <select id="tag" name="tag" >
@@ -36,7 +36,7 @@
               </div> 
           </form>
           <div>
-              <a class="btn btn-outline-secondary" href="/resume" style=" padding:10px ;margin-top:50px;margin-left:40%;"><div style="display: flex; justify-content: space-between; padding:5px;">
+              <a class="btn btn-outline-secondary" href="{{url_for('resume')}}" style=" padding:10px ;margin-top:50px;margin-left:40%;"><div style="display: flex; justify-content: space-between; padding:5px;">
                   <div>
                     <i class="fa-solid fa-backward" style="margin-right: 10px;"></i>
                     

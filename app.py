@@ -29,6 +29,7 @@ import re
 
 load_dotenv()
 app = Flask(__name__)
+application=app
 profile_images_upload_folder = 'static/profile_images'
 if not os.path.exists(profile_images_upload_folder):
     os.makedirs(profile_images_upload_folder)
@@ -1283,7 +1284,7 @@ def Add():
             db.session.add(employee)
             db.session.commit()
             flash(f'Added {name} successfully!', 'success')
-        return redirect(url_for(Add))
+        return redirect(url_for('Add'))
     return render_template("add.html")
 
 @app.route("/update/<int:sno>",methods=["GET","POST"])
@@ -1460,7 +1461,7 @@ def register():
         existing_user = Login.query.filter_by(email=email).first()
         if existing_user:
             flash(f"{email} already exists!", "danger")
-            return redirect("/register")
+            return redirect(url_for("register"))
         if 'photo' in request.files:
             photo=request.files['photo']
             if photo.filename!='':
@@ -1472,7 +1473,7 @@ def register():
         db.session.add(user)
         db.session.commit()
         flash(f"Registration successful for {name}!", "success")
-        return redirect("/register")
+        return redirect(url_for("register"))
 
     return render_template("register.html")
 @app.route("/get_employees_list/<employment_status>")

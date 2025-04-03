@@ -94,14 +94,14 @@
                         </select>
                     </div>
                     <div style="margin-bottom: 10px; margin-top: 20px;" class="inner_filter">
-                        <label for="interview1Filter" class="filter_label">Interview 1 Status:</label>
+                        <label for="interview1Filter" class="filter_label">L1 Status:</label>
                         <select id="interview1Filter" onchange="filterTableByInterview1Status()" >
                             <option value="">Select</option>
                             
                         </select>
                     </div>
                     <div style="margin-bottom:10px; margin-top: 20px;" class="inner_filter">
-                        <label for="interview2Filter" class="filter_label">Interview 2 Status:</label>
+                        <label for="interview2Filter" class="filter_label">L2 Status:</label>
                         <select id="interview2Filter" onchange="filterTableByInterview2Status()" >
                             <option value="">Select</option>
                            
@@ -218,11 +218,35 @@
                                 <td class="checkbox-column candidate_id" >{{ start_index + loop.index }}</td>
                                 <td class="wrap-text checkbox-column candidate_name" id="name-{{ resume.id }}">
                                     {% if resume.Link %}
-                                    <a href="{{resume.Link}}" class="long-filename  text-break" target="_blank" >{{ resume.Name }}</a>
-                                    {% else %}  
-                                    <a href="{{ url_for('view_resume', filename=resume.filename) }}" class="long-filename  text-break" target="_blank">{{ resume.filename }}</a>
+                                        <a href="{{ resume.Link }}" class="long-filename text-break" target="_blank">
+                                            <span id="short-name-{{ resume.id }}">
+                                                {{ resume.Name[:20] }}{% if resume.Name|length > 20 %}...{% endif %}
+                                            </span>
+                                        </a>
+                                        {% if resume.Name|length > 20 %}
+                                            <br>
+                                            <a href="#" class="more-info" id="more-info-{{ resume.id }}" 
+                                               onclick="toggleFullName('{{ resume.id }}', '{{ resume.Name }}', event)">More...</a>
+                                        {% endif %}
+                                    {% else %}
+                                        <a href="{{ url_for('view_resume', filename=resume.filename) }}" class="long-filename text-break" target="_blank">
+                                            <span id="short-name-{{ resume.id }}">
+                                                {{ resume.filename[:20] }}{% if resume.filename|length > 20 %}...{% endif %}
+                                            </span>
+                                        </a>
+                                        {% if resume.filename|length > 20 %}
+                                            <br>
+                                            <a href="#" class="more-info" id="more-info-{{ resume.id }}" 
+                                               onclick="toggleFullName('{{ resume.id }}', '{{ resume.filename }}', event)">More...</a>
+                                        {% endif %}
                                     {% endif %}
-                                    <a href="{{ url_for('get_intro_status', resume_id=resume.id) }}"  style="margin-left: 20px; color: red;display: none;" onclick="getInterviewStatus(event,{{resume.id}})"><i class="fa-solid fa-info" style="font-size: 20px;"></i></a>
+                     
+                                    <a href="{{ url_for('get_intro_status', resume_id=resume.id) }}"  
+                                       style="margin-left: 20px; color: red; display: none;" 
+                                       onclick="getInterviewStatus(event, {{ resume.id }})">
+                                        <i class="fa-solid fa-info" style="font-size: 20px;"></i>
+                                    </a>
+                                    
                                     <div id="toggle{{ resume.id }}" style="display: none;">
                                         <div id="introStatus{{ resume.id }}" style="margin-bottom: 3px; margin-top:5px;"></div>
                                         <div id="interview1Status{{ resume.id }}" style="margin-bottom: 3px;"></div>
@@ -230,6 +254,7 @@
                                         <div id="hrStatus{{ resume.id }}" style="margin-bottom: 3px;"></div>
                                     </div>
                                 </td>
+                                
                                 <!-- <td class="wrap-text" >
                                     {% if resume.Email %}
                                     {{ resume.Email }}
@@ -397,6 +422,28 @@
     <script src="{{ url_for('static', filename='config.js') }}"></script>   
     <script src="{{ url_for('static', filename='employee.js') }}?v=1.6"></script>
     
+<!-- function of both more and ... for candidate_name -->
+<script>
+    function toggleFullName(id, fullName, event) {
+        event.preventDefault(); // Prevent scrolling to the top
+
+        let nameElement = document.getElementById("short-name-" + id);
+        let buttonElement = document.getElementById("more-info-" + id);
+
+        if (buttonElement.innerText === "More...") {
+            // Expand to full name
+            nameElement.innerText = fullName;
+            buttonElement.innerText = "Less...";
+        } else {
+            // Collapse back to short name
+            nameElement.innerText = fullName.substring(0, 20) + "...";
+            buttonElement.innerText = "More...";
+        }
+    }
+</script>
+
+
+    
     <script>
         {% for resume in resumes %}
             var storedName{{resume.id}}=localStorage.getItem('enteredName{{ resume.id }}');
@@ -473,38 +520,7 @@
       const homeUrl = "{{ url_for('employee') }}";
     </script>
 
-    <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    console.log("✅ Script Loaded!");
 
-    function checkQAleadCheckbox() {
-        const searchInput = document.getElementById("search_bar_qa");
-        const qaLeadCheckbox = document.getElementById("qaLeadCheckbox");
-
-        if (!searchInput || !qaLeadCheckbox) {
-            console.error("❌ QA Lead checkbox or search input not found!");
-            return;
-        }
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const qaLeadQuery = urlParams.get("qa_lead");
-
-        if (qaLeadQuery && qaLeadQuery.toLowerCase().includes("qa")) {
-            console.log("✅ QA found in URL, checking QA Lead checkbox...");
-            qaLeadCheckbox.checked = true;  // ✅ Automatically check the box
-        }
-    }
-
-    // Call function on page load
-    checkQAleadCheckbox();
-
-    // Also check when the search button is clicked
-    document.querySelector("button[type='submit']").addEventListener("click", function () {
-        setTimeout(checkQAleadCheckbox, 500);  // Slight delay to allow page reload
-    });
-});
-
-</script>
 
 
 <!-- QA CHECKBOX SHOULD BE CHECKED WHEN WE SEARCH FOR QA IN THE SEARCH BAR -->

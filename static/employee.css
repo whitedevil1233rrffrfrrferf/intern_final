@@ -99,13 +99,42 @@ label{
     word-wrap: break-word; /* For older browsers */
     white-space: normal; 
 }
+
 .inner_filter{
     display: flex;
     flex-direction: column;
 }
-select{
+
+
+/* select{
     width:7.5rem;
+} */
+
+
+select {
+    width: 150px !important;  /* Ensure width matches the button */
+    height: 27px !important;  /* Match button height */
+    border: 1px solid black !important;  /* Ensure border matches */
+    /* border-radius: 5px !important; Rounded corners */
+    padding: 3px 12px !important; /* Padding for spacing */
+    font-size: 15px !important;  /* Match font size */
+    background-color: white !important;  /* Ensure white background */
+    cursor: pointer; /* Make cursor same as button */
+    text-align: left; /* Align text properly */
+    appearance: none; /* Remove default browser select styles */
+    outline: none !important;  /* Remove the focus outline */
+    box-shadow: none !important; /* Remove any box shadow on focus */
 }
+
+/* Optional: Add dropdown arrow like the button */
+select {
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='black' d='M2 5L0 0h4z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 10px;
+}
+
+
 .wrap-text a {
     display: inline-block;
     vertical-align: middle; /* Ensures inline elements align properly */

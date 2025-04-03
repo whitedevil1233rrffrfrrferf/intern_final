@@ -507,19 +507,23 @@
 </script>
 
 
+<!-- QA CHECKBOX SHOULD BE CHECKED WHEN WE SEARCH FOR QA IN THE SEARCH BAR -->
+ 
 <script>
 
 
 document.addEventListener("DOMContentLoaded", function () {
-    const searchInput = document.getElementById("search-input"); // Your search input field
-    const searchButton = document.getElementById("search-button"); // The search button
-    const qaLeadCheckbox = document.querySelector("#dropdown-menu input[value='qa-lead']"); // QA Lead checkbox
+    const searchInput = document.getElementById("search_bar_qa");
+    const searchButton = document.querySelector("button[type='submit']");
+    const qaLeadCheckbox = document.getElementById("qaLeadCheckbox");
 
-    searchButton.addEventListener("click", function () {
+    searchButton.addEventListener("click", function (event) {
+        event.preventDefault(); // Prevent default form submission
+
         let searchTerm = searchInput.value.toLowerCase();
         let foundQA = false;
 
-        // Check if "QA" is present in the table
+        // Check if "QA" is found in the table
         document.querySelectorAll("table tbody tr").forEach(row => {
             if (row.textContent.toLowerCase().includes("qa")) {
                 foundQA = true;
@@ -531,14 +535,8 @@ document.addEventListener("DOMContentLoaded", function () {
             qaLeadCheckbox.checked = true;
 
             // Show the QA Lead column
-            let headers = document.querySelectorAll("th.qa-lead");
-            let cells = document.querySelectorAll("td.qa-lead");
-
-            headers.forEach(header => {
-                header.style.display = "";
-            });
-            cells.forEach(cell => {
-                cell.style.display = "";
+            document.querySelectorAll("th.qa_lead, td.qa_lead").forEach(el => {
+                el.style.display = "";
             });
         }
     });
@@ -548,20 +546,13 @@ document.addEventListener("DOMContentLoaded", function () {
         checkbox.addEventListener("change", function () {
             let columnClass = this.value;
             let isChecked = this.checked;
-            
-            let headers = document.querySelectorAll("th." + columnClass);
-            let cells = document.querySelectorAll("td." + columnClass);
-            
-            headers.forEach(header => {
-                header.style.display = isChecked ? "" : "none";
-            });
-            cells.forEach(cell => {
-                cell.style.display = isChecked ? "" : "none";
+
+            document.querySelectorAll("th." + columnClass + ", td." + columnClass).forEach(el => {
+                el.style.display = isChecked ? "" : "none";
             });
         });
     });
 });
-
 
 </script>
 

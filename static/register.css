@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 *{
     font-family: "poppins"
 }
@@ -33,40 +32,4 @@ body{
 }
 .btn{
     width:8rem !important;
-=======
-*{
-    font-family: "poppins"
-}
-body{
-    background-color:#EBEBEB;
-    color: black;
-}
-.heading{
-    
-    background-color:#00ACFF !important;
-    color:white;
-    width:50%;
-    margin-left: auto;
-    margin-right: auto;
-}
-.sign_div{
-    border: 1px solid white;
-    width:50%;
-    margin-left:auto !important;
-    margin-right: auto !important;
-    margin-top:20px;
-    box-shadow: 5px 15px 25px rgba(0,0,0,1.5);
-    padding:10px;
-}
-.form-input{
-    width: 80%;
-    text-align: center;
-}
-.form-label{
-    color:black;
-    font-size:22px;
-}
-.btn{
-    width:8rem !important;
->>>>>>> 71c6430a (updated)
 }

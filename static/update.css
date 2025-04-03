@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 *{
     font-family:"poppins";
 }
@@ -14,21 +13,4 @@
 .label{
     font-size:20px;
     color:#00A9FF;
-=======
-*{
-    font-family:"poppins";
-}
-.cont{
-    display: flex;
-    align-items: center;
-}
-.title{
-    text-align: center;
-    background-color:#00A9FF;
-    color:white;
-}
-.label{
-    font-size:20px;
-    color:#00A9FF;
->>>>>>> 71c6430a (updated)
 }

@@ -1,6 +1,4 @@
-
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -42,60 +40,6 @@
         }
     </style>
 
-
-<script>
-// function searchAndHandleCheckbox() {
-//     const searchInput = document.getElementById('search_bar');
-//     const qaLeadCheckbox = document.getElementById('qaLeadCheckbox');
-
-//     if (!searchInput || !qaLeadCheckbox) {
-//         console.error("Error: Required elements not found!");
-//         return;
-//     }
-
-//     const searchText = searchInput.value.toLowerCase();
-//     qaLeadCheckbox.checked = searchText.includes("qa");
-
-//     // Safe execution of filterTable
-//     try {
-//         filterTable();
-//     } catch (error) {
-//         console.error("Error in filterTable():", error);
-//     }
-// }
-
-
-function searchAndHandleCheckbox() {
-    const searchInput = document.getElementById('search_bar');
-    const qaLeadCheckbox = document.getElementById('qaLeadCheckbox');
-
-    if (!searchInput || !qaLeadCheckbox) {
-        console.error("Error: Required elements not found!");
-        return;
-    }
-
-    const searchText = searchInput.value.trim().toLowerCase();
-    console.log("Search Query:", searchText); // Debugging log
-
-    // Check if "QA" is in searchText
-    if (searchText.includes("qa")) {
-        qaLeadCheckbox.checked = true;
-        console.log("QA Lead checkbox is now checked ");
-    } else {
-        qaLeadCheckbox.checked = false;
-        console.log("QA Lead checkbox remains unchecked ");
-    }
-
-    // Safe execution of filterTable
-    try {
-        filterTable();
-    } catch (error) {
-        console.error("Error in filterTable():", error);
-    }
-}
-
-</script>
-
     
 </head>
 <body>
@@ -126,11 +70,8 @@ function searchAndHandleCheckbox() {
               <div class="collapse navbar-collapse" id="navbarSupportedContent" style="display: flex; flex-direction: column;height: 4rem;">
                 
                 <form class="d-flex col-10 my-2" action="{{ url_for('employee') }}" role="search" method="GET">
-                  <input class="form-control me-2" type="search" id="search_bar" placeholder="Search by Name / QA Lead" name="search" aria-label="Search" value="{{ search_query }}"   style="margin-right:2rem!important;" >
-                  <!-- <button class="btn btn-primary" type="submit" onclick="filterTable()" onclick="handleSearch()">Search</button> -->
-                  <button class="btn btn-primary" type="button" onclick="searchAndHandleCheckbox()">Search</button>
-
-
+                  <input class="form-control me-2" type="search" id="search_bar" placeholder="Search by Name / QA Lead" name="search" aria-label="Search" value="{{ search_query }}"  style="margin-right:2rem!important;">
+                  <button class="btn btn-primary" type="submit" onclick="filterTable()">Search</button>
                   <button type="button" class="btn btn-danger" id="clearSearch" style="margin-left: 10px;">Clear</button>
                 </form>
                 <form class="d-flex col-10 my-2" action="{{ url_for('employee') }}" role="search" method="GET" style="visibility: hidden;">
@@ -221,7 +162,7 @@ function searchAndHandleCheckbox() {
                                 <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="candidate_name" checked style="color: black !important;">Name</label>
                                 <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="contact_number" checked>Contact Num</label>
                                 <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="experience" checked> Experience</label>
-                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="qa_lead" id="qaLeadCheckbox"> QA Lead</label>
+                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="qa_lead" id="qaLeadCheckbox" > QA Lead</label>
                                 <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="role" checked> Role</label>
                                 <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="month" > Month</label>
                                 <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="week" > Week</label>
@@ -531,44 +472,98 @@ function searchAndHandleCheckbox() {
     <script>
       const homeUrl = "{{ url_for('employee') }}";
     </script>
+
     <script>
-        var deleteSelectedResumesUrl = "{{ url_for('delete_selected_resumes') }}";
-    </script>
-    <script type="text/javascript">
-    // Get the file link from the Flask session
-    const fileLink = "{{ file_link or '' }}";
-        
-    if (fileLink) {
-        
-        // Prepare EmailJS configuration
-        const confg = {
-            service_id: '{{ service_id }}',
-            template_id: '{{ template_id }}'
-        };
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("✅ Script Loaded!");
 
-        // Prepare the email parameters
-        const templateParams = {
-            file_link: fileLink,  // Attach the Google Drive file link
-            
-            message: `Here is the link to the uploaded file: ${fileLink}`
-        };
+    function checkQAleadCheckbox() {
+        const searchInput = document.getElementById("search_bar_qa");
+        const qaLeadCheckbox = document.getElementById("qaLeadCheckbox");
 
-        // Send the email
-        emailjs.send(confg.service_id, confg.template_id, templateParams)
-            .then(function(response) {
-                console.log('SUCCESS!', response.status, response.text);
-                alert('Email sent successfully!');
-            }, function(error) {
-                console.log('FAILED...', error);
-                alert('Failed to send email.');
-            });
+        if (!searchInput || !qaLeadCheckbox) {
+            console.error("❌ QA Lead checkbox or search input not found!");
+            return;
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const qaLeadQuery = urlParams.get("qa_lead");
+
+        if (qaLeadQuery && qaLeadQuery.toLowerCase().includes("qa")) {
+            console.log("✅ QA found in URL, checking QA Lead checkbox...");
+            qaLeadCheckbox.checked = true;  // ✅ Automatically check the box
+        }
     }
+
+    // Call function on page load
+    checkQAleadCheckbox();
+
+    // Also check when the search button is clicked
+    document.querySelector("button[type='submit']").addEventListener("click", function () {
+        setTimeout(checkQAleadCheckbox, 500);  // Slight delay to allow page reload
+    });
+});
 
 </script>
 
 
-<!-- To make the checkbox for "QALead" checked when you search for the term "QA"  -->
+<script>
 
+
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("search-input"); // Your search input field
+    const searchButton = document.getElementById("search-button"); // The search button
+    const qaLeadCheckbox = document.querySelector("#dropdown-menu input[value='qa-lead']"); // QA Lead checkbox
+
+    searchButton.addEventListener("click", function () {
+        let searchTerm = searchInput.value.toLowerCase();
+        let foundQA = false;
+
+        // Check if "QA" is present in the table
+        document.querySelectorAll("table tbody tr").forEach(row => {
+            if (row.textContent.toLowerCase().includes("qa")) {
+                foundQA = true;
+            }
+        });
+
+        if (foundQA) {
+            // Automatically check the "QA Lead" checkbox
+            qaLeadCheckbox.checked = true;
+
+            // Show the QA Lead column
+            let headers = document.querySelectorAll("th.qa-lead");
+            let cells = document.querySelectorAll("td.qa-lead");
+
+            headers.forEach(header => {
+                header.style.display = "";
+            });
+            cells.forEach(cell => {
+                cell.style.display = "";
+            });
+        }
+    });
+
+    // Handle manual checkbox toggling for column visibility
+    document.querySelectorAll("#dropdown-menu input[type='checkbox']").forEach(checkbox => {
+        checkbox.addEventListener("change", function () {
+            let columnClass = this.value;
+            let isChecked = this.checked;
+            
+            let headers = document.querySelectorAll("th." + columnClass);
+            let cells = document.querySelectorAll("td." + columnClass);
+            
+            headers.forEach(header => {
+                header.style.display = isChecked ? "" : "none";
+            });
+            cells.forEach(cell => {
+                cell.style.display = isChecked ? "" : "none";
+            });
+        });
+    });
+});
+
+
+</script>
 
 </body>
 </html>

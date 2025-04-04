@@ -7,7 +7,7 @@
     width:5rem !important;
 }
 th{
-    font-size:15px;
+    font-size:1rem;
     font-family: 'poppins';
     text-align: center;
     background-color:#00ACFF !important;
@@ -35,18 +35,18 @@ td{
     display: flex;
     align-items: center;
     justify-content:center;
-    margin-bottom:40px;
+    margin-bottom: 2.5rem;
 }
 .sidemenu_items:hover{
     transform: scale(0.9);
 }
 .icon{
-    margin-right:30px;
+    margin-right: 2rem;
     color: white;
 }
 .main_icon{
-    margin-left:10px;
-    margin-bottom:30px;
+    margin-left: 0.6rem;
+    margin-bottom: 2rem;
 }
 .first_div{
     display: flex;
@@ -56,7 +56,7 @@ a{
 }
 
 .filename-cell {
-    font-size: 22px;
+    font-size: 1.4rem;
     word-wrap: break-word;  /* This property allows long words to be broken and wrap onto the next line */
     overflow-wrap: break-word; /* For browsers that support the newer property name */
 }
@@ -80,12 +80,12 @@ td{
     padding:7px!important;
 }
 i{
-    font-size: 15px;
+    font-size: 1 rem;
 }
 .sub{
     margin-left: auto !important;
     margin-right:auto!important ;
-    width:5rem !important;
+    width: 20%;
     margin-top:1rem;
 }
 label{
@@ -94,7 +94,8 @@ label{
 }
 .wrap-text{
     
-    max-width:5.3rem!important;
+    /* max-width:5.3rem!important; */
+    max-width: 30%;
     overflow-wrap: break-word !important; /* Breaks long words */
     word-wrap: break-word; /* For older browsers */
     white-space: normal; 
@@ -112,8 +113,8 @@ label{
 
 
 select {
-    width: 150px !important;  /* Ensure width matches the button */
-    height: 27px !important;  /* Match button height */
+    width: 10rem;
+    height: 1.8rem; /* Match button height */
     border: 1px solid black !important;  /* Ensure border matches */
     /* border-radius: 5px !important; Rounded corners */
     padding: 3px 12px !important; /* Padding for spacing */
@@ -130,8 +131,9 @@ select {
 select {
     background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='black' d='M2 5L0 0h4z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 10px center;
+    background-position: right 0.6rem center;
     background-size: 10px;
+    box-sizing: border-box;
 }
 
 

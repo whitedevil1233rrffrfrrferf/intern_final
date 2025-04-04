@@ -18,23 +18,25 @@
         
         <form action="{{ url_for('edit_employee_resume', employee_id=resume.id) }}" method="post">
             <div class="mb-3 label">
-                <label for="email" class="form-label">Email: </label>
+                <label for="email" class="form-label">Email:<span style="color: red;">*</span></label>
                 <input type="text" class="form-control" id="email" name="email" value="{{resume.Email}}" aria-describedby="emailHelp" required >
                 
             </div>
             <div class="mb-3 label">
-                <label for="name" class="form-label">Name:</label>
+                <label for="name" class="form-label">Name:<span style="color: red;">*</span></label>
                 <input type="text" class="form-control" id="name" name="name" value="{{resume.Name}}" aria-describedby="emailHelp" required  >
                 
             </div>
             <div class="mb-3 label">
-                <label for="qualification" class="form-label">Qualification:</label>
+                <label for="qualification" class="form-label">Qualification:<span style="color: red;">*</span></label>
                 <input type="text" class="form-control" id="qualification" name="qualification" value="{{resume.Qualification}}" aria-describedby="emailHelp" required>
                 
             </div>
+            <!-- not allowed non-numeric input -->
             <div class="mb-3 label">
-                <label for="phone" class="form-label">Phone:</label>
-                <input type="text" class="form-control" id="phone" name="phone" value="{{resume.Phone}}" aria-describedby="emailHelp" required  >
+                <label for="phone" class="form-label">Phone:<span style="color: red;">*</span></label>
+                <input type="text" class="form-control" id="phone" name="phone" value="{{resume.Phone}}" aria-describedby="emailHelp" 
+                pattern="[0-9]{10}" title="Please enter a valid 10-digit mobile number" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required  >   
                 
             </div>
             <div class="mb-3 label">
@@ -44,22 +46,22 @@
             </div>
             
             <div class="mb-3 label">
-                <label for="qa_lead" class="form-label">QA Lead Assigned:<i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+                <label for="qa_lead" class="form-label">QA Lead Assigned:<span style="color: red;">*</span></label>
                 <input type="text" class="form-control" id="qa_lead" name="qa_lead" value="{{resume.QA_Lead}}" aria-describedby="emailHelp" required>
                 
             </div>
             <div class="mb-3 label">
-                <label for="actual_ctc" class="form-label">Actual CTC:<i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+                <label for="actual_ctc" class="form-label">Actual CTC:<span style="color: red;">*</span></label>
                 <input type="text" class="form-control" id="actual_ctc" name="actual_ctc" value="{{resume.Actual_CTC}}" aria-describedby="emailHelp" required>
                 
             </div>
             <div class="mb-3 label">
-                <label for="expected_ctc" class="form-label">Excepting CTC:<i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+                <label for="expected_ctc" class="form-label">Expected CTC:<span style="color: red;">*</span></label>
                 <input type="text" class="form-control" id="expected_ctc" name="expected_ctc" value="{{resume.Expected_CTC}}" aria-describedby="emailHelp" required>
                 
             </div>
             <div class="mb-3 label">
-              <label for="expected_ctc" class="form-label">Experience:<i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
+              <label for="expected_ctc" class="form-label">Experience:<span style="color: red;">*</span></label>
               <input type="text" class="form-control" id="experience" name="experience" value="{{resume.Experience}}" aria-describedby="emailHelp" required>
               
           </div>

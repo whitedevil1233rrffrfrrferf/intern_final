@@ -38,6 +38,8 @@
             display: block;
             
         }
+
+
     </style>
 
     
@@ -216,9 +218,9 @@
                                     <input type="checkbox" class="resume-checkbox" value="{{ resume.id }}">
                                 </td>
                                 <td class="checkbox-column candidate_id" >{{ start_index + loop.index }}</td>
-                                <td class="wrap-text checkbox-column candidate_name" id="name-{{ resume.id }}">
+                                <td class="wrap-text checkbox-column candidate_name" id="name-{{ resume.id }}" >
                                     {% if resume.Link %}
-                                        <a href="{{ resume.Link }}" class="long-filename text-break" target="_blank">
+                                        <a href="{{ resume.Link }}" class="long-filename text-break" target="_blank" href="javascript:void(0);" onclick="return false">
                                             <span id="short-name-{{ resume.id }}">
                                                 {{ resume.Name[:20] }}{% if resume.Name|length > 20 %}...{% endif %}
                                             </span>
@@ -359,8 +361,8 @@
                                 </td>
                                <td class="wrap-text checkbox-column view" ><a href="{{url_for('resume_details',resume_id=resume.id)}}" class="btn btn-primary mx-1" title="view"><i class="fa-solid fa-eye mx-2" style="color:white;"></i></a></td>
                                <td class="wrap-text checkbox-column action">
-                                <button class="btn btn-primary" style=" display: block; margin-left: auto; margin-right: auto;" onclick="window.location.href='{{ url_for('edit_employee_resume', employee_id=resume.id) }}'"><i class="fa-solid fa-pencil mx-2" style="color:#fff;"></i></button>
-                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal{{ resume.id }}" style="margin-top: 1rem;">More Info</button>
+                                <button class="btn btn-primary" title="Edit" style=" display: block; margin-left: auto; margin-right: auto;" onclick="window.location.href='{{ url_for('edit_employee_resume', employee_id=resume.id) }}'"><i class="fa-solid fa-pencil mx-2" style="color:#fff;"></i></button>
+                                <button class="btn btn-primary btn-sm" title="More Info" data-bs-toggle="modal" data-bs-target="#viewModal{{ resume.id }}" style="margin-top: 1rem;">More Info</button>
 
                                
                             </tr>

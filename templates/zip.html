@@ -8,6 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
+    
+
 </head>
 <body style="background-color:white;">
   <div style="display: flex;">
@@ -15,17 +17,39 @@
     <div class="container">
       <center><h1 style="text-align: center; background-color: #00A9FF; color: white; width:48rem; ">Upload multiple zip folders</h1></center>
       <div class="container" style="padding:10px; width:51rem; margin-top:15%;">
-          <form action="/zip" method="POST" enctype="multipart/form-data" style=" border: 1px solid black; padding:10px;">
-              <div class="filter" style="margin-bottom:40px; margin-left:20%;">
-                  <label for="tag"  style="font-size:25px;">Select Role:</label>
-                  <select id="tag" name="tag" >
-                    <option value="">Select</option>
-                    <option value="Interns">Interns</option>
-                    <option value="Delivery Manager">Delivery Manager</option>
-                    <option value="QA architect">QA architect</option>
-                    <option value="Performance Tester">Performance Tester</option> 
+          <form action="/zip" method="POST" enctype="multipart/form-data" multiple accept=".zip" style=" border: 1px solid black; padding:10px;">
+            <div class="filter" style="display: flex; align-items: center; gap: 20px; margin-bottom: 40px; margin-left: 20%;">
+              <div>
+                  <label for="tag" style="font-size: 25px;">Select Role:</label>
+                  <select id="tag" name="tag">
+                      <option value="">Select</option>
+                      <option value="Interns">Intern</option>
+                      <option value="Delivery Manager">Delivery Manager</option>
+                      <option value="QA architect">QA architect</option>
+                      <option value="Performance Tester">Performance Tester</option> 
                   </select>
               </div>
+          
+              <div>
+                  <label for="month" style="font-size: 25px; margin-left: 10px;">Select Month:</label>
+                  <select id="month" name="month">
+                      <option value="">Select</option>
+                      <option value="January">January</option>
+                      <option value="February">February</option>
+                      <option value="March">March</option>
+                      <option value="April">April</option>
+                      <option value="May">May</option>
+                      <option value="June">June</option>
+                      <option value="July">July</option>
+                      <option value="August">August</option>
+                      <option value="September">September</option>
+                      <option value="October">October</option>
+                      <option value="November">November</option>
+                      <option value="December">December</option>
+                  </select>
+              </div>
+          </div>
+          
               <label for="zipFilesInput" style="font-size: 25px;margin-left:20%;">Select zip folders :</label>
               <input type="file" id="zipFilesInput" name="zipFiles" accept=".zip" multiple>
               <button type="submit" class="btn btn-primary">Upload</button>
@@ -72,5 +96,77 @@
     {% endwith %}
   </div> 
 </body>
+
+<script>
+ document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("form");
+
+    form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const files = document.getElementById("zipFilesInput").files;
+        if (files.length === 0) {
+            showFlashMessage("Please select at least one ZIP file before uploading.", "danger");
+            return;
+        }
+
+        showFlashMessage("Uploading files, please wait...", "info");
+
+        const formData = new FormData(form);
+        fetch("/zip", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())  // Ensure JSON response
+        .then(data => {
+            if (data.success) {
+                showFlashMessage(data.message, "success");
+            } else {
+                showFlashMessage(data.error || "Upload failed. Please try again.", "danger");
+            }
+        })
+        .catch(error => {
+            showFlashMessage("An error occurred: " + error.message, "danger");
+        });
+    });
+});
+
+
+    function showFlashMessage(message, type) {
+    document.querySelectorAll(".add_flash_message").forEach(el => el.remove()); // Remove existing messages
+
+    const flashDiv = document.createElement("div");
+    flashDiv.className = `alert alert-${type} add_flash_message`;
+    flashDiv.role = "alert";
+    flashDiv.innerText = message;
+    document.body.prepend(flashDiv);
+
+    setTimeout(() => flashDiv.remove(), 5000);
+}
+
+</script>
+
+
+
+<!-- <script>
+  document.querySelector("form").addEventListener("submit", function(event) {
+    const files = document.getElementById("zipFilesInput").files;
+    if (files.length === 0) {
+      event.preventDefault(); // Prevent form submission
+      showFlashMessage("Please select at least one zip file before uploading.", "danger");
+    }
+  });
+
+  function showFlashMessage(message, type) {
+    const flashDiv = document.createElement("div");
+    flashDiv.className = `alert alert-${type} add_flash_message`;
+    flashDiv.role = "alert";
+    flashDiv.innerText = message;
+    document.body.prepend(flashDiv);
+
+    // Optionally remove message after 5 seconds
+    setTimeout(() => flashDiv.remove(), 5000);
+  }
+</script> -->
 
 </html>

@@ -83,14 +83,14 @@
               </div>
                 <div class="form-group">
                     
-                      <label for="date" class="form-label" style="font-size:20px; color:#1AACAC;">Date</label>
+                      <label for="date" class="form-label" style="font-size:20px; color:#1AACAC;">Date<span style="color: red;">*</span></label>
                       
                     <input type="date" class="form-control" id="date" name="date" value="{{ date or '' }}" min="" required>
                 </div>
               
 
                 <div class="form-group">
-                    <label for="status">Status</label>
+                    <label for="status">Status<span style="color: red;">*</span></label>
                     <div class="status-container" onclick="toggleStatusDropdown()">
                         <select id="status" name="status" class="form-control" required>
                             <option value="Rejected" {{ 'selected' if status1 == 'Rejected' else '' }}>Rejected</option>
@@ -267,7 +267,7 @@ document.addEventListener("click", function (event) {
             let commentBox = document.createElement("div");
             commentBox.classList.add("form-group");
             commentBox.innerHTML = `
-                <label for="comment_${panel}">${panel} feedback</label>
+                <label for="comment_${panel}">${panel} feedback<span style="color: red;">*</span></label>
                 <input 
                   type="text" 
                   id="comment_${panel}" 

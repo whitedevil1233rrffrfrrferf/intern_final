@@ -66,7 +66,8 @@
             
             <div class="mb-3">
                 <label for="mobile">Mobile Number:</label>
-                <input type="text" class="form-control" id="mobile" name="mobile" value="{{ mobile }}">
+                <input type="text" class="form-control" id="mobile" name="mobile" value="{{ mobile }}" 
+                pattern="[0-9]{10}" title="Please enter a valid 10-digit mobile number" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required >
             </div>
             <div class="mb-3">
                 <label for="password">Password:</label>

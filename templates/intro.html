@@ -34,7 +34,7 @@
         <div style="margin-top:50px; width: 90%; margin-left:4%;">
             <form id="panelForm" action="{{ url_for('introCall', resume_id=resume.id) }}" method="post" >
               <div class="form-group">
-                    <label for="selectedPanel">Panel Member</label>
+                    <label for="selectedPanel">Panel Members</label>
                     
                     <!-- Fake select box -->
                     <!-- <div class="custom-select-box form-control" onclick="togglePanelDropdown()">
@@ -59,7 +59,7 @@
                     <!-- Fake select box -->
 <!-- Custom Select Box -->
 <div class="custom-select-box form-control" id="panelSelectBox">
-    <span id="selectedPanelText">Add panel</span>
+    <span id="selectedPanelText">Select panels</span>
     <span id="panelArrow" class="arrow">&#9660;</span> <!-- Default Down Arrow -->
 </div>
 
@@ -101,7 +101,7 @@
               </div>
                 <div class="form-group">
                     
-                      <label for="date" class="form-label" style="font-size:20px; color:#1AACAC;">Date</label>
+                      <label for="date" class="form-label" style="font-size:20px; color:#1AACAC;">Date<span style="color: red;">*</span></label>
                       
                     <input type="date" class="form-control" id="date" name="date" value="{{ date or '' }}" min="" required>
                 </div>
@@ -116,7 +116,7 @@
                 </div> --> 
 
                 <div class="form-group">
-                    <label for="status">Status</label>
+                    <label for="status">Status<span style="color: red;">*</span></label>
                     <div class="status-container" onclick="toggleStatusDropdown()">
                         <select id="status" name="status" class="form-control" required>
                             <option value="Rejected" {{ 'selected' if status1 == 'Rejected' else '' }}>Rejected</option>
@@ -127,7 +127,7 @@
                 </div>
                 
                 <div class="form-group" style="display: none;">
-                    <label for="comments" class="form-label" style="font-size:15px !important;">Feedback</label>
+                    <label for="comments" class="form-label" style="font-size:15px !important;">Feedback<i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
                     <input class="form-control" type="text" name="comments" value="{{comments1}}" placeholder="Enter your comments" required>
                 </div>
                 <div id="commentsSection">
@@ -322,7 +322,7 @@ document.addEventListener("click", function (event) {
             let commentBox = document.createElement("div");
             commentBox.classList.add("form-group");
             commentBox.innerHTML = `
-                <label for="comment_${panel}">${panel} feedback</label>
+                <label for="comment_${panel}">${panel} feedback<span style="color: red;">*</span></label>
                 <input 
                   type="text" 
                   id="comment_${panel}" 

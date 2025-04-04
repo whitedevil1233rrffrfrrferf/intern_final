@@ -123,7 +123,7 @@ class Employee(db.Model):
     Last_promoted = db.Column(db.String(500))
     Comments = db.Column(db.String(500))
     employee_status=db.Column(db.String(500))
-    salary=db.Column(db.Integer)   
+      
 
 
 class Login(db.Model):
@@ -1770,8 +1770,9 @@ def introCall(resume_id):
         if status == "Rejected":
             flash("Candidate Rejected", "danger")  # Using 'danger' for a red flash message    
         elif status == "Move to Interview 1":
-            flash("Candidate Moved to L1", "success")  # Using 'success' for a green flash message
-            return redirect(url_for('interview1v', resume_id=resume_id))
+            interview_url = url_for('interview1v', resume_id=resume_id)
+            flash(f"Candidate Moved to L1 — <a href='{interview_url}' class='alert-link'>Go to L1</a>", "success")
+            
         return redirect(url_for('introCall', resume_id=resume.id))
     return render_template("intro.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date,selected_panels=selected_panels,comments_dict=comments_dict,all_panels=all_panels,candidate_name=candidate_name,candidate_email = candidate_email,candidate_phone=candidate_phone,candidate_role=candidate_role,candidate_experience=candidate_experience,candidate_location=candidate_location,candidate_notice_period=candidate_notice_period,candidate_actual_ctc=candidate_actual_ctc,candidate_expected_ctc=candidate_expected_ctc,candidate_current_link=candidate_current_link,candidate_next_link=candidate_next_link,is_mandatory_missing=is_mandatory_missing)
 @app.route("/interview1")
@@ -1800,6 +1801,12 @@ def resume_details(resume_id):
     interview2_status = interview2.Status if interview2 else "Interview 2 not conducted"
     hr_status = hr.Status if hr else "HR not conducted"
 
+    ## Panel feedbacks
+    intro_panel_feedback = json.loads(intro.Json_comments) if intro and intro.Json_comments else {}
+    interview1_panel_feedback = json.loads(interview1.Json_comments) if interview1 and interview1.Json_comments else {}
+    interview2_panel_feedback = json.loads(interview2.Json_comments) if interview2 and interview2.Json_comments else {}
+    hr_panel_feedback = json.loads(hr.Json_comments) if hr and hr.Json_comments else {}
+
     statuses = [intro_status, interview1_status, interview2_status, hr_status]
     all_rounds_status = "Cleared"
 
@@ -1815,7 +1822,12 @@ def resume_details(resume_id):
         interview1_status=interview1_status,
         interview2_status=interview2_status,
         hr_status=hr_status,
-        all_rounds_status=all_rounds_status)
+        all_rounds_status=all_rounds_status,
+        intro_panel_feedback=intro_panel_feedback,
+        interview1_panel_feedback=interview1_panel_feedback,
+        interview2_panel_feedback=interview2_panel_feedback,
+        hr_panel_feedback=hr_panel_feedback
+        )
 
 # @app.route("/interview1v/<int:resume_id>", methods=["GET", "POST"])
 # def interview1v(resume_id):
@@ -1934,8 +1946,8 @@ def interview1v(resume_id):
         if status == "On Hold":
             flash("Candidate Kept on hold", "warning") 
         elif status == "Move to Interview 2":
-            flash("Candidate Moved to L2", "success")  # Using 'success' for a green flash message
-            return redirect(url_for('interview2v', resume_id=resume_id))
+            interview_url = url_for('interview2v', resume_id=resume_id)
+            flash(f"Candidate Moved to L2 — <a href='{interview_url}' class='alert-link'>Go to L2</a>", "success")
         return redirect(url_for('interview1v', resume_id=resume.id))
     return render_template("interview1.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date,selected_panels=selected_panels,comments_dict=comments_dict,all_panels=all_panels,candidate_name=candidate_name,candidate_email = candidate_email,candidate_phone=candidate_phone,candidate_role=candidate_role,candidate_experience=candidate_experience,candidate_location=candidate_location,candidate_notice_period=candidate_notice_period,candidate_actual_ctc=candidate_actual_ctc,candidate_expected_ctc=candidate_expected_ctc,candidate_current_link=candidate_current_link,candidate_next_link=candidate_next_link,is_mandatory_missing=is_mandatory_missing)
 
@@ -2008,8 +2020,8 @@ def interview2v(resume_id):
         if status == "On Hold":
             flash("Candidate Kept on hold", "warning")     
         elif status == "Move to HR Round":
-            flash("Candidate Moved to HR Round", "success")  # Using 'success' for a green flash message
-            return redirect(url_for('hr', resume_id=resume_id))
+            interview_url = url_for('interview2v', resume_id=resume_id)
+            flash(f"Candidate Moved to L2 — <a href='{interview_url}' class='alert-link'>Go to L2</a>", "success")
         return redirect(url_for('interview2v', resume_id=resume.id))
     return render_template("interview2.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date,selected_panels=selected_panels,comments_dict=comments_dict,all_panels=all_panels,candidate_name=candidate_name,candidate_email = candidate_email,candidate_phone=candidate_phone,candidate_role=candidate_role,candidate_experience=candidate_experience,candidate_location=candidate_location,candidate_notice_period=candidate_notice_period,candidate_actual_ctc=candidate_actual_ctc,candidate_expected_ctc=candidate_expected_ctc,candidate_current_link=candidate_current_link,candidate_next_link=candidate_next_link,is_mandatory_missing=is_mandatory_missing)
 

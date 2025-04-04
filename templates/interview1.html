@@ -129,7 +129,7 @@
               <div class="flash-messages">
                 {% for category, message in messages %}
                   <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
+                    {{ message|safe  }}
                     
                   </div>
                 {% endfor %}
@@ -361,7 +361,7 @@ document.addEventListener("click", function (event) {
             candidate_ectc: "{{ candidate_expected_ctc or 'N/A' }}",
             status: status,
             panel_feedback: "{{ candidate_current_link or 'N/A' }}",
-            next_interview_round: "L1",
+            next_interview_round: "L2",
             link: "{{ candidate_next_link or 'N/A' }}",
             message: `Candidate ${candidateName} has been marked as '${status}'.`
         };

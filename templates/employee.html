@@ -218,9 +218,27 @@
                                 <td class="checkbox-column candidate_id" >{{ start_index + loop.index }}</td>
                                 <td class="wrap-text checkbox-column candidate_name" id="name-{{ resume.id }}">
                                     {% if resume.Link %}
-                                    <a href="{{resume.Link}}" class="long-filename  text-break" target="_blank" >{{ resume.Name }}</a>
-                                    {% else %}  
-                                    <a href="{{ url_for('view_resume', filename=resume.filename) }}" class="long-filename  text-break" target="_blank">{{ resume.filename }}</a>
+                                        <a href="{{ resume.Link }}" class="long-filename text-break" target="_blank">
+                                            <span id="short-name-{{ resume.id }}">
+                                                {{ resume.Name[:20] }}{% if resume.Name|length > 20 %}...{% endif %}
+                                            </span>
+                                        </a>
+                                        {% if resume.Name|length > 20 %}
+                                            <br>
+                                            <a href="#" class="more-info" id="more-info-{{ resume.id }}" 
+                                               onclick="toggleFullName('{{ resume.id }}', '{{ resume.Name }}', event)">More...</a>
+                                        {% endif %}
+                                    {% else %}
+                                        <a href="{{ url_for('view_resume', filename=resume.filename) }}" class="long-filename text-break" target="_blank">
+                                            <span id="short-name-{{ resume.id }}">
+                                                {{ resume.filename[:20] }}{% if resume.filename|length > 20 %}...{% endif %}
+                                            </span>
+                                        </a>
+                                        {% if resume.filename|length > 20 %}
+                                            <br>
+                                            <a href="#" class="more-info" id="more-info-{{ resume.id }}" 
+                                               onclick="toggleFullName('{{ resume.id }}', '{{ resume.filename }}', event)">More...</a>
+                                        {% endif %}
                                     {% endif %}
                                     <a href="{{ url_for('get_intro_status', resume_id=resume.id) }}"  style="margin-left: 20px; color: red;display: none;" onclick="getInterviewStatus(event,{{resume.id}})"><i class="fa-solid fa-info" style="font-size: 20px;"></i></a>
                                     <div id="toggle{{ resume.id }}" style="display: none;">
@@ -396,6 +414,24 @@
     
     <script src="{{ url_for('static', filename='config.js') }}"></script>   
     <script src="{{ url_for('static', filename='employee.js') }}?v=1.6"></script>
+    <script>
+        function toggleFullName(id, fullName, event) {
+            event.preventDefault(); // Prevent scrolling to the top
+    
+            let nameElement = document.getElementById("short-name-" + id);
+            let buttonElement = document.getElementById("more-info-" + id);
+    
+            if (buttonElement.innerText === "More...") {
+                // Expand to full name
+                nameElement.innerText = fullName;
+                buttonElement.innerText = "Less...";
+            } else {
+                // Collapse back to short name
+                nameElement.innerText = fullName.substring(0, 20) + "...";
+                buttonElement.innerText = "More...";
+            }
+        }
+    </script>
     
     <script>
         {% for resume in resumes %}
@@ -475,35 +511,72 @@
     <script>
         var deleteSelectedResumesUrl = "{{ url_for('delete_selected_resumes') }}";
     </script>
-    <script type="text/javascript">
-    // Get the file link from the Flask session
-    const fileLink = "{{ file_link or '' }}";
+//     <script type="text/javascript">
+//     // Get the file link from the Flask session
+//     const fileLink = "{{ file_link or '' }}";
         
-    if (fileLink) {
+//     if (fileLink) {
         
-        // Prepare EmailJS configuration
-        const confg = {
-            service_id: '{{ service_id }}',
-            template_id: '{{ template_id }}'
-        };
+//         // Prepare EmailJS configuration
+//         const confg = {
+//             service_id: '{{ service_id }}',
+//             template_id: '{{ template_id }}'
+//         };
 
-        // Prepare the email parameters
-        const templateParams = {
-            file_link: fileLink,  // Attach the Google Drive file link
+//         // Prepare the email parameters
+//         const templateParams = {
+//             file_link: fileLink,  // Attach the Google Drive file link
             
-            message: `Here is the link to the uploaded file: ${fileLink}`
-        };
+//             message: `Here is the link to the uploaded file: ${fileLink}`
+//         };
 
-        // Send the email
-        emailjs.send(confg.service_id, confg.template_id, templateParams)
-            .then(function(response) {
-                console.log('SUCCESS!', response.status, response.text);
-                alert('Email sent successfully!');
-            }, function(error) {
-                console.log('FAILED...', error);
-                alert('Failed to send email.');
+//         // Send the email
+//         emailjs.send(confg.service_id, confg.template_id, templateParams)
+//             .then(function(response) {
+//                 console.log('SUCCESS!', response.status, response.text);
+//                 alert('Email sent successfully!');
+//             }, function(error) {
+//                 console.log('FAILED...', error);
+//                 alert('Failed to send email.');
+//             });
+//     }
+// </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchValue = urlParams.get("search");
+
+        const qaLeadCheckbox = document.querySelector("input[value='qa_lead']");
+
+        if (searchValue && searchValue.toLowerCase().includes("qa")) {
+            // Auto-check QA Lead
+            qaLeadCheckbox.checked = true;
+
+            // Trigger change event to show the column
+            let event = new Event("change");
+            qaLeadCheckbox.dispatchEvent(event);
+        }
+
+        // Your existing checkbox logic
+        document.querySelectorAll('#dropdown-menu input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function () {
+                let columnClass = this.value;
+                let isChecked = this.checked;
+
+                document.querySelectorAll('.' + columnClass).forEach(cell => {
+                    cell.style.display = isChecked ? '' : 'none';
+                });
+
+                // Resize logic
+                let visibleColumns = document.querySelectorAll('th:not([style*="display: none"])').length;
+                let table = document.querySelector('.table');
+                let minWidth = 50;
+                let maxWidth = 100;
+                let newWidth = minWidth + (visibleColumns * 5);
+                table.style.width = newWidth > maxWidth ? '100%' : newWidth + '%';
             });
-    }
+        });
+    });
 </script>
 </body>
 </html>

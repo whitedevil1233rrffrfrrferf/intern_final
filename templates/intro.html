@@ -128,7 +128,7 @@
               <div class="flash-messages">
                 {% for category, message in messages %}
                   <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                    {{ message }}
+                    {{ message|safe  }}
                     
                   </div>
                 {% endfor %}
@@ -343,7 +343,7 @@ document.addEventListener("click", function (event) {
         const toEmail = "varunrram2003@gmail.com"; // Replace with actual recipient
         let ccEmails = Array.from(document.querySelectorAll(".panel-checkbox:checked"))
             .map(checkbox => checkbox.getAttribute("data-email"));
-
+        
         const templateParams = {
             to_email: toEmail,
             cc_email: ccEmails.join(", "),

@@ -73,6 +73,8 @@ TEMPLATE_ID=os.environ.get('EMAILJS_TEMPLATE_ID')
 
 REDIRECT_URI='http://localhost:5000/google_sign_in' # for oauth sign in
 REDIRECT_URI_DRIVE='http://localhost:5000/google_drive_callback' #for google_drive
+# REDIRECT_URI = 'https://qaoncloud.com/EMP/google_sign_in' # for oauth sign in
+# REDIRECT_URI_DRIVE='https://qaoncloud.com/EMP/google_drive_callback' #for google_drive
 # REDIRECT_URI = 'https://intern-final-0b4w.onrender.com/google_sign_in'
 # REDIRECT_URI_DRIVE='https://intern-final-0b4w.onrender.com/google_drive_callback'
 
@@ -2020,8 +2022,8 @@ def interview2v(resume_id):
         if status == "On Hold":
             flash("Candidate Kept on hold", "warning")     
         elif status == "Move to HR Round":
-            interview_url = url_for('interview2v', resume_id=resume_id)
-            flash(f"Candidate Moved to L2 — <a href='{interview_url}' class='alert-link'>Go to L2</a>", "success")
+            interview_url = url_for('hr', resume_id=resume_id)
+            flash(f"Candidate Moved to HR — <a href='{interview_url}' class='alert-link'>Go to HR</a>", "success")
         return redirect(url_for('interview2v', resume_id=resume.id))
     return render_template("interview2.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date,selected_panels=selected_panels,comments_dict=comments_dict,all_panels=all_panels,candidate_name=candidate_name,candidate_email = candidate_email,candidate_phone=candidate_phone,candidate_role=candidate_role,candidate_experience=candidate_experience,candidate_location=candidate_location,candidate_notice_period=candidate_notice_period,candidate_actual_ctc=candidate_actual_ctc,candidate_expected_ctc=candidate_expected_ctc,candidate_current_link=candidate_current_link,candidate_next_link=candidate_next_link,is_mandatory_missing=is_mandatory_missing)
 

@@ -26,13 +26,13 @@
                   <i class="fa-solid fa-house"></i>
                 </a>
               </li>
-              
+              <li>
+                <a href="{{ url_for('dashBoard') }}" class="nav-link py-3 border-bottom rounded-0" title="Dashboard" data-bs-toggle="tooltip" data-bs-placement="right">
+                  <i class="fa-solid fa-gauge icons"></i>
+                </a>
+              </li>
             {% endif %}
-            <li>
-              <a href="{{ url_for('dashBoard') }}" class="nav-link py-3 border-bottom rounded-0" title="Dashboard" data-bs-toggle="tooltip" data-bs-placement="right">
-                <i class="fa-solid fa-gauge icons"></i>
-              </a>
-            </li>
+            
             {% if g.user_role in ['admin', 'interviewer'] %}
               <li>
                 

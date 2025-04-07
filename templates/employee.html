@@ -43,6 +43,7 @@
     
 </head>
 <body>
+    
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
@@ -345,8 +346,11 @@
                                     <div>
                                         <a id="introButton{{ resume.id }}" href="{{ url_for('introCall', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2 " title="Intro call" data-url="{{ url_for('get_intro_status', resume_id=resume.id) }}">Intro</a>
                                         <a id="interview1Button{{ resume.id }}" href="{{ url_for('interview1v', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2" title="Interview 1"><i class="fa-solid fa-phone"></i> 1</a>
-                                        <a id="interview2Button{{ resume.id }}" href="{{ url_for('interview2v', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2 " title="Interview 2"><i class="fa-solid fa-phone"></i> 2</a>
-                                        <a id="hrButton{{ resume.id }}" href="{{ url_for('hr', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2" title="HR round">HR</a>
+                                        {% if role == 'admin' %}
+                                            <a id="interview2Button{{ resume.id }}" href="{{ url_for('interview2v', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2 " title="Interview 2"><i class="fa-solid fa-phone"></i> 2</a>
+                                            <a id="hrButton{{ resume.id }}" href="{{ url_for('hr', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2" title="HR round">HR</a>
+                                        {% endif %}    
+
                                     </div>
                                     
                                 </td>

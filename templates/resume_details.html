@@ -280,6 +280,10 @@ body {
 
 <!-- new one as per document -->
 
+<!-- new one as per document -->
+
+<!-- new one as per document -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -299,11 +303,11 @@ body {
           background: linear-gradient(to right, #eef2f3, #dfe9f3);
           border-radius: 15px;
           padding: 30px;
-          width: 70%;
+          width: 95%;
           margin: 0 auto;
       }
 
-      .stage-wrapper {
+      /* .stage-wrapper {
           display: flex;
           align-items: center;
           gap: 15px;
@@ -319,13 +323,35 @@ body {
           border-radius: 8px;
           cursor: pointer;
           transition: 0.3s;
-          width: auto;
-      }
+          width: 5rem;
+      } */
 
-      .stage-container:hover {
+
+      .stage-wrapper {
+    display: flex;
+    align-items: stretch; /* Makes both children equal in height */
+    gap: 1rem;
+}
+
+.stage-container {
+    background: #4699F9;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+
+      /* .stage-container:hover {
           background: #0056b3;
           transform: scale(1.05);
-      }
+      } */
 
       .details-container {
           display: flex;
@@ -353,8 +379,12 @@ body {
 
       .details-row {
           display: flex;
-          flex-wrap: wrap;
+          
+          align-items: center;
           margin-bottom: 10px;
+          gap: 7rem;
+          
+          
       }
 
       .details-column {
@@ -365,12 +395,10 @@ body {
 
       .label {
           font-weight: bold;
-          margin-bottom: 5px;
+          width: 10rem;
       }
 
-      .value {
-          margin-bottom: 15px;
-      }
+      
 
        /* For centering the button */
        .center-button-container {
@@ -380,22 +408,28 @@ body {
             width: 100%;
             /* height: 100vh; Optional: Adjust the height as needed */
         }
+        .value {
+            min-width: 300px; /* Ensures values start from the same point */
+            text-align: left;
+            word-wrap: break-word; /* Prevents text overflow */
+        }
   </style>
 </head>
 <body>
     {% include 'sidemenu.html'%}
-    <div style="width: 950px; text-align: center; margin-left: 300px;">
-      <h1>Interview Details</h1>
+    <div style="width: 70%; text-align: center; margin-left:17%;">
+      <h1 style="text-align: center;  background-color:#4699F9;color: white;">Interview Details</h1>
       <div class="container">
           <!-- Stage 1: Intro Call -->
           <div class="stage-wrapper">
               <div class="stage-container">
-                  Intro Call
+                <b>Intro</b>
+                  
               </div>
               <div class="stage-details">
                   <div class="stage-header">Intro Call Details</div>
                   <div class="details-container">
-                      <div class="details-row">
+                      <!-- <div class="details-row">
                           <div class="details-column">
                               <div class="label">Date:</div>
                               <div class="label">Status:</div>
@@ -410,7 +444,27 @@ body {
                               <div class="value">{{ intro_call.PanelMember2Feedback }}</div>
                               <div class="value">{{ intro_call.SelectedPanel }}</div>
                           </div>
-                      </div>
+                      </div> -->
+                      <div class="details-row">
+                        <span class="label">Date:</span>
+                        <span class="value">{{ intro_call.Date }}</span>
+                    </div>
+                    <div class="details-row">
+                        <span class="label">Status:</span>
+                        <span class="value">{{ intro_call.Status }}</span>
+                    </div>
+                    {% if intro_panel_feedback %}
+                        {% for panel_member, feedback in intro_panel_feedback.items() %}
+                            <div class="details-row">
+                                <span class="label">{{panel_member}} Feedback:</span>
+                                <span class="value">{{ feedback }}</span>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="details-row">
+                        <span class="label">Panel Names:</span>
+                        <span class="value">{{ intro_call.SelectedPanel }}</span>
+                    </div>
                   </div>
               </div>
           </div>
@@ -418,12 +472,12 @@ body {
           <!-- Stage 2: L1 Interview -->
           <div class="stage-wrapper">
               <div class="stage-container">
-                  L1 Interview
+                  <b>L1</b>
               </div>
               <div class="stage-details">
                   <div class="stage-header">L1 Interview Details</div>
                   <div class="details-container">
-                      <div class="details-row">
+                      <!-- <div class="details-row">
                           <div class="details-column">
                               <div class="label">Date:</div>
                               <div class="label">Status:</div>
@@ -438,6 +492,26 @@ body {
                               <div class="value">{{ interview1.PanelMember2Feedback }}</div>
                               <div class="value">{{ interview1.SelectedPanel }}</div>
                           </div>
+                      </div> -->
+                      <div class="details-row">
+                        <span class="label">Date:</span>
+                        <span class="value">{{ interview1.Date }}</span>
+                      </div>
+                      <div class="details-row">
+                          <span class="label">Status:</span>
+                          <span class="value">{{ interview1.Status }}</span>
+                      </div>
+                      {% if interview1_panel_feedback %}
+                        {% for panel_member, feedback in interview1_panel_feedback.items() %}
+                            <div class="details-row">
+                                <span class="label">{{panel_member}} Feedback:</span>
+                                <span class="value">{{ feedback }}</span>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                      <div class="details-row">
+                          <span class="label">Panel Names:</span>
+                          <span class="value">{{ interview1.SelectedPanel }}</span>
                       </div>
                   </div>
               </div>
@@ -446,12 +520,12 @@ body {
           <!-- Stage 3: L2 Interview -->
           <div class="stage-wrapper">
               <div class="stage-container">
-                  L2 Interview
+                  <b>L2</b> 
               </div>
               <div class="stage-details">
                   <div class="stage-header">L2 Interview Details</div>
                   <div class="details-container">
-                      <div class="details-row">
+                      <!-- <div class="details-row">
                           <div class="details-column">
                               <div class="label">Date:</div>
                               <div class="label">Status:</div>
@@ -466,6 +540,26 @@ body {
                               <div class="value">{{ interview2.PanelMember2Feedback }}</div>
                               <div class="value">{{ interview2.SelectedPanel }}</div>
                           </div>
+                      </div> -->
+                      <div class="details-row">
+                        <span class="label">Date:</span>
+                        <span class="value">{{ interview2.Date }}</span>
+                      </div>
+                      <div class="details-row">
+                          <span class="label">Status:</span>
+                          <span class="value">{{ interview2.Status }}</span>
+                      </div>
+                      {% if interview2_panel_feedback %}
+                        {% for panel_member, feedback in interview2_panel_feedback.items() %}
+                            <div class="details-row">
+                                <span class="label">{{panel_member}} Feedback:</span>
+                                <span class="value">{{ feedback }}</span>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                      <div class="details-row">
+                          <span class="label">Panel Names:</span>
+                          <span class="value">{{ interview2.SelectedPanel }}</span>
                       </div>
                   </div>
               </div>
@@ -474,12 +568,12 @@ body {
           <!-- Stage 4: HR Interview -->
           <div class="stage-wrapper">
               <div class="stage-container">
-                  HR Interview
+                  <b>HR</b> 
               </div>
               <div class="stage-details">
                   <div class="stage-header">HR Interview Details</div>
                   <div class="details-container">
-                      <div class="details-row">
+                      <!-- <div class="details-row">
                           <div class="details-column">
                               <div class="label">Date:</div>
                               <div class="label">Status:</div>
@@ -493,6 +587,26 @@ body {
                               <div class="value">{{ hr.PanelMember1Feedback }}</div>
                               <div class="value">{{ hr.PanelMember2Feedback }}</div>
                               <div class="value">{{ hr.SelectedPanel }}</div>
+                          </div> -->
+                          <div class="details-row">
+                            <span class="label">Date:</span>
+                            <span class="value">{{ hr.Date }}</span>
+                          </div>
+                          <div class="details-row">
+                              <span class="label">Status:</span>
+                              <span class="value">{{ hr.Status }}</span>
+                          </div>
+                          {% if hr_panel_feedback %}
+                              {% for panel_member, feedback in hr_panel_feedback.items() %}
+                                  <div class="details-row">
+                                      <span class="label">{{panel_member}} Feedback:</span>
+                                      <span class="value">{{ feedback }}</span>
+                                  </div>
+                              {% endfor %}
+                          {% endif %}
+                          <div class="details-row">
+                              <span class="label">Panel Names:</span>
+                              <span class="value">{{ hr.SelectedPanel }}</span>
                           </div>
                       </div>
                   </div>

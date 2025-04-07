@@ -72,7 +72,7 @@
               <div class="collapse navbar-collapse" id="navbarSupportedContent" style="display: flex; flex-direction: column;height: 4rem;">
                 
                 <form class="d-flex col-10 my-2" action="{{ url_for('employee') }}" role="search" method="GET">
-                  <input class="form-control me-2" type="search" id="search_bar" placeholder="Search by Name / QA Lead" name="search" aria-label="Search" value="{{ search_query }}"  style="margin-right:2rem!important;">
+                  <input class="form-control me-2" type="search" id="search_bar" placeholder="Search by Name / QA Lead" name="search" aria-label="Search" value="{{ request.args.get('search', '') }}"  style="margin-right:2rem!important;">
                   <button class="btn btn-primary" type="submit" onclick="filterTable()">Search</button>
                   <button type="button" class="btn btn-danger" id="clearSearch" style="margin-left: 10px;">Clear</button>
                 </form>
@@ -117,32 +117,31 @@
                     </div>
                     <div class="inner_filter" style="margin-bottom: 10px; margin-top: 20px;">
                         <label for="role" class="label " class="filter_label">Role:</label>
-                        <select name="role" id="role" onchange="handleFilters()" >
+                        <select name="role" id="role" onchange="this.form.submit()" style="margin-right: 1rem;">
                             <option value="">Select</option>
-                            <!-- Populate dynamically or add static options -->
-                            <option value="QA Engineer" {% if filter_role == 'QA Engineer' %}selected{% endif %}>QA Engineer</option>
-                            <option value="Jr. QA Engineer" {% if filter_role == 'Jr. QA Engineer' %}selected{% endif %}>Jr. QA Engineer</option>
-                            <option value="Sr. QA Engineer" {% if filter_role == 'Sr. QA Engineer' %}selected{% endif %}>Sr. QA Engineer</option>
-                            <option value="QA Lead" {% if filter_role == 'QA Lead' %}selected{% endif %}>QA Lead</option>
-                            <option value="Intern" {% if filter_role == 'Intern' %}selected{% endif %}>Intern</option>
-                        </select>
+                            <option value="QA Engineer" {% if request.args.get('role') == 'QA Engineer' %}selected{% endif %}>QA Engineer</option>
+                            <option value="Jr. QA Engineer" {% if request.args.get('role') == 'Jr. QA Engineer' %}selected{% endif %}>Jr. QA Engineer</option>
+                            <option value="Sr. QA Engineer" {% if request.args.get('role') == 'Sr. QA Engineer' %}selected{% endif %}>Sr. QA Engineer</option>
+                            <option value="QA Lead" {% if request.args.get('role') == 'QA Lead' %}selected{% endif %}>QA Lead</option>
+                            <option value="Intern" {% if request.args.get('role') == 'Intern' %}selected{% endif %}>Intern</option>
+                          </select>
                     </div>
                     <div class="inner_filter" style="margin-bottom: 10px; margin-top: 20px;">
                         <label for="month" class="filter_label">Month:</label>
-                        <select id="month" onchange="handleFilters()" >
+                        <select id="month" onchange="handleFilters()">
                             {% for month in months %}
-                                <option value="{{ month }}" 
-                                    
-                                    {% if not selected_month and month == current_month %}
-                                        selected
-                                    {% elif selected_month and month == selected_month %}
+                                <option value="{{ month }}"
+                                    {% if selected_month %}
+                                        {% if month == selected_month %} selected {% endif %}
+                                    {% elif month == current_month %}
                                         selected
                                     {% endif %}
                                 >
                                     {{ month }}
                                 </option>
-                             {% endfor %}
+                            {% endfor %}
                         </select>
+                        
                     </div>
                     <div class="inner_filter" style="margin-bottom: 10px; margin-top: 20px;">
                         <label for="week"  class="filter_label">Week:</label>
@@ -164,7 +163,8 @@
                                 <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="candidate_name" checked style="color: black !important;">Name</label>
                                 <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="contact_number" checked>Contact Num</label>
                                 <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="experience" checked> Experience</label>
-                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="qa_lead" id="qaLeadCheckbox" > QA Lead</label>
+                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" name="qa_lead" value="yes" id="qaLeadCheckbox"
+                                    {% if request.args.get('qa_lead') == 'yes' %}checked{% endif %}> QA Lead</label>
                                 <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="role" checked> Role</label>
                                 <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="month" > Month</label>
                                 <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="week" > Week</label>
@@ -227,8 +227,8 @@
                                         </a>
                                         {% if resume.Name|length > 20 %}
                                             <br>
-                                            <a href="#" class="more-info" id="more-info-{{ resume.id }}" 
-                                               onclick="toggleFullName('{{ resume.id }}', '{{ resume.Name }}', event)">More...</a>
+                                            <!-- <a href="#" class="more-info" id="more-info-{{ resume.id }}" 
+                                               onclick="toggleFullName('{{ resume.id }}', '{{ resume.Name }}', event)">More...</a> -->
                                         {% endif %}
                                     {% else %}
                                         <a href="{{ url_for('view_resume', filename=resume.filename) }}" class="long-filename text-break" target="_blank">
@@ -238,11 +238,15 @@
                                         </a>
                                         {% if resume.filename|length > 20 %}
                                             <br>
-                                            <a href="#" class="more-info" id="more-info-{{ resume.id }}" 
-                                               onclick="toggleFullName('{{ resume.id }}', '{{ resume.filename }}', event)">More...</a>
+                                            <!-- <a href="#" class="more-info" id="more-info-{{ resume.id }}" 
+                                               onclick="toggleFullName('{{ resume.id }}', '{{ resume.filename }}', event)">More...</a> -->
+                                               
                                         {% endif %}
                                     {% endif %}
-                     
+                                    <!-- text-decoration: underline  if we need underline in the more info -->
+                                    <a href="#" title="More Info" data-bs-toggle="modal" data-bs-target="#viewModal{{ resume.id }}" 
+                                    
+                                    style="display: block; margin-top: 0.5rem; color: #0d6efd; font-size: 0.9rem; text-decoration: underline">More Info</a>
                                     <a href="{{ url_for('get_intro_status', resume_id=resume.id) }}"  
                                        style="margin-left: 20px; color: red; display: none;" 
                                        onclick="getInterviewStatus(event, {{ resume.id }})">
@@ -362,7 +366,7 @@
                                <td class="wrap-text checkbox-column view" ><a href="{{url_for('resume_details',resume_id=resume.id)}}" class="btn btn-primary mx-1" title="view"><i class="fa-solid fa-eye mx-2" style="color:white;"></i></a></td>
                                <td class="wrap-text checkbox-column action">
                                 <button class="btn btn-primary" title="Edit" style=" display: block; margin-left: auto; margin-right: auto;" onclick="window.location.href='{{ url_for('edit_employee_resume', employee_id=resume.id) }}'"><i class="fa-solid fa-pencil mx-2" style="color:#fff;"></i></button>
-                                <button class="btn btn-primary btn-sm" title="More Info" data-bs-toggle="modal" data-bs-target="#viewModal{{ resume.id }}" style="margin-top: 1rem;">More Info</button>
+                                <!-- <button class="btn btn-primary btn-sm" title="More Info" data-bs-toggle="modal" data-bs-target="#viewModal{{ resume.id }}" style="margin-top: 1rem;">More Info</button> -->
 
                                
                             </tr>
@@ -396,7 +400,20 @@
                     </div>
                     
                 </div>
-                <div style="margin-bottom: 1rem;">
+                <!-- <div style="margin-bottom: 1rem;  margin-top: 1rem; margin-left: 0; text-align: left;" >
+                    <form method="POST" action="{{ url_for('employee',month=selected_month) }}" id="pageSizeForm">
+                    Results per page:
+                    <select name="page_size" class="option" style="width: 4rem !important; margin-bottom: 2rem;font-size:16px;" onchange="document.getElementById('pageSizeForm').submit();">
+                        {% for option in page_size_options %}
+                        <option value="{{ option }}" {% if option == selected_page_size %}selected{% endif %}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                    
+                    <input type="hidden" name="month" value="{{ selected_month }}">
+                    </form>
+                </div> -->
+                
+                  <div style="margin-bottom: 1rem;">
                     <form method="POST" action="{{ url_for('employee',month=selected_month) }}" id="pageSizeForm">
                     Results per page:
                     <select name="page_size" class="option" style="width: 5rem !important; margin-bottom: 2rem;font-size:16px;" onchange="document.getElementById('pageSizeForm').submit();">
@@ -408,7 +425,6 @@
                     <input type="hidden" name="month" value="{{ selected_month }}">
                     </form>
                 </div>
-                
                 
                 
                 </div>
@@ -432,16 +448,16 @@
         let nameElement = document.getElementById("short-name-" + id);
         let buttonElement = document.getElementById("more-info-" + id);
 
-        if (buttonElement.innerText === "More...") {
-            // Expand to full name
-            nameElement.innerText = fullName;
-            buttonElement.innerText = "Less...";
-        } else {
-            // Collapse back to short name
-            nameElement.innerText = fullName.substring(0, 20) + "...";
-            buttonElement.innerText = "More...";
-        }
-    }
+    //     if (buttonElement.innerText === "More...") {
+    //         // Expand to full name
+    //         nameElement.innerText = fullName;
+    //         buttonElement.innerText = "Less...";
+    //     } else {
+    //         // Collapse back to short name
+    //         nameElement.innerText = fullName.substring(0, 20) + "...";
+    //         buttonElement.innerText = "More...";
+    //     }
+     }
 </script>
 
 

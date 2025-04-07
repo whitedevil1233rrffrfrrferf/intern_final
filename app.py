@@ -28,6 +28,7 @@ import time
 import io
 import re
 
+
 load_dotenv()
 app = Flask(__name__)
 profile_images_upload_folder = 'static/profile_images'

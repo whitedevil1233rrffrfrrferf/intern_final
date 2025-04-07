@@ -24,79 +24,84 @@
       {% include 'sidemenu.html' %}
       
       <div class="content" style="padding:10px; height: 100vh; width:100%; margin-left: 150px;">
-        <h1 style="padding: 50px;"><center>Employee Dashboard</center></h1>
-      <div class="flex_div" style="flex: 1; justify-content: space-between;">
-        <div class="row row-cols-1 row-cols-md-3 g-4" style="padding: 10px;">
-          <div class="col">
-            <div class="card h-100" >
-              
-              <div class="card-body" >
-                <i class="fa-solid fa-3x fa-users icons" style="margin-bottom: 20px;"></i>
+        {% if role == 'admin' %}
+          <div>
+            <h1 style="padding: 50px;"><center>Employee Dashboard</center></h1>
+            <div class="flex_div" style="flex: 1; justify-content: space-between;">
+              <div class="row row-cols-1 row-cols-md-3 g-4" style="padding: 10px;">
+                <div class="col">
+                  <div class="card h-100" >
+                    
+                    <div class="card-body" >
+                      <i class="fa-solid fa-3x fa-users icons" style="margin-bottom: 20px;"></i>
+                      
+                      <p class="card-text" >Total number of employees :{{ total_employees }}</p>
+                      <p class="card-text">Number of active employees :{{active_employees }}</p>
+                      <p class="card-text">Number of resigned employees :{{resigned_employees }}</p>
+                      
+                    </div>
+                  </div>
+                </div>
                 
-                <p class="card-text" >Total number of employees :{{ total_employees }}</p>
-                <p class="card-text">Number of active employees :{{active_employees }}</p>
-                <p class="card-text">Number of resigned employees :{{resigned_employees }}</p>
-              </div>
-            </div>
-          </div>
-          
-          
-          <div class="col">
-            <div class="card h-80">
-              <div class="card-body">
-                <i class="fa-solid fa-location-dot fa-2x" style="color: black; margin-bottom: 10px;"></i>
-                <p class="card-text" style="margin-bottom: 0.85rem;">Chennai employees count: {{Chennai_employees_count}}</p>
-                <p class="card-text" style="margin-bottom: 0.85rem;">Kollu employees count: {{kollu_employees_count}}</p>
-                <p class="card-text" style="margin-bottom: 0.85rem;">Kaup employees count: {{kaup_employees_count}}</p>
-                <p class="card-text" style="margin-bottom: 0.85rem;">TN palayam employees count: {{tn_palyam_count}}</p>
-              </div>
-            </div>
-          </div>
-          <div class="col">
-            <div class="card h-80">
-              <div class="card-body" style="max-height:12.8rem; overflow-y: auto;"> <!-- Set a fixed height and enable scrolling -->
-                <i class="fa-solid fa-clipboard-list icon fa-2x" ></i>
-                <div class="row" style="margin-top: 10px;">
-                  <div class="col-12"> <!-- Changed to a single column -->
-                    {% for project, count in project_status_counts.items() %}
-                      <p style=" margin-bottom:1rem;">{{ project }} employees count: {{ count }}</p>
-                    {% endfor %}
+                
+                <div class="col">
+                  <div class="card h-80">
+                    <div class="card-body">
+                      <i class="fa-solid fa-location-dot fa-2x" style="color: black; margin-bottom: 10px;"></i>
+                      <p class="card-text" style="margin-bottom: 0.85rem;">Chennai employees count: {{Chennai_employees_count}}</p>
+                      <p class="card-text" style="margin-bottom: 0.85rem;">Kollu employees count: {{kollu_employees_count}}</p>
+                      <p class="card-text" style="margin-bottom: 0.85rem;">Kaup employees count: {{kaup_employees_count}}</p>
+                      <p class="card-text" style="margin-bottom: 0.85rem;">TN palayam employees count: {{tn_palyam_count}}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div class="col">
-            <div class="card">
-              <div class="card-body" style="max-height: 200px; overflow-y: auto;"> <!-- Set a fixed height and enable scrolling -->
-                <i class="fa-solid fa-briefcase icon fa-2x"></i>
-                <div class="row no-gutters" style="margin-top: 10px;">
-                  <div class="col-12 custom-col"> <!-- Changed to a single column -->
-                    {% for status, count in employment_status_counts.items() %}
-                      <p class="card-text" style="font-size:1rem; margin-bottom:0.8rem;">{{ status }} employees count: {{ count }}</p>
-                    {% endfor %}
+                <div class="col">
+                  <div class="card h-80">
+                    <div class="card-body" style="max-height:12.8rem; overflow-y: auto;"> <!-- Set a fixed height and enable scrolling -->
+                      <i class="fa-solid fa-clipboard-list icon fa-2x" ></i>
+                      <div class="row" style="margin-top: 10px;">
+                        <div class="col-12"> <!-- Changed to a single column -->
+                          {% for project, count in project_status_counts.items() %}
+                            <p style=" margin-bottom:1rem;">{{ project }} employees count: {{ count }}</p>
+                          {% endfor %}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div class="col">
-            <div class="card h-100">
-              <div class="card-body">
-                <img src="https://banner2.cleanpng.com/20190724/geb/kisspng-product-design-technology-font-5d385089740a08.2768103715639717214753.jpg" height="50px" width="50px" class="icons">
-                <p class="card-text">No of Applications: {{total_resumes}}</p>
-                <p class="card-text">No of applications selected :{{hr_selected}}</p>
-              </div>
-            </div>
-          </div>
-          
-          
+                <div class="col">
+                  <div class="card">
+                    <div class="card-body" style="max-height: 200px; overflow-y: auto;"> <!-- Set a fixed height and enable scrolling -->
+                      <i class="fa-solid fa-briefcase icon fa-2x"></i>
+                      <div class="row no-gutters" style="margin-top: 10px;">
+                        <div class="col-12 custom-col"> <!-- Changed to a single column -->
+                          {% for status, count in employment_status_counts.items() %}
+                            <p class="card-text" style="font-size:1rem; margin-bottom:0.8rem;">{{ status }} employees count: {{ count }}</p>
+                          {% endfor %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="card h-100">
+                    <div class="card-body">
+                      <img src="https://banner2.cleanpng.com/20190724/geb/kisspng-product-design-technology-font-5d385089740a08.2768103715639717214753.jpg" height="50px" width="50px" class="icons">
+                      <p class="card-text">No of Applications: {{total_resumes}}</p>
+                      <p class="card-text">No of applications selected :{{hr_selected}}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                
 
-          
+                
+                </div>
+                
+            </div>
+            <hr>
           </div>
-          
-      </div>
-      <hr>
+        {% endif %}  
       <h1 style="padding:20px;"><center>Resume Dashboard</center></h1>
       <div class="flex_div" style="flex: 1; justify-content: space-between; margin-bottom: 20rem !important;">
         <div class="row row-cols-1 row-cols-md-3 g-4" style="padding: 10px;">
@@ -475,63 +480,7 @@
           </div>
         </div>
       </div>
-      <div class="col">
-        <div class="card h-100" style="max-height:19rem; overflow-y: auto; max-width:25.8rem; overflow-x: auto;">
-          
-          <div class="card-body">
-            <table class="table table-bordered">
-              <span style="color: white; font-size:1.3rem;">Overall Interview count</span>
-              <thead>
-                <tr>
-                    
-                    
-                    <th scope="col" class="head">Role</th>
-                    <th scope="col" class="head">Week</th>
-                    <th scope="col" class="head">Intro round</th>
-                    <th scope="col" class="head">Count</th>
-                    <th scope="col" class="head">Interview1 round</th>
-                    <th scope="col" class="head">Count</th>
-                    <th scope="col" class="head">Interview2 round</th>
-                    <th scope="col" class="head">Count</th>
-                    <th scope="col" class="head">HR round</th>
-                    <th scope="col" class="head">Count</th>
-                </tr>
-              <tbody>
-                {% for role, weeks in weekly_statistics.items() %}
-                {% for week_label, week_data in weeks.items() %}
-                    <tr>
-                        {% if loop.first %}
-                            <th rowspan="{{ weeks|length * 2 }}">{{ role }}</th>  <!-- Role in the first column, row spans for each week -->
-                        {% endif %}
-                        <th rowspan="2">{{ week_label }}</th>  <!-- Week in one row -->
-                        <td>Intro Selected</td>
-                        <td>{{ week_data.intro.selected }}</td>
-                        <td>Interview1 Selected</td>
-                        <td>{{ week_data.interview1.selected }}</td>
-                        <td>Interview2 Selected</td>
-                        <td>{{ week_data.interview2.selected }}</td>
-                        <td>HR Selected</td>
-                        <td>{{ week_data.hr.selected }}</td>
-                    </tr>
-                    <tr>
-                        <td>Intro Rejected</td>
-                        <td>{{ week_data.intro.rejected }}</td>
-                        <td>Interview1 Rejected</td>
-                        <td>{{ week_data.interview1.rejected }}</td>
-                        <td>Interview2 Rejected</td>
-                        <td>{{ week_data.interview2.rejected }}</td>
-                        <td>HR Rejected</td>
-                        <td>{{ week_data.hr.rejected }}</td>
-                    </tr>
-                {% endfor %}
-            {% endfor %}
-              </tbody>
-            
-          </table>
-            
-          </div>
-        </div>
-      </div>
+      
         </div>
       </div>
       

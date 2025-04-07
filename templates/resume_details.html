@@ -280,6 +280,10 @@ body {
 
 <!-- new one as per document -->
 
+<!-- new one as per document -->
+
+<!-- new one as per document -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -303,7 +307,7 @@ body {
           margin: 0 auto;
       }
 
-      .stage-wrapper {
+      /* .stage-wrapper {
           display: flex;
           align-items: center;
           gap: 15px;
@@ -320,12 +324,35 @@ body {
           cursor: pointer;
           transition: 0.3s;
           width: 5rem;
-      }
+      } */
 
-      .stage-container:hover {
+
+      .stage-wrapper {
+    display: flex;
+    align-items: stretch; /* Makes both children equal in height */
+    gap: 1rem;
+}
+
+.stage-container {
+    background: #4699F9;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 17rem; 
+}
+
+
+      /* .stage-container:hover {
           background: #0056b3;
           transform: scale(1.05);
-      }
+      } */
 
       .details-container {
           display: flex;
@@ -387,17 +414,19 @@ body {
             text-align: left;
             word-wrap: break-word; /* Prevents text overflow */
         }
+        
   </style>
 </head>
 <body>
     {% include 'sidemenu.html'%}
     <div style="width: 70%; text-align: center; margin-left:17%;">
-      <h1>Interview Details</h1>
+      <h1 style="text-align: center;  background-color:#4699F9;color: white;">Interview Details</h1>
       <div class="container">
           <!-- Stage 1: Intro Call -->
           <div class="stage-wrapper">
               <div class="stage-container">
-                  Intro 
+                <b>Intro</b>
+                  
               </div>
               <div class="stage-details">
                   <div class="stage-header">Intro Call Details</div>
@@ -445,7 +474,7 @@ body {
           <!-- Stage 2: L1 Interview -->
           <div class="stage-wrapper">
               <div class="stage-container">
-                  L1 
+                  <b>L1</b>
               </div>
               <div class="stage-details">
                   <div class="stage-header">L1 Interview Details</div>
@@ -493,7 +522,7 @@ body {
           <!-- Stage 3: L2 Interview -->
           <div class="stage-wrapper">
               <div class="stage-container">
-                  L2 
+                  <b>L2</b> 
               </div>
               <div class="stage-details">
                   <div class="stage-header">L2 Interview Details</div>
@@ -541,7 +570,7 @@ body {
           <!-- Stage 4: HR Interview -->
           <div class="stage-wrapper">
               <div class="stage-container">
-                  HR 
+                  <b>HR</b> 
               </div>
               <div class="stage-details">
                   <div class="stage-header">HR Interview Details</div>

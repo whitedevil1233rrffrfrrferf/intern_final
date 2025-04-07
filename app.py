@@ -1073,7 +1073,11 @@ def signPage():
         if correct_user:
             if correct_user.password==password:
                 session['email'] = email 
-                return redirect(url_for("dashBoard"))
+                if correct_user.Role=="admin":
+                    
+                    return redirect(url_for("dashBoard"))
+                else:
+                    return redirect(url_for("employee"))        
             else:
                 correct_user=None
                 error_message="invalid login credentials"
@@ -1083,7 +1087,13 @@ def signPage():
 @app.route("/dashboard")
 def dashBoard():
     # status=Employee.query.with_entities(Employee.Employment_status).distinct()
-                   
+    email=session.get('email')
+    if email:
+        user=Login.query.filter_by(email=email).first()
+        role=user.Role
+        
+        if not user:
+            return redirect(url_for('login'))              
 
     
     # employment_status_counts={}
@@ -1091,7 +1101,7 @@ def dashBoard():
     #     count=Employee.query.filter_by(Employment_status=stat.Employment_status).count()
         
     #     employment_status_counts[stat.Employment_status]=count
-    return render_template("dashboard.html") 
+    return render_template("dashboard.html",role=role) 
 # @app.route("/home",methods=["GET","POST"])
 # def Home():
 #     default_page_size = 20
@@ -1721,7 +1731,7 @@ def introCall(resume_id):
     candidate_notice_period = safe_get(resume.Notice_period)
     candidate_actual_ctc = safe_get(resume.Actual_CTC)
     candidate_expected_ctc = safe_get(resume.Expected_CTC)
-    candidate_current_link = url_for('introCall', resume_id=resume_id, _external=True)
+    candidate_current_link = url_for('resume_details', resume_id=resume_id, _external=True)
     candidate_next_link = url_for('interview1v', resume_id=resume_id, _external=True)
     existing_entry=Intro.query.filter_by(resumeId=resume.id).first()
     all_panels = Panel.query.all()
@@ -1895,7 +1905,7 @@ def interview1v(resume_id):
     candidate_notice_period = safe_get(resume.Notice_period)
     candidate_actual_ctc = safe_get(resume.Actual_CTC)
     candidate_expected_ctc = safe_get(resume.Expected_CTC)
-    candidate_current_link = url_for('interview1v', resume_id=resume_id, _external=True)
+    candidate_current_link = url_for('resume_details', resume_id=resume_id, _external=True)
     candidate_next_link = url_for('interview2v', resume_id=resume_id, _external=True)
     existing_entry=Interview1.query.filter_by(resumeId=resume.id).first()
     all_panels = Panel.query.all()
@@ -1969,7 +1979,7 @@ def interview2v(resume_id):
     candidate_notice_period = safe_get(resume.Notice_period)
     candidate_actual_ctc = safe_get(resume.Actual_CTC)
     candidate_expected_ctc = safe_get(resume.Expected_CTC)
-    candidate_current_link = url_for('interview2v', resume_id=resume_id, _external=True)
+    candidate_current_link = url_for('resume_details', resume_id=resume_id, _external=True)
     candidate_next_link = url_for('hr', resume_id=resume_id, _external=True)
     existing_entry=Interview2.query.filter_by(resumeId=resume.id).first()
     all_panels = Panel.query.all()
@@ -2043,7 +2053,7 @@ def hr(resume_id):
     candidate_notice_period = safe_get(resume.Notice_period)
     candidate_actual_ctc = safe_get(resume.Actual_CTC)
     candidate_expected_ctc = safe_get(resume.Expected_CTC)
-    candidate_current_link = url_for('hr', resume_id=resume_id, _external=True)
+    candidate_current_link = url_for('resume_details', resume_id=resume_id, _external=True) 
     candidate_next_link = url_for('hr', resume_id=resume_id, _external=True)
     existing_entry=Hr.query.filter_by(resumeId=resume.id).first()
     all_panels = Panel.query.all()

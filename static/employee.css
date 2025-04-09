@@ -109,7 +109,7 @@ select {
     /* border-radius: 5px !important; Rounded corners */
     padding: 3px 12px !important; /* Padding for spacing */
     font-size: 15px !important;  /* Match font size */
-    background-color: white !important;  /* Ensure white background */
+    background-color: #f0f0f0;;  /* Ensure white background */
     cursor: pointer; /* Make cursor same as button */
     text-align: left; /* Align text properly */
     appearance: none; /* Remove default browser select styles */

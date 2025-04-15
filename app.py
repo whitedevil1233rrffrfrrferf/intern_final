@@ -109,6 +109,13 @@ drive_flow = Flow.from_client_config(
 )
 
 
+location_corrections = {
+    "Kollu": "Kollumangudi",
+    "TN palayam":"TN Palayam",
+    "WDC": "Whitefield DC",
+    # add more mappings as needed
+}
+
 
 class Employee(db.Model):
     Sno = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -302,7 +309,7 @@ class Panel(db.Model):
     name = db.Column(db.String(100), nullable=False, unique=True)
     email = db.Column(db.String(100), nullable=False, unique=True)    
 
-def get_distinct_statistics():
+def get_distinct_statistics(): 
     # Querying distinct roles from the Resume table
     distinct_roles = db.session.query(Resume.Role).distinct().all()
     roles_list=[role[0] for role in distinct_roles]
@@ -1056,7 +1063,7 @@ def load_user():
         if user:
             
             g.user_role = user.Role
-            
+            g.user_name = user.Name
         else:
             print("No user found")    
     
@@ -1088,20 +1095,217 @@ def signPage():
 def dashBoard():
     # status=Employee.query.with_entities(Employee.Employment_status).distinct()
     email=session.get('email')
-    if email:
-        user=Login.query.filter_by(email=email).first()
-        role=user.Role
+    project_filter = request.args.get('project', '').strip()
+    designation_filter= request.args.get('designation', '').strip()
+    location_filter= request.args.get('location', '').strip()
+    week_filter=request.args.get('week', '').strip()
+    month_filter=request.args.get('month', '').strip()
+    months=["January","February","March","April","May","June","July","August","September","October","November","December"]
+    if not email:
+        return redirect(url_for('login'))
+    
+    user=Login.query.filter_by(email=email).first()
+    
         
-        if not user:
-            return redirect(url_for('login'))              
+    if not user:
+        return redirect(url_for('login'))  
+
+    user_role=user.Role
+    base_query = Employee.query
+    if project_filter:
+        base_query = base_query.filter(func.trim(Employee.Project) == project_filter)
+    if designation_filter:
+        base_query = base_query.filter(func.trim(Employee.Designation) == designation_filter) 
+    if location_filter:
+        corrected_location_filter = location_corrections.get(location_filter, location_filter)
+        base_query = base_query.filter(func.trim(Employee.Location) == corrected_location_filter)        
+
+    # 🔹 Get all distinct locations
+    trimmed_locations = db.session.query(func.trim(Employee.Location)).distinct()
+    projects = db.session.query(func.trim(Employee.Project)).distinct()
+    Employment_status = db.session.query(func.trim(Employee.Employment_status)).distinct()
+    employee_status = db.session.query(func.trim(Employee.employee_status)).distinct()
+    # Count employees per column
+    location_counts = {}
+    projects_counts = {}
+    Employment_status_counts = {}
+    employee_status_counts={}
 
     
-    # employment_status_counts={}
-    # for stat in status:
-    #     count=Employee.query.filter_by(Employment_status=stat.Employment_status).count()
+
+    ## for loop for storing the column counts
+
+    for loc_tuple in trimmed_locations:
+        loc = loc_tuple[0]
+        count = base_query.filter(func.trim(Employee.Location) == loc).count()
+        location_counts[loc] = count
+
+    for proj_tuple in projects:
+        proj= proj_tuple[0]
+        count=base_query.filter(func.trim(Employee.Project)==proj).count()
+        projects_counts[proj]=count
+
+    for Emp_status in Employment_status:
+        status=Emp_status[0]
+        count=base_query.filter(func.trim(Employee.Employment_status)==status).count()
+        Employment_status_counts[status]=count    
+
+    for emp_status in employee_status:
+        status=emp_status[0]
+        count=base_query.filter(func.trim(Employee.employee_status)==status).count()
+        employee_status_counts[status]=count
+
+    total_employees_from_base = base_query.count()
+    employee_status_counts["Total"] = total_employees_from_base      
+
+    ## Resume base query
+
+    base_query_resume = db.session.query(Resume)  # No filters for now
+    if week_filter:
+        base_query_resume = base_query_resume.filter(func.trim(Resume.week) == week_filter)
+    if month_filter:
+        base_query_resume = base_query_resume.filter(func.trim(Resume.Month) == month_filter)    
+    if hasattr(g, 'user_name'):
+        base_query_resume = base_query_resume.filter(func.trim(Resume.QA_Lead) == g.user_name)
+    ## Overall counts
+
+    # Get all resume IDs
+    resume_ids = [res.id for res in base_query_resume.all()]
+
+    # A helper function that counts distinct statuses from any interview stage
+    def get_status_counts(model, resume_ids):
+        from collections import defaultdict
+        counts = defaultdict(int)
+
+        if not resume_ids:
+            return counts
+
+        # Get all unique statuses for this stage
+        distinct_statuses = db.session.query(func.trim(model.Status)).filter(
+            model.resumeId.in_(resume_ids)
+        ).distinct().all()
+
+        for status_tuple in distinct_statuses:
+            status = status_tuple[0]
+            count = db.session.query(model).filter(
+                model.resumeId.in_(resume_ids),
+                func.trim(model.Status) == status
+            ).count()
+            counts[status] = count
+
+        # Add total count for the stage
+        counts["Total"] = db.session.query(model).filter(model.resumeId.in_(resume_ids)).count()
+
+        return counts
+
+    # Get counts for all stages
+    intro_counts = get_status_counts(Intro, resume_ids)
+    interview1_counts = get_status_counts(Interview1, resume_ids)
+    interview2_counts = get_status_counts(Interview2, resume_ids)
+    hr_counts = get_status_counts(Hr, resume_ids)
+    
+    
+
+    ##role specific counts
+    roles = [r[0] for r in base_query_resume.with_entities(Resume.Role).distinct()]
+    role_intro_stats = {}
+    role_interview1_stats = {}
+    role_interview2_stats={}
+    role_hr_stats={}
+
+    for role in roles:
+        resume_ids = [r.id for r in base_query_resume.filter(Resume.Role == role)]
+        role_intro_stats[role] = get_status_counts(Intro, resume_ids) 
+        role_interview1_stats[role] = get_status_counts(Interview1, resume_ids) 
+        role_interview2_stats[role] = get_status_counts(Interview2, resume_ids)
+        role_hr_stats[role] = get_status_counts(Hr, resume_ids)
+
+    print(role_intro_stats)    
+    
+    role_statistics = {}
+
+    for role in role_intro_stats:
+        intro_stats = role_intro_stats.get(role, {})
+        interview1_stats = role_interview1_stats.get(role, {})
+        interview2_stats = role_interview2_stats.get(role, {})
+        hr_stats = role_hr_stats.get(role, {})
+
+        role_statistics[role] = {
+            'intro': {
+                'selected': intro_stats.get("Move to Interview 1", 0),
+                'rejected': intro_stats.get("Rejected", 0),
+                'hold': intro_stats.get("On Hold", 0)
+            },
+            'interview1': {
+                'selected': interview1_stats.get("Move to Interview 2", 0),
+                'rejected': interview1_stats.get("Rejected", 0),
+                'hold': interview1_stats.get("On Hold", 0)
+            },
+            'interview2': {
+                'selected': interview2_stats.get("Move to HR", 0),
+                'rejected': interview2_stats.get("Rejected", 0),
+                'hold': interview2_stats.get("On Hold", 0)
+            },
+            'hr': {
+                'selected': hr_stats.get("Move to HR Process", 0),
+                'rejected': hr_stats.get("Rejected", 0),
+                'hold': hr_stats.get("On Hold", 0)
+            }
+        }
         
-    #     employment_status_counts[stat.Employment_status]=count
-    return render_template("dashboard.html",role=role) 
+    ## LEAD STATISTICS
+    distinct_leads = base_query_resume.filter(Resume.QA_Lead.isnot(None)).with_entities(Resume.QA_Lead).distinct().all()
+    leads = [lead[0] for lead in distinct_leads]
+    lead_intro_stats = {}
+    lead_interview1_stats = {}
+    lead_interview2_stats = {}
+    lead_hr_stats = {}
+
+    # Step 3: Loop through each lead and calculate stats
+    for lead in leads:
+        resume_ids = [r.id for r in base_query_resume.filter(Resume.QA_Lead == lead)]
+        lead_intro_stats[lead] = get_status_counts(Intro, resume_ids)
+        lead_interview1_stats[lead] = get_status_counts(Interview1, resume_ids)
+        lead_interview2_stats[lead] = get_status_counts(Interview2, resume_ids)
+        lead_hr_stats[lead] = get_status_counts(Hr, resume_ids)
+
+    # Step 4: Build the final lead_statistics structure
+    lead_statistics = {}
+
+    for lead in lead_intro_stats:
+        intro_stats = lead_intro_stats.get(lead, {})
+        interview1_stats = lead_interview1_stats.get(lead, {})
+        interview2_stats = lead_interview2_stats.get(lead, {})
+        hr_stats = lead_hr_stats.get(lead, {})
+
+        lead_statistics[lead] = {
+            'intro': {
+                'selected': intro_stats.get("Move to Interview 1", 0),
+                'rejected': intro_stats.get("Rejected", 0),
+                'hold': intro_stats.get("On Hold", 0)
+            },
+            'interview1': {
+                'selected': interview1_stats.get("Move to Interview 2", 0),
+                'rejected': interview1_stats.get("Rejected", 0),
+                'hold': interview1_stats.get("On Hold", 0)
+            },
+            'interview2': {
+                'selected': interview2_stats.get("Move to HR", 0),
+                'rejected': interview2_stats.get("Rejected", 0),
+                'hold': interview2_stats.get("On Hold", 0)
+            },
+            'hr': {
+                'selected': hr_stats.get("Move to HR Process", 0),
+                'rejected': hr_stats.get("Rejected", 0),
+                'hold': hr_stats.get("On Hold", 0)
+            }
+        }
+       
+        
+
+    
+
+    return render_template("dashboard.html",user_role=user_role,location_counts=location_counts,projects_counts=projects_counts,Employment_status_counts=Employment_status_counts,employee_status_counts=employee_status_counts,intro_counts=intro_counts,interview1_counts=interview1_counts,interview2_counts=interview2_counts,hr_counts=hr_counts,role_statistics=role_statistics,project=project_filter,designation=designation_filter,location=location_filter,months=months,week_filter=week_filter,month_filter=month_filter,lead_statistics=lead_statistics) 
 # @app.route("/home",methods=["GET","POST"])
 # def Home():
 #     default_page_size = 20
@@ -3197,6 +3401,8 @@ def upload_to_drive():
 def edit_employee_resume(employee_id):
     # Fetch employee details from the database using employee_id
     resume = Resume.query.get(employee_id)
+    ## pass the panel members to the template
+    panel_members = Panel.query.all()
     if request.method=="POST":
         resume.Email=request.form['email']
         resume.Name=request.form['name']
@@ -3214,7 +3420,7 @@ def edit_employee_resume(employee_id):
         
         db.session.commit()
         flash('Successfully updated!', 'success')
-    return render_template("update_resume.html",resume=resume)
+    return render_template("update_resume.html",resume=resume,panel_members=panel_members)
 
 
 @app.route("/form_test", methods=["GET","POST"])

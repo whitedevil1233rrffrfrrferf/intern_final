@@ -23,6 +23,7 @@
     var date="{{date}}"
     var addPanelUrl="{{ url_for('add_panel_member') }}"
     var deletePanelUrl="{{ url_for('delete_panel') }}"
+    cand="{{candidate_role}}"
   </script>
   <div style="display: flex;">
     {% include 'sidemenu.html'%}
@@ -303,6 +304,7 @@ document.addEventListener("click", function (event) {
 
 
 <script>
+    
     document.addEventListener("DOMContentLoaded", function () {
         emailjs.init("Nce5bwHWE3-gXvm-9"); // EmailJS User ID
 

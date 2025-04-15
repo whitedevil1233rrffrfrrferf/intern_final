@@ -191,6 +191,7 @@
                     <th class="head">Jr QA Engg</th>
                     <th class="head">QA Engg</th>
                     <th class="head">Sr QA Engg</th>
+                    <th class="head">QA Lead</th>
                     <th class="head">Grand Total</th>
                 </tr>
             </thead>
@@ -205,10 +206,14 @@
                   {{ role_statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('selected', 0) }}
                 </td>
                 <td>
+                  {{ role_statistics.get('QA Lead', {}).get('intro', {}).get('selected', 0) }}
+                </td>
+                <td>
                   <!-- Grand Total for the Intro round -->
                   {{ role_statistics.get('Jr. QA Engineer', {}).get('intro', {}).get('selected', 0) +
                     role_statistics.get('QA Engineer', {}).get('intro', {}).get('selected', 0) +
-                    role_statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('selected', 0) }}
+                    role_statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('selected', 0)+
+                    role_statistics.get('QA Lead', {}).get('intro', {}).get('selected', 0) }}
                 </td>
               </tr>
               <tr>
@@ -220,12 +225,15 @@
                 <td>
                   {{ role_statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('rejected', 0) }}
                 </td>
-                
+                <td>
+                  {{ role_statistics.get('QA Lead', {}).get('intro', {}).get('rejected', 0) }}
+                </td>
                   <td>
                     <!-- Grand Total for the Intro round -->
                     {{ role_statistics.get('Jr. QA Engineer', {}).get('intro', {}).get('rejected', 0) +
                       role_statistics.get('QA Engineer', {}).get('intro', {}).get('rejected', 0) +
-                      role_statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('rejected', 0) }}
+                      role_statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('rejected', 0) +
+                      role_statistics.get('QA Lead', {}).get('intro', {}).get('rejected', 0) }}
                   </td>
                 
               </tr>
@@ -238,12 +246,16 @@
                 <td>
                   {{ role_statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('hold', 0) }}
                 </td>
-                
+                <td>
+                  {{ role_statistics.get('QA Lead', {}).get('intro', {}).get('hold', 0) }}
+                </td>
                   <td>
                     <!-- Grand Total for the Intro round -->
                     {{ role_statistics.get('Jr. QA Engineer', {}).get('intro', {}).get('hold', 0) +
                       role_statistics.get('QA Engineer', {}).get('intro', {}).get('hold', 0) +
-                      role_statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('hold', 0) }}
+                      role_statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('hold', 0) +
+                      role_statistics.get('QA Lead', {}).get('intro', {}).get('hold', 0)
+                     }}
                   </td>
                 
               </tr>
@@ -257,10 +269,14 @@
                   {{ role_statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('selected', 0) }}
                 </td>
                 <td>
+                  {{ role_statistics.get('QA Lead', {}).get('interview1', {}).get('selected', 0) }}
+                </td>
+                <td>
                   <!-- Grand Total for the Intro round -->
                   {{ role_statistics.get('Jr. QA Engineer', {}).get('interview1', {}).get('selected', 0) +
                      role_statistics.get('QA Engineer', {}).get('interview1', {}).get('selected', 0) +
-                     role_statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('selected', 0) }}
+                     role_statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('selected', 0)+
+                     role_statistics.get('QA Lead', {}).get('interview1', {}).get('selected', 0) }}
                 </td>
               </tr>
               <tr>
@@ -273,10 +289,14 @@
                   {{ role_statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('rejected', 0) }}
                 </td>
                 <td>
+                  {{ role_statistics.get('QA Lead', {}).get('interview1', {}).get('rejected', 0) }}
+                </td>
+                <td>
                   <!-- Grand Total for the Intro round -->
                   {{ role_statistics.get('Jr. QA Engineer', {}).get('interview1', {}).get('rejected', 0) +
                      role_statistics.get('QA Engineer', {}).get('interview1', {}).get('rejected', 0) +
-                     role_statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('rejected', 0) }}
+                     role_statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('rejected', 0) +
+                     role_statistics.get('QA Lead', {}).get('interview1', {}).get('rejected', 0) }}
                 </td>
               </tr>
               <tr>
@@ -289,10 +309,14 @@
                   {{ role_statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('hold', 0) }}
                 </td>
                 <td>
+                  {{ role_statistics.get('QA Lead', {}).get('interview1', {}).get('hold', 0) }}
+                </td>
+                <td>
                   <!-- Grand Total for the Intro round -->
                   {{ role_statistics.get('Jr. QA Engineer', {}).get('interview1', {}).get('hold', 0) +
                      role_statistics.get('QA Engineer', {}).get('interview1', {}).get('hold', 0) +
-                     role_statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('hold', 0) }}
+                     role_statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('hold', 0)+
+                     role_statistics.get('QA Lead', {}).get('interview1', {}).get('hold', 0)  }}
                 </td>
               </tr>
               <tr>
@@ -305,10 +329,14 @@
                   {{ role_statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('selected', 0) }}
                 </td>
                 <td>
+                  {{ role_statistics.get('QA Lead', {}).get('interview2', {}).get('selected', 0) }}
+                </td>
+                <td>
                   <!-- Grand Total for the Intro round -->
                   {{ role_statistics.get('Jr. QA Engineer', {}).get('interview2', {}).get('selected', 0) +
                      role_statistics.get('QA Engineer', {}).get('interview2', {}).get('selected', 0) +
-                     role_statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('selected', 0) }}
+                     role_statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('selected', 0)+
+                     role_statistics.get('QA Lead', {}).get('interview2', {}).get('selected', 0) }}
                 </td>
               </tr>
               <tr>
@@ -321,10 +349,14 @@
                   {{ role_statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('rejected', 0) }}
                 </td>
                 <td>
+                  {{ role_statistics.get('QA Lead', {}).get('interview2', {}).get('rejected', 0) }}
+                </td>
+                <td>
                   <!-- Grand Total for the Intro round -->
                   {{ role_statistics.get('Jr. QA Engineer', {}).get('interview2', {}).get('rejected', 0) +
                      role_statistics.get('QA Engineer', {}).get('interview2', {}).get('rejected', 0) +
-                     role_statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('rejected', 0) }}
+                     role_statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('rejected', 0)+
+                     role_statistics.get('QA Lead', {}).get('interview2', {}).get('rejected', 0) }}
                 </td>
               </tr>
               <tr>
@@ -337,10 +369,14 @@
                   {{ role_statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('hold', 0) }}
                 </td>
                 <td>
+                  {{ role_statistics.get('QA Lead', {}).get('interview2', {}).get('hold', 0) }}
+                </td>
+                <td>
                   <!-- Grand Total for the Intro round -->
                   {{ role_statistics.get('Jr. QA Engineer', {}).get('interview2', {}).get('hold', 0) +
                      role_statistics.get('QA Engineer', {}).get('interview2', {}).get('hold', 0) +
-                     role_statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('hold', 0) }}
+                     role_statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('hold', 0)+
+                     role_statistics.get('QA Lead', {}).get('interview2', {}).get('hold', 0) }}
                 </td>
               </tr>
               <tr>
@@ -353,10 +389,14 @@
                   {{ role_statistics.get('Sr. QA Engineer', {}).get('hr', {}).get('selected', 0) }}
                 </td>
                 <td>
+                  {{ role_statistics.get('QA Lead', {}).get('hr', {}).get('selected', 0) }}
+                </td>
+                <td>
                   <!-- Grand Total for the Intro round -->
                   {{ role_statistics.get('Jr. QA Engineer', {}).get('hr', {}).get('selected', 0) +
                      role_statistics.get('QA Engineer', {}).get('hr', {}).get('selected', 0) +
-                     role_statistics.get('Sr. QA Engineer', {}).get('hr', {}).get('selected', 0) }}
+                     role_statistics.get('Sr. QA Engineer', {}).get('hr', {}).get('selected', 0)+
+                     role_statistics.get('QA Lead', {}).get('hr', {}).get('selected', 0) }}
                 </td>
               </tr>
               <tr>
@@ -369,10 +409,34 @@
                   {{ role_statistics.get('Sr. QA Engineer', {}).get('hr', {}).get('rejected', 0) }}
                 </td>
                 <td>
+                  {{ role_statistics.get('QA Lead', {}).get('hr', {}).get('rejected', 0) }}
+                </td>
+                <td>
                   <!-- Grand Total for the Intro round -->
                   {{ role_statistics.get('Jr. QA Engineer', {}).get('hr', {}).get('rejected', 0) +
                      role_statistics.get('QA Engineer', {}).get('hr', {}).get('rejected', 0) +
-                     role_statistics.get('Sr. QA Engineer', {}).get('hr', {}).get('rejected', 0) }}
+                     role_statistics.get('Sr. QA Engineer', {}).get('hr', {}).get('rejected', 0)+
+                     role_statistics.get('QA Lead', {}).get('hr', {}).get('rejected', 0) }}
+                </td>
+              </tr>
+              <tr>
+                <td><strong>HR Hold</strong></td>
+                <td>{{ role_statistics.get('Jr. QA Engineer', {}).get('hr', {}).get('hold', 0) }}</td>
+                <td>
+                  {{ role_statistics.get('QA Engineer', {}).get('hr', {}).get('hold', 0) }}
+                </td>
+                <td>
+                  {{ role_statistics.get('Sr. QA Engineer', {}).get('hr', {}).get('hold', 0) }}
+                </td>
+                <td>
+                  {{ role_statistics.get('QA Lead', {}).get('hr', {}).get('hold', 0) }}
+                </td>
+                <td>
+                  <!-- Grand Total for the Intro round -->
+                  {{ role_statistics.get('Jr. QA Engineer', {}).get('hr', {}).get('hold', 0) +
+                     role_statistics.get('QA Engineer', {}).get('hr', {}).get('hold', 0) +
+                     role_statistics.get('Sr. QA Engineer', {}).get('hr', {}).get('hold', 0)+
+                     role_statistics.get('QA Lead', {}).get('hr', {}).get('hold', 0) }}
                 </td>
               </tr>
               

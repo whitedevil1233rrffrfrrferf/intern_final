@@ -551,16 +551,34 @@
     document.addEventListener("DOMContentLoaded", function () {
         const urlParams = new URLSearchParams(window.location.search);
         const searchValue = urlParams.get("search");
-
+        const selectedMonth = urlParams.get("month");
+        const selectedWeek = urlParams.get("week");
         const qaLeadCheckbox = document.querySelector("input[value='qa_lead']");
 
-        if (searchValue && searchValue.toLowerCase().includes("qa")) {
+        if (searchValue ) {
             // Auto-check QA Lead
             qaLeadCheckbox.checked = true;
 
             // Trigger change event to show the column
             let event = new Event("change");
             qaLeadCheckbox.dispatchEvent(event);
+        }
+        if (selectedMonth) {
+            const monthCheckbox = document.querySelector("input[value='month']");
+            if (monthCheckbox) {
+                monthCheckbox.checked = true;
+                monthCheckbox.dispatchEvent(new Event("change"));
+            }
+        }
+
+        if (selectedWeek) {
+            const weekCheckbox = document.querySelector("input[value='week']");
+            if (weekCheckbox) {
+                weekCheckbox.checked = true;
+                weekCheckbox.dispatchEvent(new Event("change"));
+            }
+
+            
         }
 
         // Your existing checkbox logic

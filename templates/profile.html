@@ -86,10 +86,12 @@
                 <input type="checkbox" id="user" name="role" value="user" {{ 'checked' if role == 'user' else '' }}>
                 <label for="user">User</label><br>
             </div> -->
-
+            <h1>{{user_role}}</h1>
             <div style="display: flex; margin-left: 30%;margin-top: 2rem;">
                 <button type="submit" class="btn btn-primary" style="width:6rem; height:3rem; margin-right: 2rem;">Submit</button>
-                <a class="btn btn-outline-secondary" href="{{url_for('Home')}}" style="padding:10px ;width:6rem; height:3rem;"><div style="display: flex; justify-content: space-between; padding:5px;">
+                <a class="btn btn-outline-secondary"
+                   href="{{ url_for('Home') if role == 'admin' else url_for('dashBoard') }}" 
+                   style="padding:10px ;width:6rem; height:3rem;"><div style="display: flex; justify-content: space-between; padding:5px;">
                     <div>
                       <i class="fa-solid fa-backward" style="margin-right: 10px;"></i>
                     </div>
@@ -97,7 +99,7 @@
                       Back
                     </div>
                   </div>
-                  </a>
+                </a>
             </div>
             
         </form>

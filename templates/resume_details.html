@@ -521,101 +521,102 @@ body {
                   </div>
               </div>
           </div>
-
-          <!-- Stage 3: L2 Interview -->
-          <div class="stage-wrapper">
-              <div class="stage-container">
-                  <b>L2</b> 
-              </div>
-              <div class="stage-details">
-                  <div class="stage-header">L2 Interview Details</div>
-                  <div class="details-container">
-                      <!-- <div class="details-row">
-                          <div class="details-column">
-                              <div class="label">Date:</div>
-                              <div class="label">Status:</div>
-                              <div class="label">Panel Member1 Feedback:</div>
-                              <div class="label">Panel Member2 Feedback:</div>
-                              <div class="label">Panel Names:</div>
-                          </div>
-                          <div class="details-column">
-                              <div class="value">{{ interview2.Date }}</div>
-                              <div class="value">{{ interview2.Status }}</div>
-                              <div class="value">{{ interview2.PanelMember1Feedback }}</div>
-                              <div class="value">{{ interview2.PanelMember2Feedback }}</div>
-                              <div class="value">{{ interview2.SelectedPanel }}</div>
-                          </div>
-                      </div> -->
-                      <div class="details-row">
-                        <span class="label">Date:</span>
-                        <span class="value">{{ interview2.Date }}</span>
-                      </div>
-                      <div class="details-row">
-                          <span class="label">Status:</span>
-                          <span class="value">{{ interview2.Status }}</span>
-                      </div>
-                      {% if interview2_panel_feedback %}
-                        {% for panel_member, feedback in interview2_panel_feedback.items() %}
-                            <div class="details-row">
-                                <span class="label">{{panel_member}} Feedback:</span>
-                                <span class="value">{{ feedback }}</span>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                      <div class="details-row">
-                          <span class="label">Panel Names:</span>
-                          <span class="value">{{ interview2.SelectedPanel }}</span>
-                      </div>
+          {% if g.user_role == 'admin' %}
+              <!-- Stage 3: L2 Interview -->
+              <div class="stage-wrapper">
+                  <div class="stage-container">
+                      <b>L2</b> 
                   </div>
-              </div>
-          </div>
-
-          <!-- Stage 4: HR Interview -->
-          <div class="stage-wrapper">
-              <div class="stage-container">
-                  <b>HR</b> 
-              </div>
-              <div class="stage-details">
-                  <div class="stage-header">HR Interview Details</div>
-                  <div class="details-container">
-                      <!-- <div class="details-row">
-                          <div class="details-column">
-                              <div class="label">Date:</div>
-                              <div class="label">Status:</div>
-                              <div class="label">Panel Member1 Feedback:</div>
-                              <div class="label">Panel Member2 Feedback:</div>
-                              <div class="label">Panel Names:</div>
-                          </div>
-                          <div class="details-column">
-                              <div class="value">{{ hr.Date }}</div>
-                              <div class="value">{{ hr.Status }}</div>
-                              <div class="value">{{ hr.PanelMember1Feedback }}</div>
-                              <div class="value">{{ hr.PanelMember2Feedback }}</div>
-                              <div class="value">{{ hr.SelectedPanel }}</div>
+                  <div class="stage-details">
+                      <div class="stage-header">L2 Interview Details</div>
+                      <div class="details-container">
+                          <!-- <div class="details-row">
+                              <div class="details-column">
+                                  <div class="label">Date:</div>
+                                  <div class="label">Status:</div>
+                                  <div class="label">Panel Member1 Feedback:</div>
+                                  <div class="label">Panel Member2 Feedback:</div>
+                                  <div class="label">Panel Names:</div>
+                              </div>
+                              <div class="details-column">
+                                  <div class="value">{{ interview2.Date }}</div>
+                                  <div class="value">{{ interview2.Status }}</div>
+                                  <div class="value">{{ interview2.PanelMember1Feedback }}</div>
+                                  <div class="value">{{ interview2.PanelMember2Feedback }}</div>
+                                  <div class="value">{{ interview2.SelectedPanel }}</div>
+                              </div>
                           </div> -->
                           <div class="details-row">
                             <span class="label">Date:</span>
-                            <span class="value">{{ hr.Date }}</span>
+                            <span class="value">{{ interview2.Date }}</span>
                           </div>
                           <div class="details-row">
                               <span class="label">Status:</span>
-                              <span class="value">{{ hr.Status }}</span>
+                              <span class="value">{{ interview2.Status }}</span>
                           </div>
-                          {% if hr_panel_feedback %}
-                              {% for panel_member, feedback in hr_panel_feedback.items() %}
-                                  <div class="details-row">
-                                      <span class="label">{{panel_member}} Feedback:</span>
-                                      <span class="value">{{ feedback }}</span>
-                                  </div>
-                              {% endfor %}
-                          {% endif %}
+                          {% if interview2_panel_feedback %}
+                            {% for panel_member, feedback in interview2_panel_feedback.items() %}
+                                <div class="details-row">
+                                    <span class="label">{{panel_member}} Feedback:</span>
+                                    <span class="value">{{ feedback }}</span>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
                           <div class="details-row">
                               <span class="label">Panel Names:</span>
-                              <span class="value">{{ hr.SelectedPanel }}</span>
+                              <span class="value">{{ interview2.SelectedPanel }}</span>
                           </div>
                       </div>
                   </div>
               </div>
+
+              <!-- Stage 4: HR Interview -->
+              <div class="stage-wrapper">
+                  <div class="stage-container">
+                      <b>HR</b> 
+                  </div>
+                  <div class="stage-details">
+                      <div class="stage-header">HR Interview Details</div>
+                      <div class="details-container">
+                          <!-- <div class="details-row">
+                              <div class="details-column">
+                                  <div class="label">Date:</div>
+                                  <div class="label">Status:</div>
+                                  <div class="label">Panel Member1 Feedback:</div>
+                                  <div class="label">Panel Member2 Feedback:</div>
+                                  <div class="label">Panel Names:</div>
+                              </div>
+                              <div class="details-column">
+                                  <div class="value">{{ hr.Date }}</div>
+                                  <div class="value">{{ hr.Status }}</div>
+                                  <div class="value">{{ hr.PanelMember1Feedback }}</div>
+                                  <div class="value">{{ hr.PanelMember2Feedback }}</div>
+                                  <div class="value">{{ hr.SelectedPanel }}</div>
+                              </div> -->
+                              <div class="details-row">
+                                <span class="label">Date:</span>
+                                <span class="value">{{ hr.Date }}</span>
+                              </div>
+                              <div class="details-row">
+                                  <span class="label">Status:</span>
+                                  <span class="value">{{ hr.Status }}</span>
+                              </div>
+                              {% if hr_panel_feedback %}
+                                  {% for panel_member, feedback in hr_panel_feedback.items() %}
+                                      <div class="details-row">
+                                          <span class="label">{{panel_member}} Feedback:</span>
+                                          <span class="value">{{ feedback }}</span>
+                                      </div>
+                                  {% endfor %}
+                              {% endif %}
+                              <div class="details-row">
+                                  <span class="label">Panel Names:</span>
+                                  <span class="value">{{ hr.SelectedPanel }}</span>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              {% endif %}
           </div>
 
       </div>

@@ -1161,12 +1161,21 @@ def dashBoard():
     ## Resume base query
 
     base_query_resume = db.session.query(Resume)  # No filters for now
-    if week_filter:
-        base_query_resume = base_query_resume.filter(func.trim(Resume.week) == week_filter)
-    if month_filter:
-        base_query_resume = base_query_resume.filter(func.trim(Resume.Month) == month_filter)    
+    
     if hasattr(g, 'user_name'):
-        base_query_resume = base_query_resume.filter(func.trim(Resume.QA_Lead) == g.user_name)
+        base_query_resume = base_query_resume.filter(
+            func.lower(func.trim(Resume.QA_Lead)) == g.user_name.lower()
+        )
+
+    if week_filter:
+        base_query_resume = base_query_resume.filter(
+            func.lower(func.trim(Resume.week)) == week_filter.lower()
+        )
+
+    if month_filter:
+        base_query_resume = base_query_resume.filter(
+            func.lower(func.trim(Resume.Month)) == month_filter.lower()
+        )         
     ## Overall counts
 
     # Get all resume IDs
@@ -1220,7 +1229,7 @@ def dashBoard():
         role_interview2_stats[role] = get_status_counts(Interview2, resume_ids)
         role_hr_stats[role] = get_status_counts(Hr, resume_ids)
 
-    print(role_intro_stats)    
+      
     
     role_statistics = {}
 
@@ -1252,7 +1261,7 @@ def dashBoard():
                 'hold': hr_stats.get("On Hold", 0)
             }
         }
-        
+    print("ss",role_statistics)    
     ## LEAD STATISTICS
     distinct_leads = base_query_resume.filter(Resume.QA_Lead.isnot(None)).with_entities(Resume.QA_Lead).distinct().all()
     leads = [lead[0] for lead in distinct_leads]
@@ -2163,7 +2172,8 @@ def interview1v(resume_id):
             flash("Candidate Kept on hold", "warning") 
         elif status == "Move to Interview 2":
             interview_url = url_for('interview2v', resume_id=resume_id)
-            flash(f"Candidate Moved to L2 — <a href='{interview_url}' class='alert-link'>Go to L2</a>", "success")
+            if g.user_role == 'admin':
+                flash(f"Candidate Moved to L2 — <a href='{interview_url}' class='alert-link'>Go to L2</a>", "success")
         return redirect(url_for('interview1v', resume_id=resume.id))
     return render_template("interview1.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date,selected_panels=selected_panels,comments_dict=comments_dict,all_panels=all_panels,candidate_name=candidate_name,candidate_email = candidate_email,candidate_phone=candidate_phone,candidate_role=candidate_role,candidate_experience=candidate_experience,candidate_location=candidate_location,candidate_notice_period=candidate_notice_period,candidate_actual_ctc=candidate_actual_ctc,candidate_expected_ctc=candidate_expected_ctc,candidate_current_link=candidate_current_link,candidate_next_link=candidate_next_link,is_mandatory_missing=is_mandatory_missing)
 
@@ -2237,7 +2247,8 @@ def interview2v(resume_id):
             flash("Candidate Kept on hold", "warning")     
         elif status == "Move to HR Round":
             interview_url = url_for('hr', resume_id=resume_id)
-            flash(f"Candidate Moved to HR — <a href='{interview_url}' class='alert-link'>Go to HR</a>", "success")
+            if g.user_role == 'admin':
+                flash(f"Candidate Moved to HR — <a href='{interview_url}' class='alert-link'>Go to HR</a>", "success")
         return redirect(url_for('interview2v', resume_id=resume.id))
     return render_template("interview2.html",resume=resume,comments1=comments1,status1=status1,selected_panel=selected_panel,date=date,selected_panels=selected_panels,comments_dict=comments_dict,all_panels=all_panels,candidate_name=candidate_name,candidate_email = candidate_email,candidate_phone=candidate_phone,candidate_role=candidate_role,candidate_experience=candidate_experience,candidate_location=candidate_location,candidate_notice_period=candidate_notice_period,candidate_actual_ctc=candidate_actual_ctc,candidate_expected_ctc=candidate_expected_ctc,candidate_current_link=candidate_current_link,candidate_next_link=candidate_next_link,is_mandatory_missing=is_mandatory_missing)
 

@@ -1093,6 +1093,11 @@ def signPage():
     return render_template("sign.html",error_message=error_message)   
 @app.route("/dashboard")
 def dashBoard():
+    data = {"Intro Selected": 10, "Intro Rejected": 5}
+    chart_data = {
+        "labels": list(data.keys()),
+        "values": list(data.values())  # ✅ note the () after values
+    }
     # status=Employee.query.with_entities(Employee.Employment_status).distinct()
     email=session.get('email')
     project_filter = request.args.get('project', '').strip()
@@ -1162,7 +1167,7 @@ def dashBoard():
 
     base_query_resume = db.session.query(Resume)  # No filters for now
     
-    if hasattr(g, 'user_name'):
+    if hasattr(g, 'user_name') and getattr(g, 'user_role', None) == 'interviewer':
         base_query_resume = base_query_resume.filter(
             func.lower(func.trim(Resume.QA_Lead)) == g.user_name.lower()
         )
@@ -1212,7 +1217,16 @@ def dashBoard():
     interview1_counts = get_status_counts(Interview1, resume_ids)
     interview2_counts = get_status_counts(Interview2, resume_ids)
     hr_counts = get_status_counts(Hr, resume_ids)
-    
+    grand_total = (
+        intro_counts.get("Total", 0) +
+        interview1_counts.get("Total", 0) +
+        interview2_counts.get("Total", 0) +
+        hr_counts.get("Total", 0)
+    )
+
+    overall_counts = {
+        "grand_total": grand_total
+    }
     
 
     ##role specific counts
@@ -1260,8 +1274,7 @@ def dashBoard():
                 'rejected': hr_stats.get("Rejected", 0),
                 'hold': hr_stats.get("On Hold", 0)
             }
-        }
-    print("ss",role_statistics)    
+        }   
     ## LEAD STATISTICS
     distinct_leads = base_query_resume.filter(Resume.QA_Lead.isnot(None)).with_entities(Resume.QA_Lead).distinct().all()
     leads = [lead[0] for lead in distinct_leads]
@@ -1309,12 +1322,172 @@ def dashBoard():
                 'hold': hr_stats.get("On Hold", 0)
             }
         }
-       
-        
-
+     
+    raw_data = {
+        "Intro Round Selected": intro_counts.get("Move to Interview 1", 0),
+        "Intro Round Rejected": intro_counts.get("Rejected", 0),
+        "Intro Round Hold": intro_counts.get("On Hold", 0),
+        "L1 Selected": interview1_counts.get("Move to Interview 2", 0),
+        "L1 Rejected": interview1_counts.get("Rejected", 0),
+        "L1 Hold": interview1_counts.get("On Hold", 0),
+        "L2 Selected": interview2_counts.get("Move to HR Round", 0),
+        "L2 Rejected": interview2_counts.get("Rejected", 0),
+        "L2 Hold": interview2_counts.get("On Hold", 0),
+        "HR Selected": hr_counts.get("Move to HR Process", 0),
+        "HR Rejected": hr_counts.get("Rejected", 0),
+        "HR Hold": hr_counts.get("On Hold", 0)
+    }
+    total_selected = raw_data.get('Intro Round Selected', 0) + raw_data.get('L1 Selected', 0)  + raw_data.get('L2 Selected', 0) + raw_data.get('HR Selected', 0)
+    total_rejected = raw_data.get('Intro Round Rejected', 0)
+    total_hold = raw_data.get('L1 Hold', 0)
     
+    # Remove all zero values
+    chart_labels = [label for label, value in raw_data.items() if value != 0]
+    chart_values = [value for value in raw_data.values() if value != 0]
+    selected_hover = []
+    rejected_hover = []
+    hold_hover = []
+    total_selected = 0
+    lead_breakdowns = {
+        'Selected': {},
+        'Rejected': {},
+        'Hold': {}
+    }
 
-    return render_template("dashboard.html",user_role=user_role,location_counts=location_counts,projects_counts=projects_counts,Employment_status_counts=Employment_status_counts,employee_status_counts=employee_status_counts,intro_counts=intro_counts,interview1_counts=interview1_counts,interview2_counts=interview2_counts,hr_counts=hr_counts,role_statistics=role_statistics,project=project_filter,designation=designation_filter,location=location_filter,months=months,week_filter=week_filter,month_filter=month_filter,lead_statistics=lead_statistics) 
+    for lead, stats in lead_statistics.items():
+        selected_total = stats['intro']['selected'] + stats['interview1']['selected'] + stats['interview2']['selected'] + stats['hr']['selected']
+        rejected_total = stats['intro']['rejected'] + stats['interview1']['rejected'] + stats['interview2']['rejected'] + stats['hr']['rejected']
+        hold_total = stats['intro']['hold'] + stats['interview1']['hold'] + stats['interview2']['hold'] + stats['hr']['hold']
+
+        selected_hover.append(f"{lead}: {selected_total}")
+        rejected_hover.append(f"{lead}: {rejected_total}")
+        hold_hover.append(f"{lead}: {hold_total}")
+
+        lead_breakdowns['Selected'][lead] = selected_total
+        lead_breakdowns['Rejected'][lead] = rejected_total
+        lead_breakdowns['Hold'][lead] = hold_total
+
+    hover_texts = [
+        "Selected:<br>" + "<br>".join(selected_hover),
+        "Rejected:<br>" + "<br>".join(rejected_hover),
+        "Hold:<br>" + "<br>".join(hold_hover)
+    ]
+    ## Pie charts for Lead wise charts
+    labels = ["Interview Results"]
+    parents = [""]
+    values = [0]  # we'll update this total at the end
+
+    rounds = ['intro', 'interview1', 'interview2', 'hr']
+    round_labels = {
+        'intro': 'Intro Round',
+        'interview1': 'Interview 1',
+        'interview2': 'Interview 2',
+        'hr': 'HR Round'
+    }
+    status_labels = {'selected': 'Selected', 'rejected': 'Rejected', 'hold': 'Hold'}
+
+    round_totals = {r: 0 for r in rounds}
+
+    # Step 1: Add top-level rounds
+    for r in rounds:
+        labels.append(round_labels[r])
+        parents.append("Interview Results")
+        values.append(0)  # we'll update these later
+
+    # Step 2: Add per-lead stats under each round
+    for lead, stats in lead_statistics.items():
+        for r_idx, r in enumerate(rounds):
+            lead_total = sum(stats[r].values())
+            if lead_total == 0:
+                continue
+
+            lead_label = f"{lead} ({round_labels[r]})"
+            round_label = round_labels[r]
+
+            labels.append(lead_label)
+            parents.append(round_label)
+            values.append(lead_total)
+            round_totals[r] += lead_total
+
+            for status_key, status_label in status_labels.items():
+                count = stats[r].get(status_key, 0)
+                if count == 0:
+                    continue
+                labels.append(f"{lead} - {status_label} ({round_labels[r]})")
+                parents.append(lead_label)
+                values.append(count)
+
+    # Step 3: Update total and round values
+    total = sum(round_totals.values())
+    values[0] = total  # Interview Results
+    for i, r in enumerate(rounds):
+        values[i + 1] = round_totals[r]
+
+    # Output JavaScript arrays
+    print("labels =", labels)
+    print("parents =", parents)
+    print("values =", values)
+    
+    ## Pie charts for Role wise charts
+
+    role_labels = ["Interview Results"]
+    role_parents = [""]
+    role_values = [0]  # will be updated at the end
+
+    rounds = ['intro', 'interview1', 'interview2', 'hr']
+    round_labels = {
+        'intro': 'Intro Round',
+        'interview1': 'Interview 1',
+        'interview2': 'Interview 2',
+        'hr': 'HR Round'
+    }
+    status_labels = {'selected': 'Selected', 'rejected': 'Rejected', 'hold': 'Hold'}
+
+    role_totals = {}  # To store total per role
+
+    # Optional: Clean up None keys to a string
+    role_statistics = {role if role else "None": stats for role, stats in role_statistics.items()}
+
+    # Step 1: Add each role as top-level under "Interview Results"
+    for role, stats in role_statistics.items():
+        total_for_role = 0
+
+        # Count all rounds' totals
+        for r in rounds:
+            total_for_role += sum(stats.get(r, {}).values())
+
+        # Add role node (even if 0, so we see "None" roles too)
+        role_labels.append(role)
+        role_parents.append("Interview Results")
+        role_values.append(total_for_role)
+        role_totals[role] = total_for_role
+
+        # Step 2: Add rounds under each role
+        for r in rounds:
+            round_data = stats.get(r, {})
+            round_total = sum(round_data.values())
+
+            round_label = f"{round_labels[r]} ({role})"
+            role_labels.append(round_label)
+            role_parents.append(role)
+            role_values.append(round_total)
+
+            # Step 3: Add status under each round
+            for status_key, status_label in status_labels.items():
+                count = round_data.get(status_key, 0)
+                if count == 0:
+                    continue
+
+                status_label_full = f"{status_label} ({round_labels[r]})"
+                role_labels.append(status_label_full)
+                role_parents.append(round_label)
+                role_values.append(count)
+
+    # Step 4: Update top-level total
+    role_values[0] = sum(role_totals.values())
+    return render_template("dashboard.html",user_role=user_role,location_counts=location_counts,projects_counts=projects_counts,Employment_status_counts=Employment_status_counts,employee_status_counts=employee_status_counts,intro_counts=intro_counts,interview1_counts=interview1_counts,interview2_counts=interview2_counts,hr_counts=hr_counts,role_statistics=role_statistics,project=project_filter,designation=designation_filter,location=location_filter,months=months,week_filter=week_filter,month_filter=month_filter,lead_statistics=lead_statistics,overall_counts=overall_counts,chart_labels=chart_labels,chart_values=chart_values,hover_texts=hover_texts,total_selected=total_selected,total_rejected=total_rejected,total_hold=total_hold,lead_breakdowns=lead_breakdowns,labels=json.dumps(labels), parents=json.dumps(parents), values=json.dumps(values),role_labels=json.dumps(role_labels),
+        role_parents=json.dumps(role_parents),
+        role_values=json.dumps(role_values)) 
 # @app.route("/home",methods=["GET","POST"])
 # def Home():
 #     default_page_size = 20

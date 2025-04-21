@@ -103,27 +103,26 @@ label{
     flex-direction: column;
 }
 select {
-    width: 8rem !important;  /* Ensure width matches the button */
-    height: 27px !important;  /* Match button height */
-    border: 1px solid black !important;  /* Ensure border matches */
-    /* border-radius: 5px !important; Rounded corners */
-    padding: 3px 12px !important; /* Padding for spacing */
-    font-size: 15px !important;  /* Match font size */
-    background-color: #f0f0f0;;  /* Ensure white background */
-    cursor: pointer; /* Make cursor same as button */
-    text-align: left; /* Align text properly */
-    appearance: none; /* Remove default browser select styles */
-    outline: none !important;  /* Remove the focus outline */
-    box-shadow: none !important; /* Remove any box shadow on focus */
-}
-
-/* Optional: Add dropdown arrow like the button */
-select {
-    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='black' d='M2 5L0 0h4z'/%3E%3C/svg%3E");
+    width: 10rem;
+    height: 36px;
+    padding: 6px 12px;
+    font-size: 15px;
+    background-color: #f4f5f7;
+    border: 1px solid #dfe1e6;
+    border-radius: 6px;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23000' stroke-width='1.5' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 10px center;
-    background-size: 10px;
-}
+    background-size: 12px;
+  }
+  
+label {
+    margin-bottom: 4px;
+    font-weight: 500;
+    color: #344563;
+  }
 .wrap-text a {
     display: inline-block;
     vertical-align: middle; /* Ensures inline elements align properly */

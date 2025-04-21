@@ -73,7 +73,7 @@
             </div>
             <div class="mb-3">
                 <label for="role">Role:</label>
-                <select class="form-control" id="role" name="role">
+                <select class="form-control" id="role" name="role" {% if role == 'interviewer' %}disabled{% endif %}>
                     <option value="admin" {% if role == 'admin' %}selected{% endif %}>Admin</option>
                     <option value="user" {% if role == 'user' %}selected{% endif %}>User</option>
                     <option value="interviewer" {% if role == 'interviewer' %}selected{% endif %}>Interviewer</option>

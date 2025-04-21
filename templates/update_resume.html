@@ -65,10 +65,13 @@
                 
             </div>
             <div class="mb-3 label">
-              <label for="expected_ctc" class="form-label">Experience:<i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
-              <input type="text" class="form-control" id="experience" name="experience" value="{{resume.Experience}}" aria-describedby="emailHelp" required>
-              
-          </div>
+              <label for="experience" class="form-label">Experience:
+                <i class="fa-solid fa-star" style="color: red; font-size: 10px; bottom: 10px; position: relative;"></i>
+              </label>
+              <input type="number" class="form-control" id="experience" name="experience"
+                     value="{{ resume.Experience if resume.Experience is not none else 0 }}" 
+                     step="1" min="0" required>
+            </div>
             <div class="mb-3 label">
                 <label for="emp_id" class="form-label">Notice period:</label>
                 <input type="text" class="form-control" id="notice_period" name="notice_period" value="{{resume.Notice_period}}" aria-describedby="emailHelp" required >

@@ -87,14 +87,14 @@
             <div class="filters" style="margin-bottom: 20px; margin-left: 1rem; width: 95%;">
                 
                 <div class="flex" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
-                    <div style="margin-bottom: 10px; margin-top: 20px;" class="inner_filter">
+                    <div style="margin-bottom: 10px; margin-top: 20px; display: none;" class="inner_filter" id="introFilterContainer" class="inner_filter" >
                         <label for="introFilter" class="filter_label">Intro Call Status:</label>
                         <select  id="introFilter" onchange="filterTableByIntroStatus()" >
                             <option value="">Select</option>
                             
                         </select>
                     </div>
-                    <div style="margin-bottom: 10px; margin-top: 20px;" class="inner_filter">
+                    <div style="margin-bottom: 10px; margin-top: 20px;" class="inner_filter" >
                         <label for="interview1Filter" class="filter_label">L1 Status:</label>
                         <select id="interview1Filter" onchange="filterTableByInterview1Status()" >
                             <option value="">Select</option>
@@ -174,7 +174,7 @@
                         </div>
                         
                     </div> 
-                    
+                    <button onclick="openMoreFilters()" class="more-filters-btn">More Filters +</button>
                 </div>
             </div>
             
@@ -416,7 +416,18 @@
     
                         
     </div>
-    
+    <div id="moreFiltersModal" class="filter-modal" style="display: none;">
+        <div class="filter-modal-content">
+          <h3>Select Filters</h3>
+          <label><input type="checkbox" value="introFilterContainer" onchange="toggleFilter(this)"> Intro Call Status</label>
+          <label><input type="checkbox" value="interview1FilterContainer" checked onchange="toggleFilter(this)"> L1 Status</label>
+          <label><input type="checkbox" value="interview2FilterContainer" checked onchange="toggleFilter(this)"> L2 Status</label>
+          <label><input type="checkbox" value="allRoundsFilterContainer" onchange="toggleFilter(this)"> All Rounds Cleared</label>
+          <label><input type="checkbox" value="roleFilterContainer" onchange="toggleFilter(this)"> Role</label>
+          <label><input type="checkbox" value="monthFilterContainer" onchange="toggleFilter(this)"> Month</label>
+          <button onclick="closeMoreFilters()">Done</button>
+        </div>
+    </div>
     
     <script src="{{ url_for('static', filename='config.js') }}"></script>   
     <script src="{{ url_for('static', filename='employee.js') }}?v=1.6"></script>

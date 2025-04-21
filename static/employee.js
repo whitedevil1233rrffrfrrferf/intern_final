@@ -631,3 +631,18 @@ document.querySelectorAll('#dropdown-menu input[type="checkbox"]').forEach(check
         table.style.width = newWidth > maxWidth ? '100%' : newWidth + '%';
     });
 });
+
+// ############################################################ Modal for dashboard #############################################################
+
+function openMoreFilters() {
+    document.getElementById("moreFiltersModal").style.display = "block";
+}
+
+function closeMoreFilters() {
+    document.getElementById("moreFiltersModal").style.display = "none";
+}
+
+function toggleFilter(checkbox) {
+    const container = document.getElementById(checkbox.value);
+    container.style.display = checkbox.checked ? 'flex' : 'none';
+}

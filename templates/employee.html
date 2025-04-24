@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='employee.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    
+    <link rel="stylesheet" href="{{ url_for('static', filename='font.css') }}">
     
     <script type="text/javascript">
         (function(){
@@ -63,7 +63,7 @@
         {% include 'sidemenu.html'%}
         
         <div style=" margin-left:7rem;width: 140%;height:500%;width: 400%; overflow-x: hidden;">
-            <h1 style="text-align: center;  background-color:#4699F9;color: white;">Candidate resumes</h1>
+            <h1 class="headline">Candidate Resumes</h1>
             <div class="container-fluid" style="margin-bottom: 2rem;margin-top: 1rem !important;">
           <nav class="navbar navbar-expand-lg bg-body-tertiary" style="margin-top: 1rem;">
             <div class="container" >
@@ -87,28 +87,28 @@
             <div class="filters" style="margin-bottom: 20px; margin-left: 1rem; width: 95%;">
                 
                 <div class="flex" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
-                    <div style="margin-bottom: 10px; margin-top: 20px; display: none;" class="inner_filter" id="introFilterContainer" class="inner_filter" >
+                    <div style="margin-bottom: 10px; margin-top: 20px; display: none;" class="inner_filter" id="introFilterContainer">
                         <label for="introFilter" class="filter_label">Intro Call Status:</label>
                         <select  id="introFilter" onchange="filterTableByIntroStatus()" >
                             <option value="">Select</option>
                             
                         </select>
                     </div>
-                    <div style="margin-bottom: 10px; margin-top: 20px;" class="inner_filter" >
+                    <div style="margin-bottom: 10px; margin-top: 20px; display: none;" class="inner_filter" id="interview1FilterContainer">
                         <label for="interview1Filter" class="filter_label">L1 Status:</label>
                         <select id="interview1Filter" onchange="filterTableByInterview1Status()" >
                             <option value="">Select</option>
                             
                         </select>
                     </div>
-                    <div style="margin-bottom:10px; margin-top: 20px;" class="inner_filter">
+                    <div style="margin-bottom:10px; margin-top: 20px;display: none;" class="inner_filter" id="interview2FilterContainer">
                         <label for="interview2Filter" class="filter_label">L2 Status:</label>
                         <select id="interview2Filter" onchange="filterTableByInterview2Status()" >
                             <option value="">Select</option>
                            
                         </select>
                     </div>
-                    <div style="margin-bottom: 10px; margin-top: 20px;" class="inner_filter">
+                    <div style="margin-bottom: 10px; margin-top: 20px;display: none;" class="inner_filter" id="allRoundsFilterContainer">
                         <label for="allRoundsFilter" class="filter_label">All rounds cleared:</label>
                         <select id="allRoundsFilter" onchange="filterTableByAllRoundsStatus()" >
                             <option value="">Select</option>
@@ -154,27 +154,9 @@
                             <option value="Week 5" {% if filter_week == "Week 5" %}selected{% endif %}>Week 5</option>
                         </select>
                     </div>
-                    <div class="inner_filter" style="margin-bottom: 10px; margin-top: 20px;">
-                        <label for="columnSelect" class="label " class="filter_label">Columns to display:</label>
-                        <div id="dropdown-container">
-                            <button id="dropdown-btn">Select Columns ▼</button>
-                            <div id="dropdown-menu">
-                                <label style="margin-bottom: 5px; color: black;"><input type="checkbox" value="candidate_id" checked> ID</label>
-                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="candidate_name" checked style="color: black !important;">Name</label>
-                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="contact_number" checked>Contact Num</label>
-                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="experience" checked> Experience</label>
-                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="qa_lead" > QA Lead</label>
-                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="role" checked> Role</label>
-                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="month" > Month</label>
-                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="week" > Week</label>
-                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="int_details" checked> Interview Det</label>
-                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="view" checked> View</label>
-                                <label style="margin-bottom: 5px;color: black;"><input type="checkbox" value="action" checked> Action</label>
-                            </div>
-                        </div>
-                        
-                    </div> 
-                    <button onclick="openMoreFilters()" class="more-filters-btn">More Filters +</button>
+                    
+                    <button onclick="openMoreFilters()" class="more-filters-btn" style="text-align: left; margin-top:30px !important;">More ..</button>
+                    
                 </div>
             </div>
             
@@ -182,10 +164,10 @@
             
             <div class="table-responsive my-4">
                 <table class="table" style="min-width:90%;width: auto;
-                max-width: 95%; 
-                table-layout: auto;
-                margin-left:1%; 
-                white-space: nowrap;">
+                        max-width: 95%; 
+                        table-layout: auto;
+                        margin-left:1%; 
+                        white-space: nowrap;">
                     
                     <thead class="thead-dark">
                         <tr>
@@ -202,7 +184,7 @@
                             <!-- <th scope="col" class="others">Others</th> -->
                             <th scope="col" class="month" style="display: none;">Month</th>
                             <th scope="col" class="week" style="display: none;">Week</th>
-                            <th scope="col" class="int_details" >Interview Details</th>
+                            <!-- <th scope="col" class="int_details" >Interview Details</th> -->
                             <th scope="col" class="view" >View</th>
                             <th scope="col" class="action">Action</th>
                             
@@ -243,7 +225,7 @@
                                         {% endif %}
                                     {% endif %}
                                     
-                                    <a href="{{ url_for('get_intro_status', resume_id=resume.id) }}"  style="margin-left: 20px; color: red;display: none;" onclick="getInterviewStatus(event,{{resume.id}})"><i class="fa-solid fa-info" style="font-size: 20px;"></i></a>
+                                    <a href="{{ url_for('get_intro_status', resume_id=resume.id) }}"  style="margin-left: 20px; color: red;display: none;" onclick="getInterviewStatus(event,{{resume.id}})"><i class="fa-solid fa-info" ></i></a>
                                     <div id="toggle{{ resume.id }}" style="display: none;">
                                         <div id="introStatus{{ resume.id }}" style="margin-bottom: 3px; margin-top:5px;"></div>
                                         <div id="interview1Status{{ resume.id }}" style="margin-bottom: 3px;"></div>
@@ -273,7 +255,7 @@
                                     None
                                     {% endif %}
                                 </td> -->
-                                <div class="modal fade" id="viewModal{{ resume.id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal fade" id="viewModal{{ resume.id }}" tabindex="-1" aria-hidden="true" style="z-index: 100000;">
                                     <div class="modal-dialog modal-dialog-centered"> <!-- Centers modal -->
                                         <div class="modal-content">
                                             <div class="modal-header">
@@ -344,7 +326,7 @@
                                 </td> -->
                                 <td class="wrap-text checkbox-column month" style="display: none;">{{resume.Month}}</td>
                                 <td class="wrap-text checkbox-column week" style="display: none;">{{resume.week}}</td>
-                                <td class="wrap-text checkbox-column int_details" >
+                                <!-- <td class="wrap-text checkbox-column int_details" >
                                     <div>
                                         <a id="introButton{{ resume.id }}" href="{{ url_for('introCall', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2 " title="Intro call" data-url="{{ url_for('get_intro_status', resume_id=resume.id) }}">Intro</a>
                                         <a id="interview1Button{{ resume.id }}" href="{{ url_for('interview1v', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2" title="Interview 1"><i class="fa-solid fa-phone"></i> 1</a>
@@ -355,12 +337,27 @@
 
                                     </div>
                                     
-                                </td>
+                                </td> -->
                                <td class="wrap-text checkbox-column view" ><a href="{{url_for('resume_details',resume_id=resume.id)}}" class="btn btn-primary mx-1" title="view"><i class="fa-solid fa-eye mx-2" style="color:white;"></i></a></td>
                                <td class="wrap-text checkbox-column action">
-                                <button class="btn btn-primary" style=" display: block; margin-left: auto; margin-right: auto;" onclick="window.location.href='{{ url_for('edit_employee_resume', employee_id=resume.id) }}'"><i class="fa-solid fa-pencil mx-2" style="color:#fff;"></i></button>
-                                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal{{ resume.id }}" style="margin-top: 1rem;">More Info</button>
-
+                                <!-- <button class="btn btn-primary" style=" display: block; margin-left: auto; margin-right: auto;" onclick="window.location.href='{{ url_for('edit_employee_resume', employee_id=resume.id) }}'"><i class="fa-solid fa-pencil mx-2" style="color:#fff;"></i></button> -->
+                                <!-- <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal{{ resume.id }}" style="margin-top: 1rem;">More Info</button> -->
+                                <button class="btn btn-primary" onclick="openActionModal({{ resume.id }}, '{{ role }}')">...</button>
+                                <div id="actionModal" class="custom-modal" style="display: none;">
+                                    <div class="custom-modal-content">
+                                      <ul class="modal-link-list">
+                                        <li class="modal_li"><a id="introLink" href="{{ url_for('introCall', resume_id=resume.id) }}" class="link-item">Intro</a></li>
+                                        <li class="modal_li"><a id="l1Link"  class="link-item">L1</a></li>
+                                        <li class="modal_li"><a id="l2Link" class="link-item"> L2</a></li>
+                                        <li class="modal_li"><a id="hrLink" class="link-item">HR</a></li>
+                                        <li class="modal_li"><a id="editLink" class="link-item">Edit Resume</a></li>
+                                        <li class="modal_li" style="cursor: pointer;"><a id="moreInfoLink" class="link-item" data-bs-toggle="modal">More Info</a></li>
+                                      </ul>
+                                      <button onclick="closeActionModal()" class="btn btn-danger mt-3">Close</button>
+                                    </div>
+                                  </div>
+                               </td>
+                               
                                
                             </tr>
                         {% endfor %}
@@ -396,7 +393,7 @@
                 <div style="margin-bottom: 1rem;">
                     <form method="POST" action="{{ url_for('employee',month=selected_month) }}" id="pageSizeForm">
                     Results per page:
-                    <select name="page_size" class="option" style="width: 7rem !important; margin-bottom: 2rem;font-size:16px;" onchange="document.getElementById('pageSizeForm').submit();">
+                    <select name="page_size" class="option" style="width: 7rem !important; margin-bottom: 2rem;" onchange="document.getElementById('pageSizeForm').submit();">
                         {% for option in page_size_options %}
                         <option value="{{ option }}" {% if option == selected_page_size %}selected{% endif %}>{{ option }}</option>
                         {% endfor %}
@@ -418,16 +415,36 @@
     </div>
     <div id="moreFiltersModal" class="filter-modal" style="display: none;">
         <div class="filter-modal-content">
-          <h3>Select Filters</h3>
-          <label><input type="checkbox" value="introFilterContainer" onchange="toggleFilter(this)"> Intro Call Status</label>
-          <label><input type="checkbox" value="interview1FilterContainer" checked onchange="toggleFilter(this)"> L1 Status</label>
-          <label><input type="checkbox" value="interview2FilterContainer" checked onchange="toggleFilter(this)"> L2 Status</label>
-          <label><input type="checkbox" value="allRoundsFilterContainer" onchange="toggleFilter(this)"> All Rounds Cleared</label>
-          <label><input type="checkbox" value="roleFilterContainer" onchange="toggleFilter(this)"> Role</label>
-          <label><input type="checkbox" value="monthFilterContainer" onchange="toggleFilter(this)"> Month</label>
-          <button onclick="closeMoreFilters()">Done</button>
+          <h3>More Filters</h3>
+      
+          <!-- ROUND FILTERS -->
+          <div class="round-filters">
+            <label><input type="checkbox" value="introFilterContainer" onchange="toggleFilter(this)"> Intro Call Status</label>
+            <label><input type="checkbox" value="interview1FilterContainer" onchange="toggleFilter(this)"> L1 Status</label>
+            <label><input type="checkbox" value="interview2FilterContainer" onchange="toggleFilter(this)"> L2 Status</label>
+            <label><input type="checkbox" value="allRoundsFilterContainer" onchange="toggleFilter(this)"> All Rounds Cleared</label>
+          </div>
+      
+          <hr>
+      
+          <!-- COLUMN TOGGLES -->
+          <h4 style="margin-top: 15px;">Columns to Display</h4>
+          <div class="column-filters">
+            <label><input type="checkbox" value="candidate_id" checked onchange="toggleColumn(this)"> ID</label>
+            <label><input type="checkbox" value="candidate_name" checked onchange="toggleColumn(this)"> Name</label>
+            <label><input type="checkbox" value="contact_number" checked onchange="toggleColumn(this)"> Contact Num</label>
+            <label><input type="checkbox" value="experience" checked onchange="toggleColumn(this)"> Experience</label>
+            <label><input type="checkbox" value="qa_lead" onchange="toggleColumn(this)"> QA Lead</label>
+            <label><input type="checkbox" value="role" checked onchange="toggleColumn(this)"> Role</label>
+            <label><input type="checkbox" value="month" onchange="toggleColumn(this)"> Month</label>
+            <label><input type="checkbox" value="week" onchange="toggleColumn(this)"> Week</label>
+            <label><input type="checkbox" value="view" checked onchange="toggleColumn(this)"> View</label>
+            <label><input type="checkbox" value="action" checked onchange="toggleColumn(this)"> Action</label>
+          </div>
+      
+          <button onclick="closeMoreFilters()" class="btn btn-danger mt-3">Done</button>
         </div>
-    </div>
+      </div>
     
     <script src="{{ url_for('static', filename='config.js') }}"></script>   
     <script src="{{ url_for('static', filename='employee.js') }}?v=1.6"></script>
@@ -612,6 +629,44 @@
             });
         });
     });
+</script>
+<script>
+  function openActionModal(resumeId, role) {
+    const introBaseUrl = "{{ url_for('introCall', resume_id=0) }}".replace("0", resumeId);
+    const l1BaseUrl = "{{ url_for('interview1v', resume_id=0) }}".replace("0", resumeId);
+    const l2BaseUrl = "{{ url_for('interview2v', resume_id=0) }}".replace("0", resumeId);
+    const hrBaseUrl = "{{ url_for('hr', resume_id=0) }}".replace("0", resumeId);
+    const editUrl = "{{ url_for('edit_employee_resume', employee_id=0) }}".replace("0", resumeId);
+    const viewModalTarget = "#viewModal" + resumeId;
+
+    document.getElementById("introLink").href = introBaseUrl;
+    document.getElementById("l1Link").href = l1BaseUrl;
+    document.getElementById("editLink").href = editUrl;
+    document.getElementById("moreInfoLink").setAttribute("data-bs-target", viewModalTarget);
+
+    if (role === 'admin') {
+      document.getElementById("l2Link").style.display = 'inline-block';
+      document.getElementById("hrLink").style.display = 'inline-block';
+      document.getElementById("l2Link").href = l2BaseUrl;
+      document.getElementById("hrLink").href = hrBaseUrl;
+    } else {
+      document.getElementById("l2Link").style.display = 'none';
+      document.getElementById("hrLink").style.display = 'none';
+    }
+
+    document.getElementById("actionModal").style.display = "block";
+  }
+
+  function closeActionModal() {
+    document.getElementById("actionModal").style.display = "none";
+  }
+
+  window.onclick = function(event) {
+    const modal = document.getElementById("actionModal");
+    if (event.target === modal) {
+      closeActionModal();
+    }
+  };
 </script>
 </body>
 </html>

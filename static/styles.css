@@ -15,7 +15,7 @@ label{
     background-color: #c0392b;
     text-align: center;
     padding: 15px 30px;
-    font-size: 18px;
+    
     letter-spacing: 1.5px;
     user-select: none;
     cursor: pointer;
@@ -30,11 +30,11 @@ input[type="file"]{
     
     padding:30px;
     margin-top:20px;
-    font-size:20px;
+    
 }
 .heading{
     text-align: center;
-    font-size:50px;
+    
     background-color:#00A9FF!important;
     color:white;
     
@@ -63,7 +63,7 @@ input[type="file"]{
 .upload{
     text-align: center;
     padding: 10px 20px;
-    font-size: 18px;
+    
     letter-spacing: 1.5px;
     margin-top: 10px ;
     cursor: pointer;

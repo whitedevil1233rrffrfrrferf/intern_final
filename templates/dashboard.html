@@ -8,6 +8,7 @@
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='font.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
     
     <style>
@@ -21,7 +22,7 @@
       }
       .label{
           color:#00A9FF;
-          font-size:18px;
+          
       } 
       .filter{
         width: 90%;
@@ -64,12 +65,12 @@
     <div style="display: flex;">
       {% include 'sidemenu.html' %}
       
-      <div class="content" style="padding:10px;  width:100%; margin-left: 150px;">
+      <div class="content" style="padding:4px;  width:100%; margin-left: 150px;">
 
         {% if user_role == 'admin' %}
           <div>
             
-            <h1 style="margin-bottom:3rem;"><center>Employee Dashboard</center></h1>
+            <h1 class="headline">Employee Dashboard</h1>
             <div class="filter_div">
               <div class="filter" style="display: flex; justify-content: space-between;margin-bottom: 10px;">
                 <div >
@@ -95,87 +96,25 @@
                 
 
             </div>
-            <div class="flex_div" style="flex: 1; justify-content: space-between; ">
-              <div class="row row-cols-1 row-cols-md-3 g-4" style="padding: 10px;">
-                <div class="col" >
-                  <div class="card h-100" >
-                    
-                    <div class="card-body" >
-                      <i class="fa-solid fa-2x fa-users icons" style="margin-bottom: 20px;"></i>
-                      
-                      <p class="card-text">
-                        Total number of employees: {{ employee_status_counts['Total'] }}
-                      </p>
-                      
-                      <!-- Show other statuses -->
-                      {% for status, count in employee_status_counts.items() %}
-                        {% if status != 'Total' %}
-                          <p class="card-text">Number of {{ status }} employees: {{ count }}</p>
-                        {% endif %}
-                      {% endfor %}
-                      
-                    </div>
-                  </div>
-                </div>
-                
-                
-                <div class="col">
-                  <div class="card h-80">
-                    <div class="card-body" style="max-height:12.8rem; overflow-y: auto;">
-                      <i class="fa-solid fa-location-dot fa-2x" style="color: black; margin-bottom: 10px;"></i>
-                      {% for location, count in location_counts.items() %}
-                        <p class="card-text" style="margin-bottom: 0.85rem;">{{ location }} employees count: {{ count }}</p>
-                      {% endfor %}
-                    </div>
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="card h-80">
-                    <div class="card-body" style="max-height:12.8rem; overflow-y: auto;"> <!-- Set a fixed height and enable scrolling -->
-                      
-                      <div class="row" >
-                        <div class="col-12"> <!-- Changed to a single column -->
-                          <i class="fa-solid fa-clipboard-list icon fa-2x" style="margin-bottom: 10px;"></i>
-                          {% for project, count in projects_counts.items() %}
-                            <p style=" margin-bottom:1rem;">{{ project }} employees count: {{ count }}</p>
-                          {% endfor %}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col">
-                  <div class="card h-80">
-                    <div class="card-body" style="max-height:12.8rem; overflow-y: auto;">
-                      <i class="fa-solid fa-briefcase icon fa-2x" style="margin-bottom: 10px;"></i>
-                      {% for Emp_stat, count in Employment_status_counts.items() %}
-                        <p class="card-text" style="margin-bottom: 0.85rem;">{{ Emp_stat }} employees count: {{ count }}</p>
-                      {% endfor %}
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="col">
-                  <div class="card h-100">
-                    <div class="card-body">
-                      <img src="https://banner2.cleanpng.com/20190724/geb/kisspng-product-design-technology-font-5d385089740a08.2768103715639717214753.jpg" height="50px" width="50px" class="icons">
-                      <p class="card-text">No of Applications: {{total_resumes}}</p>
-                      <p class="card-text">No of applications selected :{{hr_selected}}</p>
-                    </div>
-                  </div>
-                </div>
-                
-                
-
-                
-                </div>
-                
+            <div class="dashboard-grid" style="margin-top: 2rem; margin-left: 2.5rem;">
+              <div class="grid-item">
+                <div id="employeeStatusChart"></div>
+              </div>
+              <div class="grid-item" >
+                <div id="locationChart"></div>
+              </div>
+              <div class="grid-item">
+                <div id="projectChart"></div>
+              </div>
+              <div class="grid-item">
+                <div id="employmentStatusChart"></div>
+              </div>
             </div>
             <hr>
           </div>
         {% endif %}  
-      <h1 style="padding:10px; margin-bottom: 2rem;"><center>Resume Dashboard</center></h1>
-      <div class="filter" style="display: flex; margin-left: 21%; margin-bottom: 1rem; gap:2rem;">
+      <h1 class="headline">Resume Dashboard</h1>
+      <div class="filter" style="display: flex; margin-left: 35%; margin-bottom: 1rem; gap:2rem;">
                 
                 <div>
                   <label for="month" class="label">Month:</label>
@@ -231,9 +170,10 @@
             </div>
           
         <div >
+          
+        </div>
+        </div>
         
-        </div>
-        </div>
     <script src="{{ url_for('static', filename='config.js') }}"></script>
     <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
     <script>
@@ -353,6 +293,218 @@
 
         Plotly.newPlot('divs', pieData, pieLayout, { displayModeBar: false });
     </script>
+    <!-- ############################ Bar graphs ############################## -->
+    <script>
+      window.onload = function () {
+        // ===== EMPLOYEE STATUS CHART =====
+        const commonSize = 400;
+        const commonTitleFont = { size: 20 };
+        const commonXAxisTickFont = { size: 10 };
+        const commonMargin = { t: 30, l: 40, r: 20, b: 80 }; // You can also consider a common margin if suitable
+
+        // ===== EMPLOYEE STATUS CHART =====
+    
+        const employeeData = {
+          labels: [
+            {% for status, count in employee_status_counts.items() if status != 'Total' %}
+              "{{ status }}",
+            {% endfor %}
+          ],
+          values: [
+            {% for status, count in employee_status_counts.items() if status != 'Total' %}
+              {{ count }},
+            {% endfor %}
+          ]
+        };
+    
+        const employeeBarData = [{
+          x: employeeData.labels,
+          y: employeeData.values,
+          type: 'bar',
+          marker: {
+            color: ['red', 'green'],
+            line: {
+              width: 2
+            }
+          },
+          text: employeeData.values.map(String),
+          textposition: 'auto'
+        }];
+    
+        const employeeLayout = {
+          title: {
+            text: 'Employee Status Distribution',
+            font: commonTitleFont
+          },
+          height: commonSize,
+          width: commonSize,
+          margin: commonMargin,
+          xaxis: {
+            tickfont: commonXAxisTickFont,
+            tickpadding: 30
+          },
+          yaxis: {
+            title: 'Number of Employees',
+            titlefont: { size: 16 },
+            tickfont: { size: 14 },
+            title_standoff: 200
+          }
+        };
+    
+        Plotly.newPlot('employeeStatusChart', employeeBarData, employeeLayout, { displayModeBar: false });
+    
+    
+        // ===== LOCATION CHART =====
+        const locationData = {
+          labels: [
+            {% for location, count in location_counts.items() %}
+              "{{ location }}",
+            {% endfor %}
+          ],
+          values: [
+            {% for location, count in location_counts.items() %}
+              {{ count }},
+            {% endfor %}
+          ]
+        };
+    
+        const locationBarData = [{
+          x: locationData.labels,
+          y: locationData.values,
+          type: 'bar',
+          marker: {
+            color: [
+              {% for location in location_counts %}
+                '{{ ["#636EFA", "#EF553B", "#00CC96", "#AB63FA", "#FFA15A", "#19D3F3", "#FF6692", "#B6E880", "#FF97FF", "#FECB52"][loop.index0 % 10] }}',
+              {% endfor %}
+            ],
+            line: { width: 2 }
+          },
+          text: locationData.values.map(String),
+          textposition: 'auto'
+        }];
+    
+        const locationLayout = {
+          title: {
+            text: 'Location-wise Employee Distribution',
+            font: commonTitleFont
+          },
+          height:commonSize,
+          width:commonSize,
+          margin: commonMargin,
+          xaxis: {
+            tickfont: commonXAxisTickFont,
+            tickpadding: 30
+          },
+          yaxis: {
+            title: 'Employee Count',
+            titlefont: { size: 16 },
+            tickfont: { size: 14 }
+          }
+        };
+    
+        Plotly.newPlot('locationChart', locationBarData, locationLayout, { displayModeBar: false });
+        const projectData = {
+        labels: [
+          {% for project, count in projects_counts.items() %}
+            "{{ project }}",
+          {% endfor %}
+        ],
+        values: [
+          {% for project, count in projects_counts.items() %}
+            {{ count }},
+          {% endfor %}
+        ]
+      };
+
+      const projectBar = [{
+        x: projectData.labels,
+        y: projectData.values,
+        type: 'bar',
+        marker: {
+          color: [
+            {% for project in projects_counts %}
+              '{{ ["#FECB52", "#FF97FF", "#B6E880", "#FF6692", "#19D3F3", "#00CC96", "#EF553B", "#636EFA", "#AB63FA", "#FFA15A"][loop.index0 % 10] }}',
+            {% endfor %}
+          ],
+          line: { width: 2 }
+        },
+        text: projectData.values.map(String),
+        textposition: 'auto'
+      }];
+
+      const projectLayout = {
+        title: {
+          text: 'Project-wise Employee Distribution',
+          font: commonTitleFont
+        },
+        height: commonSize,
+        width: commonSize,
+        margin: commonMargin,
+        xaxis: {
+          tickfont: commonXAxisTickFont,
+          tickpadding: 20
+        },
+        yaxis: {
+          title: 'Employee Count',
+          titlefont: { size: 14 },
+          tickfont: { size: 12 }
+        }
+      };
+
+      Plotly.newPlot('projectChart', projectBar, projectLayout, { displayModeBar: false });
+      const employmentData = {
+        labels: [
+          {% for Emp_stat, count in Employment_status_counts.items() %}
+            "{{ Emp_stat }}",
+          {% endfor %}
+        ],
+        values: [
+          {% for Emp_stat, count in Employment_status_counts.items() %}
+            {{ count }},
+          {% endfor %}
+        ]
+      };
+
+      const employmentBar = [{
+        x: employmentData.labels,
+        y: employmentData.values,
+        type: 'bar',
+        marker: {
+          color: [
+            {% for status in Employment_status_counts %}
+              '{{ ["#EF553B", "#00CC96", "#636EFA", "#AB63FA", "#FFA15A", "#19D3F3", "#FF6692", "#B6E880", "#FF97FF", "#FECB52"][loop.index0 % 10] }}',
+            {% endfor %}
+          ],
+          line: { width: 2 }
+        },
+        text: employmentData.values.map(String),
+        textposition: 'auto'
+      }];
+
+      const employmentLayout = {
+        title: {
+          text: 'Employment Status Distribution',
+          font: commonTitleFont
+        },
+        height:commonSize,
+        width:commonSize,
+        margin: commonMargin,
+        xaxis: {
+          tickfont: commonXAxisTickFont,
+          tickpadding: 20
+        },
+        yaxis: {
+          title: 'Employee Count',
+          titlefont: { size: 14 },
+          tickfont: { size: 12 }
+        }
+      };
+
+      Plotly.newPlot('employmentStatusChart', employmentBar, employmentLayout, { displayModeBar: false });
+      };
+    </script>
+    
     
     
       

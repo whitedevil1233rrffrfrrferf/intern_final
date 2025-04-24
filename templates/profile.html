@@ -73,12 +73,18 @@
             </div>
             <div class="mb-3">
                 <label for="role">Role:</label>
-                <select class="form-control" id="role" name="role" {% if role == 'interviewer' %}disabled{% endif %}>
-                    <option value="admin" {% if role == 'admin' %}selected{% endif %}>Admin</option>
-                    <option value="user" {% if role == 'user' %}selected{% endif %}>User</option>
-                    <option value="interviewer" {% if role == 'interviewer' %}selected{% endif %}>Interviewer</option>
-                    <!-- Add more roles as needed -->
-                </select>
+                {% if role == 'interviewer' %}
+                    <select class="form-control" id="role_display" disabled>
+                        <option selected>Interviewer</option>
+                    </select>
+                    <input type="hidden" name="role" value="interviewer">
+                {% else %}
+                    <select class="form-control" id="role" name="role">
+                        <option value="admin" {% if role == 'admin' %}selected{% endif %}>Admin</option>
+                        <option value="user" {% if role == 'user' %}selected{% endif %}>User</option>
+                        <option value="interviewer" {% if role == 'interviewer' %}selected{% endif %}>Interviewer</option>
+                    </select>
+                {% endif %}
             </div>
             <!-- <div class="mb-3">
                 <input type="checkbox" id="admin" name="role" value="admin" {{ 'checked' if role == 'admin' else '' }}>

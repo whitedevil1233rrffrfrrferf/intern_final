@@ -1401,20 +1401,23 @@ def dashBoard():
             if lead_total == 0:
                 continue
 
-            lead_label = f"{lead} ({round_labels[r]})"
+            lead_label = f"{lead} ({round_labels[r]})"  # Keep the round name for parent-child relationship
             round_label = round_labels[r]
 
+            # Append the lead stats as child under the corresponding round label
             labels.append(lead_label)
-            parents.append(round_label)
+            parents.append(round_label)  # Round label as parent for this lead
             values.append(lead_total)
             round_totals[r] += lead_total
 
+            # Add status-based child elements under the lead label
             for status_key, status_label in status_labels.items():
                 count = stats[r].get(status_key, 0)
                 if count == 0:
                     continue
-                labels.append(f"{lead} - {status_label} ({round_labels[r]})")
-                parents.append(lead_label)
+                # Use the round name for the status label while simplifying its display
+                labels.append(f"{lead} - {status_label}")  # Simplified display
+                parents.append(lead_label)  # The child points to the lead label (parent)
                 values.append(count)
 
     # Step 3: Update total and round values
@@ -1478,7 +1481,7 @@ def dashBoard():
                 if count == 0:
                     continue
 
-                status_label_full = f"{status_label} ({round_labels[r]})"
+                status_label_full = f"{status_label} "
                 role_labels.append(status_label_full)
                 role_parents.append(round_label)
                 role_values.append(count)

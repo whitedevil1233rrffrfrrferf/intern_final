@@ -590,47 +590,7 @@ document.addEventListener("DOMContentLoaded", () => {
 }
 )
 
-document.getElementById('dropdown-btn').addEventListener('click', function() {
-    let menu = document.getElementById('dropdown-menu');
-    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-});
 
-// Hide menu when clicking outside
-
-document.addEventListener('click', function(event) {
-    if (!event.target.closest('#dropdown-container')) {
-        document.getElementById('dropdown-menu').style.display = 'none';
-    }
-});
-document.querySelectorAll('#dropdown-menu input[type="checkbox"]').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-        let selectedValues = Array.from(document.querySelectorAll('#dropdown-menu input[type="checkbox"]:checked'))
-                                  .map(cb => cb.value);
-        
-        
-    });
-});
-document.querySelectorAll('#dropdown-menu input[type="checkbox"]').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-        let columnClass = this.value; // Get the class name from checkbox value
-        let isChecked = this.checked; // Check if it's checked or not
-
-        // Select both <th> and <td> elements that match the class
-        document.querySelectorAll('.' + columnClass).forEach(cell => {
-            cell.style.display = isChecked ? '' : 'none';
-        });
-        let visibleColumns = document.querySelectorAll('th:not([style*="display: none"])').length;
-
-        // Adjust table width dynamically
-        let table = document.querySelector('.table');
-        let minWidth = 50; // Initial table width in percentage
-        let maxWidth = 100; // Maximum width
-
-        // Increase width based on visible columns
-        let newWidth = minWidth + (visibleColumns * 5); // Example: increase 5% per column
-        table.style.width = newWidth > maxWidth ? '100%' : newWidth + '%';
-    });
-});
 
 // ############################################################ Modal for dashboard #############################################################
 
@@ -646,3 +606,64 @@ function toggleFilter(checkbox) {
     const container = document.getElementById(checkbox.value);
     container.style.display = checkbox.checked ? 'flex' : 'none';
 }
+// const modal = document.getElementById("moreFiltersModal");
+
+// window.onclick = function(event) {
+//   if (event.target === modal) {
+//     modal.style.display = "none";
+//   }
+// }
+
+//   function openActionModal(resumeId, role) {
+//         // Only show L2 and HR if the user is an admin
+//     if (role === 'admin') {
+//       document.getElementById("l2Link").style.display = 'inline-block';
+//       document.getElementById("hrLink").style.display = 'inline-block';
+//       document.getElementById("l2Link").href = `/interview2v/${resumeId}`;
+//       document.getElementById("hrLink").href = `/hr/${resumeId}`;
+//     } else {
+//       document.getElementById("l2Link").style.display = 'none';
+//       document.getElementById("hrLink").style.display = 'none';
+//     }
+
+//     // Show modal
+//     document.getElementById("actionModal").style.display = "block";
+//   }
+
+//   function closeActionModal() {
+//     document.getElementById("actionModal").style.display = "none";
+//   }
+
+//   // Optional: Close on outside click
+//   window.onclick = function(event) {
+//     const modal = document.getElementById("actionModal");
+//     if (event.target === modal) {
+//       closeActionModal();
+//     }
+//   };
+
+function toggleFilter(checkbox) {
+    const filterId = checkbox.value;
+    const filterContainer = document.getElementById(filterId);
+    if (filterContainer) {
+      filterContainer.style.display = checkbox.checked ? 'block' : 'none';
+    }
+  }
+  
+  function toggleColumn(checkbox) {
+    const columnClass = checkbox.value;
+    const isChecked = checkbox.checked;
+  
+    // Toggle both <th> and <td> with that class
+    document.querySelectorAll('.' + columnClass).forEach(cell => {
+      cell.style.display = isChecked ? '' : 'none';
+    });
+  
+    // Update table width dynamically
+    const visibleColumns = document.querySelectorAll('th:not([style*="display: none"])').length;
+    const table = document.querySelector('.table');
+    const minWidth = 50;
+    const maxWidth = 100;
+    const newWidth = minWidth + (visibleColumns * 5);
+    table.style.width = newWidth > maxWidth ? '100%' : newWidth + '%';
+  }

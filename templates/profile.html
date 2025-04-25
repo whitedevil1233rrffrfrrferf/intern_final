@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,14 +49,23 @@
             {% endif %} 
         {% endif %}    
         <button onclick="showFileInput()" style="margin-left:500px;"><i class="fa-solid fa-pencil mx-2"></i></button>
-        <form action="{{url_for('update_profile')}}" method="post" enctype="multipart/form-data">
+        <form id="profile-form" action="{{url_for('update_profile')}}" method="post" enctype="multipart/form-data">
             <div class="mb-3 " id="pic" style="display:none;">
                 <label for="photo">Profile Picture:</label>
+                <!-- {% if filename %}
+    <img src="{{ url_for('static', filename='profile_images/' + filename) }}?v={{ random() }}" 
+         alt="Profile Picture" 
+         width="150" 
+         class="img-thumbnail">
+{% else %}
+    <p>No profile picture uploaded.</p>
+{% endif %} -->
+
                 <input type="file" class="form-control" id="photo" name="photo">
             </div>
             <div class="mb-3">
                 <label for="name">Name:</label>
-                <input type="text" class="form-control" id="name" name="name" value="{{ name }}">
+                <input type="text" class="form-control" id="name" name="name" value="{{ name }}" disabled>
             </div>
             <div class="mb-3">
                 <label for="email">Email address:</label>
@@ -66,21 +74,26 @@
             
             <div class="mb-3">
                 <label for="mobile">Mobile Number:</label>
-                <input type="text" class="form-control" id="mobile" name="mobile" value="{{ mobile }}" 
-                pattern="[0-9]{10}" title="Please enter a valid 10-digit mobile number" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required >
+                <input type="text" class="form-control" id="mobile" name="mobile" value="{{ mobile }}" disabled>
             </div>
             <div class="mb-3">
                 <label for="password">Password:</label>
-                <input  class="form-control" id="password" name="password" value="{{ password }}" type="password">
+                <input  class="form-control" id="password" name="password" value="{{ password }}" type="password" disabled>
             </div>
             <div class="mb-3">
                 <label for="role">Role:</label>
-                <select class="form-control" id="role" name="role">
-                    <option value="admin" {% if role == 'admin' %}selected{% endif %}>Admin</option>
-                    <option value="user" {% if role == 'user' %}selected{% endif %}>User</option>
-                    <option value="interviewer" {% if role == 'interviewer' %}selected{% endif %}>Interviewer</option>
-                    <!-- Add more roles as needed -->
-                </select>
+                {% if role == 'interviewer' %}
+                    <select class="form-control" id="role_display" disabled>
+                        <option selected>Interviewer</option>
+                    </select>
+                    <input type="hidden" name="role" value="interviewer">
+                {% else %}
+                    <select class="form-control" id="role" name="role">
+                        <option value="admin" {% if role == 'admin' %}selected{% endif %}>Admin</option>
+                        <option value="user" {% if role == 'user' %}selected{% endif %}>User</option>
+                        <option value="interviewer" {% if role == 'interviewer' %}selected{% endif %}>Interviewer</option>
+                    </select>
+                {% endif %}
             </div>
             <!-- <div class="mb-3">
                 <input type="checkbox" id="admin" name="role" value="admin" {{ 'checked' if role == 'admin' else '' }}>
@@ -88,10 +101,12 @@
                 <input type="checkbox" id="user" name="role" value="user" {{ 'checked' if role == 'user' else '' }}>
                 <label for="user">User</label><br>
             </div> -->
-
+            <h1>{{user_role}}</h1>
             <div style="display: flex; margin-left: 30%;margin-top: 2rem;">
                 <button type="submit" class="btn btn-primary" style="width:6rem; height:3rem; margin-right: 2rem;">Submit</button>
-                <a class="btn btn-outline-secondary" href="{{url_for('Home')}}" style="padding:10px ;width:6rem; height:3rem;"><div style="display: flex; justify-content: space-between; padding:5px;">
+                <a class="btn btn-outline-secondary"
+                   href="{{ url_for('Home') if role == 'admin' else url_for('dashBoard') }}" 
+                   style="padding:10px ;width:6rem; height:3rem;"><div style="display: flex; justify-content: space-between; padding:5px;">
                     <div>
                       <i class="fa-solid fa-backward" style="margin-right: 10px;"></i>
                     </div>
@@ -99,7 +114,7 @@
                       Back
                     </div>
                   </div>
-                  </a>
+                </a>
             </div>
             
         </form>
@@ -128,8 +143,22 @@
     }
     </script>
     
+    <script>
+        function showFileInput() {
+            document.getElementById("pic").style.display = "block";
+    
+            // Enable all editable fields
+            document.getElementById("name").disabled = false;
+            document.getElementById("mobile").disabled = false;
+            document.getElementById("password").disabled = false;
+            let roleInput = document.getElementById("role");
+            if (roleInput) {
+                roleInput.disabled = false;
+            }
+        }
+    </script>
+    
 </body>
 </html>
-
 
 <!--  -->

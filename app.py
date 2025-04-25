@@ -28,6 +28,9 @@ import time
 import io
 import re
 
+# profile pic
+from random import random 
+
 
 load_dotenv()
 app = Flask(__name__)
@@ -2416,13 +2419,17 @@ def profile():
         role=user.Role
         mobile=user.MobileNumber
         name=user.Name
-        pic=session.get('picture')
+
+        # pic=session.get('picture')
         
-        picture=pic if pic else ""
+        # picture=pic if pic else ""
+
+        picture = user.photo_filename if user.photo_filename else ""
+
         # print(picture)
 
         filename = user.photo_filename
-        return render_template("profile.html",emailId=emailId,password=password,role=role,name=name,mobile=mobile,filename=filename,picture=picture)
+        return render_template("profile.html",emailId=emailId,password=password,role=role,name=name,mobile=mobile,filename=filename,random=random)
 
 @app.route("/get_role")
 def get_role():
@@ -2463,6 +2470,12 @@ def update_profile():
         if user.MobileNumber !=new_mobile:
             user.MobileNumber=new_mobile
             changes.append("Mobile")
+# new password
+        new_password = request.form["password"]
+        if user.password != new_password:
+            user.password = new_password
+            changes.append("Password")
+
         new_role = request.form.get("role")
         if user.Role != new_role:
             user.Role = new_role

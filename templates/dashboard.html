@@ -7,539 +7,508 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='font.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    
     <style>
       .card-body .row {
-    margin-left: 0;
-    margin-right: 0;
-  }
-  .card-body .col-6 {
-    padding-left: 0;
-    padding-right: 0;
-  }
+        margin-left: 0;
+        margin-right: 0;
+      }
+      .card-body .col-6 {
+        padding-left: 0;
+        padding-right: 0;
+      }
+      .label{
+          color:#00A9FF;
+          
+      } 
+      .filter{
+        width: 90%;
+        margin-left: 3rem;
+      }  
+      select{
+        width: 7rem;
+      }
+      #divs,
+      #sunburstChart,
+      #roleSunburstChart {
+        margin-left:20% !important;
+      }
+      .custom-carousel-btn {
+        background-color: rgba(0, 0, 0, 0.3);
+        border-radius: 50%;
+        width: 35px;
+        height: 35px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      .custom-carousel-btn .carousel-control-prev-icon,
+      .custom-carousel-btn .carousel-control-next-icon {
+        filter: invert(1);
+        width: 20px;
+        height: 20px;
+      }
+            
     </style>
+    <script>
+      var project="{{project}}"
+      var designation="{{designation}}"
+      var locations="{{location}}"
+      var leadBreakdowns = {{ lead_breakdowns | tojson }};
+      
+    </script>
   </head>
   <body>
     <div style="display: flex;">
       {% include 'sidemenu.html' %}
       
-      <div class="content" style="padding:10px; height: 100vh; width:100%; margin-left: 150px;">
-        <h1 style="padding: 50px;"><center>Employee Dashboard</center></h1>
-      <div class="flex_div" style="flex: 1; justify-content: space-between;">
-        <div class="row row-cols-1 row-cols-md-3 g-4" style="padding: 10px;">
-          <div class="col">
-            <div class="card h-100" >
-              
-              <div class="card-body" >
-                <i class="fa-solid fa-3x fa-users icons" style="margin-bottom: 20px;"></i>
-                
-                <p class="card-text" >Total number of employees :{{ total_employees }}</p>
-                <p class="card-text">Number of active employees :{{active_employees }}</p>
-                <p class="card-text">Number of resigned employees :{{resigned_employees }}</p>
-              </div>
-            </div>
-          </div>
-          
-          
-          <div class="col">
-            <div class="card h-80">
-              <div class="card-body">
-                <i class="fa-solid fa-location-dot fa-2x" style="color: black; margin-bottom: 10px;"></i>
-                <p class="card-text" style="margin-bottom: 0.85rem;">Chennai employees count: {{Chennai_employees_count}}</p>
-                <p class="card-text" style="margin-bottom: 0.85rem;">Kollu employees count: {{kollu_employees_count}}</p>
-                <p class="card-text" style="margin-bottom: 0.85rem;">Kaup employees count: {{kaup_employees_count}}</p>
-                <p class="card-text" style="margin-bottom: 0.85rem;">TN palayam employees count: {{tn_palyam_count}}</p>
-              </div>
-            </div>
-          </div>
-          <div class="col">
-            <div class="card h-80">
-              <div class="card-body" style="max-height:12.8rem; overflow-y: auto;"> <!-- Set a fixed height and enable scrolling -->
-                <i class="fa-solid fa-clipboard-list icon fa-2x" ></i>
-                <div class="row" style="margin-top: 10px;">
-                  <div class="col-12"> <!-- Changed to a single column -->
-                    {% for project, count in project_status_counts.items() %}
-                      <p style=" margin-bottom:1rem;">{{ project }} employees count: {{ count }}</p>
-                    {% endfor %}
-                  </div>
+      <div class="content" style="padding:4px;  width:100%; margin-left: 150px;">
+
+        {% if user_role == 'admin' %}
+          <div>
+            
+            <h1 class="headline">Employee Dashboard</h1>
+            <div class="filter_div">
+              <div class="filter" style="display: flex; justify-content: space-between;margin-bottom: 10px;">
+                <div >
+                  <label for="project" class="label">Project:</label>
+                  <select name="project" id="project" class="select_project" onchange="handleFilters()">
+                    <option value=" ">Select</option>
+                  </select>  
                 </div>
-              </div>
-            </div>
-          </div>
-          <div class="col">
-            <div class="card">
-              <div class="card-body" style="max-height: 200px; overflow-y: auto;"> <!-- Set a fixed height and enable scrolling -->
-                <i class="fa-solid fa-briefcase icon fa-2x"></i>
-                <div class="row no-gutters" style="margin-top: 10px;">
-                  <div class="col-12 custom-col"> <!-- Changed to a single column -->
-                    {% for status, count in employment_status_counts.items() %}
-                      <p class="card-text" style="font-size:1rem; margin-bottom:0.8rem;">{{ status }} employees count: {{ count }}</p>
-                    {% endfor %}
-                  </div>
+                <div>
+                  <label for="designation" class="label">Designation:</label>
+                  <select name="designation" id="designation" onchange="handleFilters()">
+                    <option value="">Select</option>
+                  </select>
+                  
                 </div>
+                <div>
+                  <label for="location" class="label">Location:</label>
+                  <select name="location" id="location" onchange="handleFilters()">
+                    <option value="">Select</option>
+                    
+                  </select>
+                </div>
+                
+
+            </div>
+            <div class="dashboard-grid" style="margin-top: 2rem; margin-left: 2.5rem;">
+              <div class="grid-item">
+                <div id="employeeStatusChart"></div>
+              </div>
+              <div class="grid-item" >
+                <div id="locationChart"></div>
+              </div>
+              <div class="grid-item">
+                <div id="projectChart"></div>
+              </div>
+              <div class="grid-item">
+                <div id="employmentStatusChart"></div>
               </div>
             </div>
+            <hr>
           </div>
-          <div class="col">
-            <div class="card h-100">
-              <div class="card-body">
-                <img src="https://banner2.cleanpng.com/20190724/geb/kisspng-product-design-technology-font-5d385089740a08.2768103715639717214753.jpg" height="50px" width="50px" class="icons">
-                <p class="card-text">No of Applications: {{total_resumes}}</p>
-                <p class="card-text">No of applications selected :{{hr_selected}}</p>
+        {% endif %}  
+      <h1 class="headline">Resume Dashboard</h1>
+      <div class="filter" style="display: flex; margin-left: 35%; margin-bottom: 1rem; gap:2rem;">
+                
+                <div>
+                  <label for="month" class="label">Month:</label>
+                  <select name="month" id="month" class="select_project" onchange="handleFilters()">
+                    <option value=" ">Select</option>
+                    {% for month in months %}
+                        <option value="{{ month }}" {% if month == month_filter %}selected{% endif %}>{{ month }}</option>
+                    {% endfor %}
+                  </select>  
+                </div>
+                <div>
+                  <label for="week" class="label">Week:</label>
+                  <select name="week" id="week" class="select_project" onchange="handleFilters()">
+                    <option value=" ">Select</option>
+                      {% for w in ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'] %}
+                        <option value="{{ w }}" {% if w == week_filter %}selected{% endif %}>{{ w }}</option>
+                      {% endfor %}
+                  </select>  
+                </div>
+                
+                
+
+            </div>
+            <div class="flex_div" style="flex: 1; justify-content: center;  margin-bottom: 10rem;">
+              <div 
+                  style=
+                        "width: 60%; margin: auto;  box-shadow: 0 4px 20px black; 
+                          border: 1px solid #dee2e6; border-radius: 20px; padding: 20px;">
+                
+                <div id="chartCarousel" class="carousel slide" data-bs-ride="carousel" >
+                  <div class="carousel-inner">
+                    <div class="carousel-item active">
+                      <div id="divs"></div>
+                    </div>
+                    <div class="carousel-item">
+                      <div id="sunburstChart"></div>
+                    </div>
+                    <div class="carousel-item">
+                      <div id="roleSunburstChart"></div>
+                    </div>
+                  </div>
+            
+                  <!-- Carousel arrows (styled smaller + softer) -->
+                  <button class="carousel-control-prev custom-carousel-btn" type="button" data-bs-target="#chartCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  </button>
+                  <button class="carousel-control-next custom-carousel-btn" type="button" data-bs-target="#chartCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  </button>
+                </div>
+            
               </div>
             </div>
-          </div>
           
+        <div >
           
+        </div>
+        </div>
+        
+    <script src="{{ url_for('static', filename='config.js') }}"></script>
+    <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+    <script>
+      function handleFilters() {
+        const url = new URL(window.location.href);
 
-          
-          </div>
-          
-      </div>
-      <hr>
-      <h1 style="padding:20px;"><center>Resume Dashboard</center></h1>
-      <div class="flex_div" style="flex: 1; justify-content: space-between; margin-bottom: 20rem !important;">
-        <div class="row row-cols-1 row-cols-md-3 g-4" style="padding: 10px;">
-            <!-- Role based count -->
+        function handleSelect(id, param) {
+          const el = document.getElementById(id);
+          if (el) {
+            const val = el.value.trim();
+            if (val === " ") {
+              url.searchParams.delete(param);
+            } else {
+              url.searchParams.set(param, val);
+            }
+          }
+        }
 
-      <div class="col" style="margin-bottom: 2rem;">
-        <div class="card h-100">
-          <div class="card-body" style="max-height:19rem; overflow-y: auto; max-width:25.8rem; overflow-x: auto;">
-            
-            <table class="table table-bordered" style="box-shadow:0 8px 16px rgba(0, 0, 0, 0.3); border: 1px solid gray;">
-              <thead>
-                <span style="color: white; font-size:1.3rem;">Interview count based on Role</span>
-                <tr>
-                    <th class="head">Result</th>
-                    <th class="head">Jr QA Engg</th>
-                    <th class="head">QA Engg</th>
-                    <th class="head">Sr QA Engg</th>
-                    <th class="head">Grand Total</th>
-                </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Intro round Selected</strong></td>
-                <td>{{ statistics.get('Jr. QA Engineer', {}).get('intro', {}).get('selected', 0) }}</td>
-                <td>
-                  {{ statistics.get('QA Engineer', {}).get('intro', {}).get('selected', 0) }}
-                </td>
-                <td>
-                  {{ statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('selected', 0) }}
-                </td>
-                <td>
-                  <!-- Grand Total for the Intro round -->
-                  {{ statistics.get('Jr. QA Engineer', {}).get('intro', {}).get('selected', 0) +
-                     statistics.get('QA Engineer', {}).get('intro', {}).get('selected', 0) +
-                     statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('selected', 0) }}
-                </td>
-              </tr>
-              <tr>
-                <td><strong>Intro round Rejected</strong></td>
-                <td>{{statistics.get('Jr. QA Engineer', {}).get('intro', {}).get('rejected', 0)}}</td>
-                <td>
-                  {{ statistics.get('QA Engineer', {}).get('intro', {}).get('rejected', 0) }}
-                </td>
-                <td>
-                  {{ statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('rejected', 0) }}
-                </td>
-                
-                  <td>
-                    <!-- Grand Total for the Intro round -->
-                    {{ statistics.get('Jr. QA Engineer', {}).get('intro', {}).get('rejected', 0) +
-                       statistics.get('QA Engineer', {}).get('intro', {}).get('rejected', 0) +
-                       statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('rejected', 0) }}
-                  </td>
-                
-              </tr>
-              <tr>
-                <td><strong>Intro round Hold</strong></td>
-                <td>{{statistics.get('Jr. QA Engineer', {}).get('intro', {}).get('hold', 0)}}</td>
-                <td>
-                  {{ statistics.get('QA Engineer', {}).get('intro', {}).get('hold', 0) }}
-                </td>
-                <td>
-                  {{ statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('hold', 0) }}
-                </td>
-                
-                  <td>
-                    <!-- Grand Total for the Intro round -->
-                    {{ statistics.get('Jr. QA Engineer', {}).get('intro', {}).get('hold', 0) +
-                       statistics.get('QA Engineer', {}).get('intro', {}).get('hold', 0) +
-                       statistics.get('Sr. QA Engineer', {}).get('intro', {}).get('hold', 0) }}
-                  </td>
-                
-              </tr>
-              <tr>
-                <td><strong>Interview 1 Selected</strong></td>
-                <td>{{ statistics.get('Jr. QA Engineer', {}).get('interview1', {}).get('selected', 0) }}</td>
-                <td>
-                  {{ statistics.get('QA Engineer', {}).get('interview1', {}).get('selected', 0) }}
-                </td>
-                <td>
-                  {{ statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('selected', 0) }}
-                </td>
-                <td>
-                  <!-- Grand Total for the Intro round -->
-                  {{ statistics.get('Jr. QA Engineer', {}).get('interview1', {}).get('selected', 0) +
-                     statistics.get('QA Engineer', {}).get('interview1', {}).get('selected', 0) +
-                     statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('selected', 0) }}
-                </td>
-              </tr>
-              <tr>
-                <td><strong>Interview 1 Rejected</strong></td>
-                <td>{{ statistics.get('Jr. QA Engineer', {}).get('interview1', {}).get('rejected', 0) }}</td>
-                <td>
-                  {{ statistics.get('QA Engineer', {}).get('interview1', {}).get('rejected', 0) }}
-                </td>
-                <td>
-                  {{ statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('rejected', 0) }}
-                </td>
-                <td>
-                  <!-- Grand Total for the Intro round -->
-                  {{ statistics.get('Jr. QA Engineer', {}).get('interview1', {}).get('rejected', 0) +
-                     statistics.get('QA Engineer', {}).get('interview1', {}).get('rejected', 0) +
-                     statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('rejected', 0) }}
-                </td>
-              </tr>
-              <tr>
-                <td><strong>Interview 1 Hold</strong></td>
-                <td>{{ statistics.get('Jr. QA Engineer', {}).get('interview1', {}).get('hold', 0) }}</td>
-                <td>
-                  {{ statistics.get('QA Engineer', {}).get('interview1', {}).get('hold', 0) }}
-                </td>
-                <td>
-                  {{ statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('hold', 0) }}
-                </td>
-                <td>
-                  <!-- Grand Total for the Intro round -->
-                  {{ statistics.get('Jr. QA Engineer', {}).get('interview1', {}).get('hold', 0) +
-                     statistics.get('QA Engineer', {}).get('interview1', {}).get('hold', 0) +
-                     statistics.get('Sr. QA Engineer', {}).get('interview1', {}).get('hold', 0) }}
-                </td>
-              </tr>
-              <tr>
-                <td><strong>Interview 2 Selected</strong></td>
-                <td>{{ statistics.get('Jr. QA Engineer', {}).get('interview2', {}).get('selected', 0) }}</td>
-                <td>
-                  {{ statistics.get('QA Engineer', {}).get('interview2', {}).get('selected', 0) }}
-                </td>
-                <td>
-                  {{ statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('selected', 0) }}
-                </td>
-                <td>
-                  <!-- Grand Total for the Intro round -->
-                  {{ statistics.get('Jr. QA Engineer', {}).get('interview2', {}).get('selected', 0) +
-                     statistics.get('QA Engineer', {}).get('interview2', {}).get('selected', 0) +
-                     statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('selected', 0) }}
-                </td>
-              </tr>
-              <tr>
-                <td><strong>Interview 2 Rejected</strong></td>
-                <td>{{ statistics.get('Jr. QA Engineer', {}).get('interview2', {}).get('rejected', 0) }}</td>
-                <td>
-                  {{ statistics.get('QA Engineer', {}).get('interview2', {}).get('rejected', 0) }}
-                </td>
-                <td>
-                  {{ statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('rejected', 0) }}
-                </td>
-                <td>
-                  <!-- Grand Total for the Intro round -->
-                  {{ statistics.get('Jr. QA Engineer', {}).get('interview2', {}).get('rejected', 0) +
-                     statistics.get('QA Engineer', {}).get('interview2', {}).get('rejected', 0) +
-                     statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('rejected', 0) }}
-                </td>
-              </tr>
-              <tr>
-                <td><strong>Interview 2 Hold</strong></td>
-                <td>{{ statistics.get('Jr. QA Engineer', {}).get('interview2', {}).get('hold', 0) }}</td>
-                <td>
-                  {{ statistics.get('QA Engineer', {}).get('interview2', {}).get('hold', 0) }}
-                </td>
-                <td>
-                  {{ statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('hold', 0) }}
-                </td>
-                <td>
-                  <!-- Grand Total for the Intro round -->
-                  {{ statistics.get('Jr. QA Engineer', {}).get('interview2', {}).get('hold', 0) +
-                     statistics.get('QA Engineer', {}).get('interview2', {}).get('hold', 0) +
-                     statistics.get('Sr. QA Engineer', {}).get('interview2', {}).get('hold', 0) }}
-                </td>
-              </tr>
-              <tr>
-                <td><strong>HR selected</strong></td>
-                <td>{{ statistics.get('Jr. QA Engineer', {}).get('hr', {}).get('selected', 0) }}</td>
-                <td>
-                  {{ statistics.get('QA Engineer', {}).get('hr', {}).get('selected', 0) }}
-                </td>
-                <td>
-                  {{ statistics.get('Sr. QA Engineer', {}).get('hr', {}).get('selected', 0) }}
-                </td>
-                <td>
-                  <!-- Grand Total for the Intro round -->
-                  {{ statistics.get('Jr. QA Engineer', {}).get('hr', {}).get('selected', 0) +
-                     statistics.get('QA Engineer', {}).get('hr', {}).get('selected', 0) +
-                     statistics.get('Sr. QA Engineer', {}).get('hr', {}).get('selected', 0) }}
-                </td>
-              </tr>
-              <tr>
-                <td><strong>HR Rejected</strong></td>
-                <td>{{ statistics.get('Jr. QA Engineer', {}).get('hr', {}).get('rejected', 0) }}</td>
-                <td>
-                  {{ statistics.get('QA Engineer', {}).get('hr', {}).get('rejected', 0) }}
-                </td>
-                <td>
-                  {{ statistics.get('Sr. QA Engineer', {}).get('hr', {}).get('rejected', 0) }}
-                </td>
-                <td>
-                  <!-- Grand Total for the Intro round -->
-                  {{ statistics.get('Jr. QA Engineer', {}).get('hr', {}).get('rejected', 0) +
-                     statistics.get('QA Engineer', {}).get('hr', {}).get('rejected', 0) +
-                     statistics.get('Sr. QA Engineer', {}).get('hr', {}).get('rejected', 0) }}
-                </td>
-              </tr>
-              
-              
-            </tbody>
-            </table>
-            
-          </div>
-        </div>
-      </div>
-      <!-- Lead based count -->
-      <div class="col">
-        <div class="card h-100" style="max-height:19rem; overflow-y: auto; max-width:25.8rem; overflow-x: auto;">
-          
-          <div class="card-body">
-            <table class="table table-bordered">
-              <thead>
-                <span style="color: white; font-size:1.3rem;"">Interview count based on QA leads</span>
-                <tr>
-                  <th class="head">Result</th>
-                  
-              
-                  {% for lead in statistics_leads.keys() %}
-                      <th class="head">{{ lead }}</th>
-                  {% endfor %}
-                  
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th>Intro Round Selected</th>
-                  {% for lead in statistics_leads.keys() %}
-                      <td>{{statistics_leads[lead].intro.selected}}</td>
-                  {% endfor %}
-              </tr>
-              <tr>
-                <th>Intro Round Rejected</th>
-                {% for lead in statistics_leads.keys() %}
-                    <td>{{statistics_leads[lead].intro.rejected}}</td>
-                {% endfor %}
-            </tr>
-            <tr>
-              <th>Intro Round Hold</th>
-              {% for lead in statistics_leads.keys() %}
-                  <td>{{statistics_leads[lead].intro.hold}}</td>
-              {% endfor %}
-          </tr>
-            <tr>
-              <th>Interview 1 Selected</th>
-              {% for lead in statistics_leads.keys() %}
-                  <td>{{statistics_leads[lead].interview1.selected}}</td>
-              {% endfor %}
-            </tr>
-            <tr>
-              <th>Interview 1 Rejected</th>
-              {% for lead in statistics_leads.keys() %}
-                  <td>{{statistics_leads[lead].interview1.rejected}}</td>
-              {% endfor %}
-            </tr>
-            <tr>
-              <th>Interview 1 Hold</th>
-              {% for lead in statistics_leads.keys() %}
-                  <td>{{statistics_leads[lead].interview1.hold}}</td>
-              {% endfor %}
-            </tr>
-            <tr>
-              <th>Interview 2 Selected</th>
-              {% for lead in statistics_leads.keys() %}
-                  <td>{{statistics_leads[lead].interview2.selected}}</td>
-              {% endfor %}
-            </tr>
-            <tr>
-              <th>Interview 2 Rejected</th>
-              {% for lead in statistics_leads.keys() %}
-                  <td>{{statistics_leads[lead].interview2.rejected}}</td>
-              {% endfor %}
-            </tr>
-            <tr>
-              <th>Interview 2 Hold</th>
-              {% for lead in statistics_leads.keys() %}
-                  <td>{{statistics_leads[lead].interview2.hold}}</td>
-              {% endfor %}
-            </tr>
-            <tr>
-              <th>HR Selected</th>
-              {% for lead in statistics_leads.keys() %}
-                  <td>{{statistics_leads[lead].hr.selected}}</td>
-              {% endfor %}
-            </tr>
-            <tr>
-              <th>HR Rejected</th>
-              {% for lead in statistics_leads.keys() %}
-                  <td>{{statistics_leads[lead].hr.rejected}}</td>
-              {% endfor %}
-            </tr>
-            <tr>
-              <th>Grand Total</th>
-              {% for lead in statistics_leads.keys() %}
-                  <td>{{ statistics_leads[lead].grand_total }}</td>  <!-- Displaying the grand total for each lead -->
-              {% endfor %}
-            </tr>
-              </tbody>
-            
-          </table>
-            
-          </div>
-        </div>
-      </div> 
+        handleSelect("project", "project");
+        handleSelect("designation", "designation");
+        handleSelect("location", "location");
+        handleSelect("week", "week");
+        handleSelect("month", "month");
 
-      <!--  Overall count  -->
-      <div class="col">
-        <div class="card h-100" style="max-height:19rem; overflow-y: auto; max-width:25.8rem; overflow-x: auto;">
-          
-          <div class="card-body">
-            <table class="table table-bordered">
-              <span style="color: white; font-size:1.3rem;">Overall Interview count</span>
-              <thead>
-                <tr>
-                  <th scope="col" class="head">Status</th>
-                  <th scope="col" class="head">Count</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <th>Intro Round Selected</th>
-                  <td>{{ overall_counts['intro']['selected'] }}</td>
-                </tr>
-              
-              <tr>
-                <th>Intro Round Rejected</th>
-                <td>{{ overall_counts['intro']['rejected'] }}</td>
-            </tr>
-            <tr>
-              <th>Intro Round Hold</th>
-              <td>{{ overall_counts['intro']['hold'] }}</td>
-          </tr>
-            <tr>
-              <th>Interview 1 Selected</th>
-              <td>{{ overall_counts['interview1']['selected'] }}</td>
-            </tr>
-            <tr>
-              <th>Interview 1 Rejected</th>
-              <td>{{ overall_counts['interview1']['rejected'] }}</td>
-            </tr>
-            <tr>
-              <th>Interview 1 Hold</th>
-              <td>{{ overall_counts['interview1']['hold'] }}</td>
-            </tr>
-            <tr>
-              <th>Interview 2 Selected</th>
-              <td>{{ overall_counts['interview2']['selected'] }}</td>
-            </tr>
-            <tr>
-              <th>Interview 2 Rejected</th>
-              <td>{{ overall_counts['interview2']['rejected'] }}</td>
-            </tr>
-            <tr>
-              <th>Interview 2 Hold</th>
-              <td>{{ overall_counts['interview2']['hold'] }}</td>
-            </tr>
-            <tr>
-              <th>HR Selected</th>
-              <td>{{ overall_counts['hr']['selected'] }}</td>
-            </tr>
-            <tr>
-              <th>HR Rejected</th>
-              <td>{{ overall_counts['hr']['rejected'] }}</td>
-            </tr>
-            <tr>
-              <th>Grand Total</th>
-              <td>{{ overall_counts['grand_total']}}</td>
-            </tr>
-              </tbody>
-            
-          </table>
-            
-          </div>
-        </div>
-      </div>
-      <div class="col">
-        <div class="card h-100" style="max-height:19rem; overflow-y: auto; max-width:25.8rem; overflow-x: auto;">
-          
-          <div class="card-body">
-            <table class="table table-bordered">
-              <span style="color: white; font-size:1.3rem;">Overall Interview count</span>
-              <thead>
-                <tr>
-                    
-                    
-                    <th scope="col" class="head">Role</th>
-                    <th scope="col" class="head">Week</th>
-                    <th scope="col" class="head">Intro round</th>
-                    <th scope="col" class="head">Count</th>
-                    <th scope="col" class="head">Interview1 round</th>
-                    <th scope="col" class="head">Count</th>
-                    <th scope="col" class="head">Interview2 round</th>
-                    <th scope="col" class="head">Count</th>
-                    <th scope="col" class="head">HR round</th>
-                    <th scope="col" class="head">Count</th>
-                </tr>
-              <tbody>
-                {% for role, weeks in weekly_statistics.items() %}
-                {% for week_label, week_data in weeks.items() %}
-                    <tr>
-                        {% if loop.first %}
-                            <th rowspan="{{ weeks|length * 2 }}">{{ role }}</th>  <!-- Role in the first column, row spans for each week -->
-                        {% endif %}
-                        <th rowspan="2">{{ week_label }}</th>  <!-- Week in one row -->
-                        <td>Intro Selected</td>
-                        <td>{{ week_data.intro.selected }}</td>
-                        <td>Interview1 Selected</td>
-                        <td>{{ week_data.interview1.selected }}</td>
-                        <td>Interview2 Selected</td>
-                        <td>{{ week_data.interview2.selected }}</td>
-                        <td>HR Selected</td>
-                        <td>{{ week_data.hr.selected }}</td>
-                    </tr>
-                    <tr>
-                        <td>Intro Rejected</td>
-                        <td>{{ week_data.intro.rejected }}</td>
-                        <td>Interview1 Rejected</td>
-                        <td>{{ week_data.interview1.rejected }}</td>
-                        <td>Interview2 Rejected</td>
-                        <td>{{ week_data.interview2.rejected }}</td>
-                        <td>HR Rejected</td>
-                        <td>{{ week_data.hr.rejected }}</td>
-                    </tr>
-                {% endfor %}
-            {% endfor %}
-              </tbody>
-            
-          </table>
-            
-          </div>
-        </div>
-      </div>
-        </div>
-      </div>
-      
-      </div>
-     
-    </div>
+        window.location.href = url.toString();
+            }
+    </script> 
+    <script>
+      const commonSize = 400;
+      const commonTitleFont = { size: 20 };
+      const commonMargin = { t: 30, l: 0, r: 0, b: 30 };
     
-    <script src="{{ url_for('static', filename='dashboard.js') }}"></script> 
+      // Lead-wise chart
+      var data = [{
+        type: "sunburst",
+        labels: {{ labels | safe }},
+        parents: {{ parents | safe }},
+        values: {{ values | safe }},
+        branchvalues: "total",
+        outsidetextfont: { size: 16, color: "#000" },
+        leaf: { opacity: 0.6 },
+        marker: { line: { width: 2 } },
+        hoverinfo: "label+value+percent parent"
+      }];
+      var layout = {
+        margin: commonMargin,
+        width: commonSize,
+        height: commonSize,
+        title: {
+          text: "Interview Summary - Lead Wise",
+          font: commonTitleFont
+        },
+        sunburstcolorway: ["#636efa", "#ef553b", "#00cc96", "#ab63fa"],
+        extendsunburstcolorway: true
+      };
+      data[0].maxdepth = 2;
+      Plotly.newPlot('sunburstChart', data, layout, { displayModeBar: false });
+    
+      // Role-wise chart
+      var roleData = [{
+        type: "sunburst",
+        labels: {{ role_labels | safe }},
+        parents: {{ role_parents | safe }},
+        values: {{ role_values | safe }},
+        branchvalues: "total",
+        outsidetextfont: { size: 16, color: "#000" },
+        leaf: { opacity: 0.6 },
+        marker: { line: { width: 2 } },
+        hoverinfo: "label+value+percent parent"
+      }];
+      var roleLayout = {
+        margin: commonMargin,
+        width: commonSize,
+        height: commonSize,
+        title: {
+          text: "Interview Summary - Role Wise",
+          font: commonTitleFont
+        },
+        sunburstcolorway: ["#19d3f3", "#ff6692", "#b6e880", "#ff97ff"],
+        extendsunburstcolorway: true
+      };
+      roleData[0].maxdepth = 2;
+      Plotly.newPlot('roleSunburstChart', roleData, roleLayout, { displayModeBar: false });
+    
+      // Pie chart
+      var pieData = [{
+          values: {{ chart_values | tojson }},
+          labels: {{ chart_labels | tojson }},
+          type: 'pie',
+          textinfo: 'label+value',
+          hoverinfo: 'label+value+percent',
+          textposition: 'inside',
+          insidetextorientation: 'radial',
+          hole: 0.4,  // This turns it into a doughnut chart
+          textfont: {
+            size: 15
+          },
+          marker: {
+            line: { width: 2 }
+          },
+          domain: {
+            x: [0, 1],
+            y: [0, 1]
+          }
+        }];
+
+        var pieLayout = {
+          title: {
+            text: 'Interview Summary - Overall',
+            font: commonTitleFont
+          },
+          showlegend: false,
+          height: commonSize,
+          width: commonSize,
+          margin: commonMargin
+        };
+
+        Plotly.newPlot('divs', pieData, pieLayout, { displayModeBar: false });
+    </script>
+    <!-- ############################ Bar graphs ############################## -->
+    <script>
+      window.onload = function () {
+        // ===== EMPLOYEE STATUS CHART =====
+        const commonSize = 400;
+        const commonTitleFont = { size: 20 };
+        const commonXAxisTickFont = { size: 10 };
+        const commonMargin = { t: 30, l: 40, r: 20, b: 80 }; // You can also consider a common margin if suitable
+
+        // ===== EMPLOYEE STATUS CHART =====
+    
+        const employeeData = {
+          labels: [
+            {% for status, count in employee_status_counts.items() if status != 'Total' %}
+              "{{ status }}",
+            {% endfor %}
+          ],
+          values: [
+            {% for status, count in employee_status_counts.items() if status != 'Total' %}
+              {{ count }},
+            {% endfor %}
+          ]
+        };
+    
+        const employeeBarData = [{
+          x: employeeData.labels,
+          y: employeeData.values,
+          type: 'bar',
+          marker: {
+            color: ['red', 'green'],
+            line: {
+              width: 2
+            }
+          },
+          text: employeeData.values.map(String),
+          textposition: 'auto'
+        }];
+    
+        const employeeLayout = {
+          title: {
+            text: 'Employee Status Distribution',
+            font: commonTitleFont
+          },
+          height: commonSize,
+          width: commonSize,
+          margin: commonMargin,
+          xaxis: {
+            tickfont: commonXAxisTickFont,
+            tickpadding: 30
+          },
+          yaxis: {
+            title: 'Number of Employees',
+            titlefont: { size: 16 },
+            tickfont: { size: 14 },
+            title_standoff: 200
+          }
+        };
+    
+        Plotly.newPlot('employeeStatusChart', employeeBarData, employeeLayout, { displayModeBar: false });
+    
+    
+        // ===== LOCATION CHART =====
+        const locationData = {
+          labels: [
+            {% for location, count in location_counts.items() %}
+              "{{ location }}",
+            {% endfor %}
+          ],
+          values: [
+            {% for location, count in location_counts.items() %}
+              {{ count }},
+            {% endfor %}
+          ]
+        };
+    
+        const locationBarData = [{
+          x: locationData.labels,
+          y: locationData.values,
+          type: 'bar',
+          marker: {
+            color: [
+              {% for location in location_counts %}
+                '{{ ["#636EFA", "#EF553B", "#00CC96", "#AB63FA", "#FFA15A", "#19D3F3", "#FF6692", "#B6E880", "#FF97FF", "#FECB52"][loop.index0 % 10] }}',
+              {% endfor %}
+            ],
+            line: { width: 2 }
+          },
+          text: locationData.values.map(String),
+          textposition: 'auto'
+        }];
+    
+        const locationLayout = {
+          title: {
+            text: 'Location-wise Employee Distribution',
+            font: commonTitleFont
+          },
+          height:commonSize,
+          width:commonSize,
+          margin: commonMargin,
+          xaxis: {
+            tickfont: commonXAxisTickFont,
+            tickpadding: 30
+          },
+          yaxis: {
+            title: 'Employee Count',
+            titlefont: { size: 16 },
+            tickfont: { size: 14 }
+          }
+        };
+    
+        Plotly.newPlot('locationChart', locationBarData, locationLayout, { displayModeBar: false });
+        const projectData = {
+        labels: [
+          {% for project, count in projects_counts.items() %}
+            "{{ project }}",
+          {% endfor %}
+        ],
+        values: [
+          {% for project, count in projects_counts.items() %}
+            {{ count }},
+          {% endfor %}
+        ]
+      };
+
+      const projectBar = [{
+        x: projectData.labels,
+        y: projectData.values,
+        type: 'bar',
+        marker: {
+          color: [
+            {% for project in projects_counts %}
+              '{{ ["#FECB52", "#FF97FF", "#B6E880", "#FF6692", "#19D3F3", "#00CC96", "#EF553B", "#636EFA", "#AB63FA", "#FFA15A"][loop.index0 % 10] }}',
+            {% endfor %}
+          ],
+          line: { width: 2 }
+        },
+        text: projectData.values.map(String),
+        textposition: 'auto'
+      }];
+
+      const projectLayout = {
+        title: {
+          text: 'Project-wise Employee Distribution',
+          font: commonTitleFont
+        },
+        height: commonSize,
+        width: commonSize,
+        margin: commonMargin,
+        xaxis: {
+          tickfont: commonXAxisTickFont,
+          tickpadding: 20
+        },
+        yaxis: {
+          title: 'Employee Count',
+          titlefont: { size: 14 },
+          tickfont: { size: 12 }
+        }
+      };
+
+      Plotly.newPlot('projectChart', projectBar, projectLayout, { displayModeBar: false });
+      const employmentData = {
+        labels: [
+          {% for Emp_stat, count in Employment_status_counts.items() %}
+            "{{ Emp_stat }}",
+          {% endfor %}
+        ],
+        values: [
+          {% for Emp_stat, count in Employment_status_counts.items() %}
+            {{ count }},
+          {% endfor %}
+        ]
+      };
+
+      const employmentBar = [{
+        x: employmentData.labels,
+        y: employmentData.values,
+        type: 'bar',
+        marker: {
+          color: [
+            {% for status in Employment_status_counts %}
+              '{{ ["#EF553B", "#00CC96", "#636EFA", "#AB63FA", "#FFA15A", "#19D3F3", "#FF6692", "#B6E880", "#FF97FF", "#FECB52"][loop.index0 % 10] }}',
+            {% endfor %}
+          ],
+          line: { width: 2 }
+        },
+        text: employmentData.values.map(String),
+        textposition: 'auto'
+      }];
+
+      const employmentLayout = {
+        title: {
+          text: 'Employment Status Distribution',
+          font: commonTitleFont
+        },
+        height:commonSize,
+        width:commonSize,
+        margin: commonMargin,
+        xaxis: {
+          tickfont: commonXAxisTickFont,
+          tickpadding: 20
+        },
+        yaxis: {
+          title: 'Employee Count',
+          titlefont: { size: 14 },
+          tickfont: { size: 12 }
+        }
+      };
+
+      Plotly.newPlot('employmentStatusChart', employmentBar, employmentLayout, { displayModeBar: false });
+      };
+    </script>
+    
+    
+    
+      
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
   </body>
 </html>

@@ -1,7 +1,4 @@
-*{
-    font-family:"poppins";
-    
-}
+
 a{
     text-decoration: none;
     color:red;
@@ -19,8 +16,6 @@ a{
     
 }
 .filters_title{
-    background-color:#00ACFF;
-    color:white;
     text-align: center;
     margin: 0;
     width: 90%;
@@ -36,17 +31,19 @@ a{
 }
 
 .table .table_header {
-    background-color:#00ACFF;
-    color:white;
+    text-align: center;
+    background-color:#A9A9A9 !important;
+    color:rgb(8, 1, 1) !important;
     }
-    .table.table-primary {
+
+.table.table-primary {
         background-color: #1AACAC !important ; /* Change the background color */
         color: black !important ; /* Change the text color */
         /* Add any other custom styling as needed */
       }
 .label{
     color:#00A9FF;
-    font-size:18px;
+    /* font-size:18px; */
 }     
 .btn{
     color:whitesmoke;
@@ -70,9 +67,7 @@ Add this to your CSS file */
     color: red;
     font-size:20px;
 }  
-*{
-    margin: 0 ;
-}
+
 .main_div{
     margin: 0%;
     width:24%; 
@@ -154,7 +149,7 @@ select{
 .tables td,
 .tables th {
   padding: 10px; /* Adjust padding as needed */
-  font-size: 14px; /* Adjust font size as needed */
+  /* font-size: 14px; Adjust font size as needed */
   white-space: nowrap; /* Prevent text wrapping */
   overflow: hidden; /* Hide any overflowing content */
   text-overflow: ellipsis; /* Show ellipsis for overflow */

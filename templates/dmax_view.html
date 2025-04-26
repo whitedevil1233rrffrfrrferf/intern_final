@@ -9,6 +9,7 @@
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='view.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='font.css') }}">
     
     <style>
         .table {
@@ -33,7 +34,7 @@
     <div class="first_div">
         {% include 'sidemenu.html'%}
         <div style="margin-left:100px;">
-          <h1 class="filters_title" style="margin-bottom: 2rem;"><center>Employee Dmax metrics</center></h1>
+          <h1 class="filters_title headline" style="margin-bottom: 2rem;"><center>Employee Dmax metrics</center></h1>
           <div class="dmax_view_filter_div"  >
 
             <div class=" filter" style=" display: flex; justify-content:space-around; gap: 3rem;">

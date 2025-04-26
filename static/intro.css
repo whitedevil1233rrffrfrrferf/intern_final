@@ -1,11 +1,7 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 
-*{
-    font-family: "poppins",sans-serif;
-    margin: 0;
-    
-}
+
 .select-btn{
     box-sizing: border-box;
     display: flex;
@@ -21,7 +17,7 @@
 }
 
 .btn-text{
-    font-size: 17px;
+    /* font-size: 17px; */
     font-weight: 400;
     color: #333;
 }
@@ -74,12 +70,12 @@
 
 }
 .check-icon{
-    font-size: 15px;
+    /* font-size: 15px; */
     transform: scale(0);
     color: white;
 }
 .item-text{
-    font-size: 16px;
+    /* font-size: 16px; */
     font-weight: 400;
     color: #333;
     
@@ -146,7 +142,7 @@ a:hover {
 }
 
 .form-group label {
-    font-size: 17px !important;
+    /* font-size: 17px !important; */
     font-weight: bold;
     gap: 2rem !important;
     color: #1AACAC;
@@ -154,7 +150,7 @@ a:hover {
 }
 
 .required-icon {
-    font-size: 8px;
+    /* font-size: 8px; */
     color: red;
     position: absolute;
     top: -2.5rem; /* Moves the star above the label */
@@ -222,7 +218,7 @@ margin-right: 5px; /* Reduce space between checkbox and text */
 
 .panel-item label {
 flex-grow: 1; /* Ensures label takes remaining space */
-font-size: 16px;
+/* font-size: 16px; */
 font-weight: bold;
 color: #1AACAC;
 white-space: nowrap; /* Prevents text from wrapping */
@@ -277,7 +273,7 @@ width: 100%;  Matches the input field */
 position: absolute;
 pointer-events: none;
 right: 10px;
-font-size: 16px;
+/* font-size: 16px; */
 transition: transform 0.3s ease-in-out;
 }
 

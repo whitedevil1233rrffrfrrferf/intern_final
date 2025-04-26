@@ -1663,47 +1663,100 @@ def view_resume(filename):
 
 
 
-@app.route("/zip",methods=["GET","POST"])
+# @app.route("/zip",methods=["GET","POST"])
+# def zip():
+#     current_month = datetime.now().strftime("%B")
+#     sucessful_message=None
+#     if request.method=="POST":
+        
+#         zip_files=request.files.getlist('zipFiles')
+#         selected_tag=request.form['tag']
+#         for zip_file in zip_files:
+#             if zip_file and zip_file.filename.endswith('.zip'):
+#                 temp_dir="temp_dir"
+#                 os.makedirs(temp_dir,exist_ok=True)
+#                 try:
+#                     with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+#                         zip_ref.extractall(temp_dir)
+                    
+#                     for root,dirs,files in os.walk(temp_dir):
+#                         for filename in files:
+#                             file_path = os.path.join(root, filename)
+#                             if allowed_files(filename):
+#                                 tag_filename=f"{selected_tag}_{filename}"
+#                                 target_path=os.path.join(app.config['UPLOAD_FOLDER'], tag_filename)
+#                                 # print("File")
+#                                 if not os.path.exists(target_path):
+#                                     shutil.move(file_path,target_path)
+#                                     resume=Resume(filename=tag_filename,Month=current_month)
+#                                     db.session.add(resume)
+#                                     db.session.commit()
+#                                     sucessful_message=True
+                                    
+#                                 else:
+#                                     flash('Resume already exists!', 'error')
+                                    
+#                 finally:
+#                     shutil.rmtree(temp_dir)   
+
+#         if sucessful_message:
+#             flash('Resume(s) uploaded successfully!', 'success')
+
+#         return redirect(url_for('zip'))            
+#     return render_template("zip.html")
+
+
+
+@app.route("/zip", methods=["GET", "POST"])
 def zip():
     current_month = datetime.now().strftime("%B")
-    sucessful_message=None
-    if request.method=="POST":
-        
-        zip_files=request.files.getlist('zipFiles')
-        selected_tag=request.form['tag']
+    successful_message = False
+
+    if request.method == "POST":
+        zip_files = request.files.getlist('zipFiles')
+        selected_tag = request.form['tag']
+
         for zip_file in zip_files:
             if zip_file and zip_file.filename.endswith('.zip'):
-                temp_dir="temp_dir"
-                os.makedirs(temp_dir,exist_ok=True)
+                temp_dir = "temp_dir"
+                os.makedirs(temp_dir, exist_ok=True)
                 try:
                     with zipfile.ZipFile(zip_file, 'r') as zip_ref:
                         zip_ref.extractall(temp_dir)
-                    
-                    for root,dirs,files in os.walk(temp_dir):
+
+                    for root, dirs, files in os.walk(temp_dir):
                         for filename in files:
                             file_path = os.path.join(root, filename)
                             if allowed_files(filename):
-                                tag_filename=f"{selected_tag}_{filename}"
-                                target_path=os.path.join(app.config['UPLOAD_FOLDER'], tag_filename)
-                                # print("File")
+                                tag_filename = f"{selected_tag}_{filename}"
+                                target_path = os.path.join(app.config['UPLOAD_FOLDER'], tag_filename)
                                 if not os.path.exists(target_path):
-                                    shutil.move(file_path,target_path)
-                                    resume=Resume(filename=tag_filename,Month=current_month)
+                                    shutil.move(file_path, target_path)
+                                    resume = Resume(filename=tag_filename, Month=current_month)
                                     db.session.add(resume)
                                     db.session.commit()
-                                    sucessful_message=True
-                                    
+                                    successful_message = True
                                 else:
-                                    flash('Resume already exists!', 'error')
-                                    
+                                    flash(f"Resume '{filename}' already exists!", 'error')
                 finally:
-                    shutil.rmtree(temp_dir)   
+                    shutil.rmtree(temp_dir)
+            else:
+                flash(f"Invalid file '{zip_file.filename}'. Only .zip files are allowed.", 'error')
 
-        if sucessful_message:
+        if successful_message:
             flash('Resume(s) uploaded successfully!', 'success')
+        elif not zip_files:
+            flash('No files selected!', 'error')
+        else:
+            flash('No valid files uploaded!', 'error')
 
-        return redirect(url_for('zip'))            
+        return redirect(url_for('zip'))
+
     return render_template("zip.html")
+
+
+
+
 
 # @app.route("/introcall/<int:resume_id>", methods=['GET', 'POST'])
 # def introCall(resume_id):

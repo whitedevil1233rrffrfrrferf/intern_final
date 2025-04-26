@@ -8,13 +8,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='update.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='font.css') }}">
     
   </head>
   <body>
     <div style="display: flex;">
       {% include 'sidemenu.html'%}
       <div class="container my-3" style="width:60%">
-        <h1 class="title">Update </h1>
+        <h1 class="title headline">Update </h1>
         
         <form action="{{ url_for('edit_employee_resume', employee_id=resume.id) }}" method="post">
             <div class="mb-3 label">
@@ -32,13 +33,48 @@
                 <input type="text" class="form-control" id="qualification" name="qualification" value="{{resume.Qualification}}" aria-describedby="emailHelp" required>
                 
             </div>
-            <!-- not allowed non-numeric input -->
+            <!-- not allowed non-numeric input
             <div class="mb-3 label">
                 <label for="phone" class="form-label">Phone:<span style="color: red;">*</span></label>
                 <input type="text" class="form-control" id="phone" name="phone" value="{{resume.Phone}}" aria-describedby="emailHelp" 
                 pattern="[0-9]{10}" title="Please enter a valid 10-digit mobile number" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required  >   
                 
-            </div>
+            </div> -->
+
+            <div class="mb-3 label">
+              <label for="phone" class="form-label">Phone:<span style="color: red;">*</span></label>
+              <div class="input-group">
+                  <!-- Country Code Dropdown with fixed width -->
+                  <select class="form-select" id="country_code" name="country_code"
+                          style="max-width: 25%; min-width: 25%;" required>
+                      <option value="+91" {% if resume.CountryCode == '+91' %}selected{% endif %}>🇮🇳 +91</option>
+                      <option value="+1" {% if resume.CountryCode == '+1' %}selected{% endif %}>🇺🇸 +1</option>
+                      <option value="+44" {% if resume.CountryCode == '+44' %}selected{% endif %}>🇬🇧 +44</option>
+                      <option value="+61" {% if resume.CountryCode == '+61' %}selected{% endif %}>🇦🇺 +61</option>
+                      <option value="+81" {% if resume.CountryCode == '+81' %}selected{% endif %}>🇯🇵 +81</option>
+                      <option value="+49" {% if resume.CountryCode == '+49' %}selected{% endif %}>🇩🇪 +49</option>
+                      <option value="+971" {% if resume.CountryCode == '+971' %}selected{% endif %}>🇦🇪 +971</option>
+                      <option value="+94" {% if resume.CountryCode == '+94' %}selected{% endif %}>🇱🇰 +94</option>
+                      <option value="+880" {% if resume.CountryCode == '+880' %}selected{% endif %}>🇧🇩 +880</option>
+                      <option value="+92" {% if resume.CountryCode == '+92' %}selected{% endif %}>🇵🇰 +92</option>
+                      <!-- Add more countries here in the same format if needed -->
+                  </select>
+          
+                  <!-- Phone Number Input with 75% width -->
+                  <input type="text" class="form-control"
+                         style="max-width: 75%; min-width: 75%;"
+                         id="phone" name="phone"
+                         value="{{resume.Phone}}"
+                         pattern="[0-9]{10}"
+                         title="Please enter a valid 10-digit mobile number"
+                         inputmode="numeric"
+                         maxlength="10"
+                         oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                         required>
+              </div>
+          </div>
+          
+          
             <div class="mb-3 label">
                 <label for="location" class="form-label">Current Location:</label>
                 <input type="text" class="form-control" id="location" name="location" value="{{resume.Location}}" aria-describedby="emailHelp" required  >
@@ -62,7 +98,7 @@
             </div>
             <div class="mb-3 label">
               <label for="expected_ctc" class="form-label">Experience:<span style="color: red;">*</span></label>
-              <input type="text" class="form-control" id="experience" name="experience" value="{{resume.Experience}}" aria-describedby="emailHelp" required>
+              <input type="text" class="form-control" id="experience" name="experience"  step="0.1" min="0" value="{{resume.Experience}}" aria-describedby="emailHelp" required>
               
           </div>
             <div class="mb-3 label">

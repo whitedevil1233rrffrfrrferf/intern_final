@@ -1,0 +1,19 @@
+*{
+    font-family: "Poppins", sans-serif;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 400;
+    padding:0;
+    
+  }    
+    .headline {
+        padding: 20px;
+        background-color: darkblue;
+        font-family: "Poppins", sans-serif;
+        color:white;
+        font-size: 36px !important; 
+        font-weight: 700 !important;
+        text-align: center;
+    
+    }
+   

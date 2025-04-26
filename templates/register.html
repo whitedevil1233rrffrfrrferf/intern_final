@@ -7,12 +7,13 @@
     <title>Register</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='font.css') }}">
   </head>
   <body>
     <div>
       {% include "sidemenu.html" %}
       <div>
-        <h1 class="heading"><center>Register</center></h1>
+        <h1 class="headline" style="font-weight:bold"><center>Register</center></h1>
     <div class="container sign_div">
       <form action="/register" method="post" class="form_div container" enctype="multipart/form-data" style="padding: 10px;margin-left: 3rem;" onsubmit="return validateForm(event)">
           <div class="mb-3 my-3">

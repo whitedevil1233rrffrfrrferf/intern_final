@@ -12,10 +12,58 @@
 <body>
   <div style="display: flex;">
     {% include 'sidemenu.html'%}
-    <div style="margin-left: 150px;">
+    <div style="margin-left: 180px;width: 75%;">
       <h1 class="my-3 heading"><center>{{data.Name}}'s record</center></h1> 
-   <table class="table my-3">
-    <thead>
+   <table class="table my-6 record">
+      <tr>
+        <th>Emp_id</th>
+        <td>{{data.Emp_id}}</td>
+      </tr>
+      <tr>
+        <th>Name</th>
+        <td>{{data.Name}}</td>
+      </tr>
+      <tr>
+        <th>Designation</th>
+        <td>{{data.Designation}}</td>
+      </tr>
+      <tr>
+        <th>Department</th>
+        <td>{{data.Department}}</td>
+      </tr>
+      <tr>
+        <th>Project</th>
+        <td>{{data.Project}}</td>
+      </tr>
+      <tr>
+        <th>Job_role</th>
+        <td>{{data.Job_role}}</td>
+      </tr>
+      <tr>
+        <th>Employment_status</th>
+        <td>{{data.Employment_status}}</td>
+      </tr>
+      <tr>
+        <th>Joining_date</th>
+        <td>{{data.Joining_date}}</td>
+      </tr>
+      <tr>
+        <th>Experience</th>
+        <td>{{data.Experience}}</td>
+      </tr>
+      <tr>
+        <th>Location</th>
+        <td>{{data.Location}}</td>
+      </tr>
+      <tr>
+        <th>Last_promoted</th>
+        <td>{{data.Last_promoted}}</td>
+      </tr>
+      <tr>
+        <th>Comments</th>
+        <td>{{data.Comments}}</td>
+      </tr>
+    <!-- <thead>
       <tr>        
         <th scope="col" class="table_header">Emp_id</th>
         <th scope="col" class="table_header">Name</th>
@@ -47,9 +95,9 @@
             <td>{{data.Last_promoted }}</td>
             <td>{{data.Comments}}</td>
         </tr>
-    </tbody>
+    </tbody> -->
     </table> 
-    <a class="btn btn-primary" href="/home" style="color:white; padding:10px ;margin-top:30px; margin-left:600px;"><div style="display: flex; justify-content: space-between; padding:5px;">
+    <a class="btn btn-outline-secondary" href="{{url_for('Home')}}" style="padding:10px ;margin-top:30px; margin-left:50%; width:6rem!important;"><div style="display: flex; justify-content: space-between; padding:5px;">
       <div>
         <i class="fa-solid fa-backward" style="margin-right: 10px;"></i>
       </div>

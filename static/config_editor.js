@@ -90,7 +90,7 @@ document.getElementById("updateForm").addEventListener("submit", updateConfigVal
 
 // Function to save the updated configuration to the server
 function saveConfigToServer(config) {
-    fetch('/update_config', {
+    fetch(updateConfigUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -112,8 +112,73 @@ function saveConfigToServer(config) {
 }
 
 // Populate input fields with existing configuration values when the page loads
-populateInputFields();
 
+document.addEventListener('DOMContentLoaded', function() {
+    populateInputFields();
+    document.getElementById('configForm').addEventListener('input', function(event) {
+        handleFieldChange(event, 'config');
+    });
+    document.getElementById('addForm').addEventListener('input', function(event) {
+        handleFieldChange(event, 'add');
+    });
+    document.getElementById('updateForm').addEventListener('input', function(event) {
+        handleFieldChange(event, 'update');
+    });
+    document.getElementById('uploadResumeForm').addEventListener('input', function(event) {
+        handleFieldChange(event, 'upload');
+    });
+    document.getElementById("configForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent default form submission
+        showFlashMessage('flash-message', Array.from(changedFieldsConfig)); // Show flash message with changed fields
+        updateConfigValues(); // Update config values
+    });
+    document.getElementById("addForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent default form submission
+        showFlashMessage('flash-message-add', Array.from(changedFieldsAdd)); // Show flash message with changed fields
+        updateConfigValuesAdd(); // Update config values
+    });
+    document.getElementById("updateForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent default form submission
+        showFlashMessage('flash-message-update', Array.from(changedFieldsUpdate)); // Show flash message with changed fields
+        updateConfigValuesUpdate(); // Update config values
+    });
+    document.getElementById("uploadResumeForm").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent default form submission
+        showFlashMessage('flash-message-upload', Array.from(changedFieldsUpload)); // Show flash message with changed fields
+        updateConfigValuesUploadResume(); // Update config values
+    });
+});
+
+let changedFieldsConfig = new Set();
+let changedFieldsAdd = new Set();
+let changedFieldsUpdate = new Set();
+let changedFieldsUpload = new Set();
+
+function handleFieldChange(event, formType) {
+    const fieldName = event.target.name;
+
+    const strippedFieldName = fieldName.replace(/^add|update/, '');
+
+    if (formType === 'config') {
+        changedFieldsConfig.add(strippedFieldName);
+        
+    } else if (formType === 'add') {
+        changedFieldsAdd.add(strippedFieldName);
+        
+    } else if (formType === 'update') {
+        changedFieldsUpdate.add(strippedFieldName);
+        
+    } else if (formType === 'upload') {
+        changedFieldsUpload.add(strippedFieldName);
+        
+    }
+}
+
+
+function showFlashMessage(flashMessageId, changedFields) {
+    const flashMessage = document.getElementById(flashMessageId);
+    flashMessage.style.display = 'block';
+    flashMessage.innerText = `${changedFields.map(field => field.replace(/([A-Z])/g, ' $1')).join(',')} changed.`;}
 // Add event listener for form submission
 document.getElementById("configForm").addEventListener("submit", updateConfigValues);
 
@@ -138,3 +203,5 @@ function updateConfigValuesUploadResume(event) {
 }
 
 document.getElementById("uploadResumeForm").addEventListener("submit", updateConfigValuesUploadResume);
+
+

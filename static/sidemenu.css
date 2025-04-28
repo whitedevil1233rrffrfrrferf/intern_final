@@ -84,6 +84,10 @@
   z-index: 999;
 }
 
+.nav-link:hover {
+  background-color: #f0f0f0;
+}
+
 
 
 .dropdown-toggle:hover::after {

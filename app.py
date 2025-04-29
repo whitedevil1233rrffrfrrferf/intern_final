@@ -26,6 +26,11 @@ from dotenv import load_dotenv
 import time
 import io
 import re
+from functools import wraps
+from flask import Response, render_template
+from typing import Union
+
+
 
 load_dotenv()
 app = Flask(__name__)
@@ -59,7 +64,7 @@ app.config['SQLALCHEMY_BINDS']={'login':"sqlite:///login.db",
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config['UPLOAD_FOLDER']=general_upload_folder
 app.config['PROFILE_IMAGE_UPLOAD_FOLDER'] = 'static/profile_images'
-app.secret_key = os.environ.get('SECRET_KEY')
+app.config['SECRET_KEY'] = 'your_secret_key_here'
 db = SQLAlchemy(app)
 migrate=Migrate(app,db)
 
@@ -1091,7 +1096,21 @@ def signPage():
         if correct_user == None:
                 error_message="invalid login credentials"      
     return render_template("sign.html",error_message=error_message)   
+
+
+      
+# shwetha's change
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'email' not in session:
+            flash('Please log in first.', 'warning')
+            return redirect(url_for('signPage'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 @app.route("/dashboard")
+@login_required
 def dashBoard():
     data = {"Intro Selected": 10, "Intro Rejected": 5}
     chart_data = {
@@ -1530,6 +1549,7 @@ def dashBoard():
 #                                    page_size_options=page_size_options,
 #                                    selected_page_size=selected_page_size,total_items=total_items,total_pages=total_pages,start_index=start_index,search_query=search_query)
 @app.route("/home", methods=["GET", "POST"])
+@login_required
 def Home():
     default_page_size = 20
     page_size_options = [20, 30, 40,'All']
@@ -1635,6 +1655,7 @@ def Home():
                            total_items=total_items, total_pages=total_pages,
                            start_index=start_index, search_query=search_query,page=page,project=project,designation=designation,employment_status=employment_status,status=status,loc=loc,month=month)
 @app.route("/add", methods=["GET", "POST"])
+@login_required
 def Add():
     if request.method == "POST":
         emp_id = request.form.get("emp_id")
@@ -1689,6 +1710,7 @@ def Add():
     return render_template("add.html")
 
 @app.route("/update/<int:sno>",methods=["GET","POST"])
+@login_required
 def Update(sno):
     selected_date = request.args.get("date")
     if request.method == "POST":
@@ -1885,6 +1907,7 @@ def get_employees_list(employment_status):
     # return jsonify({'employeeList': employee_names})
 
 @app.route("/resume",methods=["GET","POST"])
+@login_required
 def resume():
     flash_message=None
     months=["January","February","March","April","May","June","July","August","September","October","November","December"]
@@ -1952,6 +1975,7 @@ def resume():
 #                            total_items=total_items, no_of_pages=no_of_pages,start_index=start_index)
 
 @app.route("/employee_management", methods=["GET", "POST"])
+@login_required
 def employee():
     role=None
     email=session.get('email')
@@ -2041,6 +2065,7 @@ def employee():
 
 
 @app.route("/view_resume/<filename>")
+@login_required
 def view_resume(filename):
     resume_folder='static/files'
     file_path=os.path.join(resume_folder, filename)
@@ -2063,6 +2088,7 @@ def view_resume(filename):
 
 
 @app.route("/zip",methods=["GET","POST"])
+@login_required
 def zip():
     current_month = datetime.now().strftime("%B")
     sucessful_message=None
@@ -2105,6 +2131,7 @@ def zip():
     return render_template("zip.html")
 
 @app.route("/introcall/<int:resume_id>", methods=['GET', 'POST'])
+@login_required
 def introCall(resume_id):
     selected_panel=""
     resume=Resume.query.get(resume_id)
@@ -2730,6 +2757,11 @@ def update_profile():
         if changes:
             flash('{} changed.'.format(', '.join(changes)), 'success')
         return redirect(url_for('profile'))
+
+# shwetha's change
+@app.context_processor
+def inject_request():
+    return dict(request=request)
          
 @app.route('/update_config', methods=['POST'])
 def update_config():
@@ -2743,7 +2775,8 @@ def update_config():
 
         return jsonify({'message': 'Config updated successfully'}), 200
     except Exception as e:
-        return jsonify({'error': str(e)}), 500   
+        return jsonify({'error': str(e)}), 500 
+
 
 @app.route('/sign-in')
 def sign_in():

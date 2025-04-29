@@ -1,6 +1,6 @@
-*{
-    font-family:"poppins";
-}
+/* *{
+    font-family:"poppins",sans-serif;
+} */
 body{
     background-color:#172C54;
 
@@ -20,7 +20,7 @@ body{
     border: 1px solid white;
     width:40%;
     margin-left:450px;
-    margin-top:150px;
+    margin-top:90px;
     box-shadow: 5px 15px 25px rgba(0,0,0,1.5);
     padding:10px;
 }
@@ -32,9 +32,9 @@ body{
 .form_div{
     margin-left:50px;
 }
-.sign_div:hover{
+/* .sign_div:hover{
     transform: scale(1.1);
-}
+} */
 .divider-wrapper {
     display: flex;
     align-items: center;

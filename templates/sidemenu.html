@@ -89,18 +89,19 @@
             <li id="register_menu"  style="padding: 0; margin: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;"> </li>
 
             <!-- shwetha's changes -->
-            <li style="padding: 0; margin: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-              <a href="{{ url_for('signout') }}" class="nav-link py-2 rounded-0" title="Sign out" data-bs-toggle="tooltip" data-bs-placement="right" style="margin:0">
-                <img src="https://cdn-icons-png.flaticon.com/512/1828/1828479.png" style="width: 1.4rem; height: 1.4rem;"><br>
-                <span style="color:black; font-size:9px; white-space:nowrap;">Sign out</span>
-              </a>
-            </li>    
+              
             <li style="padding: 0; margin: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;">
               <a href="{{ url_for('profile') }}" class="nav-link py-2 rounded-0" title="Profile" data-bs-toggle="tooltip" data-bs-placement="right" style="margin: 0;">
                 <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" style="width:1.4rem; height:1.4rem;"><br>
                 <span style="color:black; font-size:9px; white-space:nowrap;">Profile</span>
               </a>
             </li>
+            <li style="padding: 0; margin: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <a href="{{ url_for('signout') }}" class="nav-link py-2 rounded-0" title="Sign out" data-bs-toggle="tooltip" data-bs-placement="right" style="margin:0">
+                <img src="https://cdn-icons-png.flaticon.com/512/1828/1828479.png" style="width: 1.4rem; height: 1.4rem;"><br>
+                <span style="color:black; font-size:9px; white-space:nowrap;">Sign out</span>
+              </a>
+            </li> 
             
           </ul>
           <!-- <div class="dropdown border-top" style="border-radius: 20px; margin-left: 0.25rem; border: 1px solid #ddd;">
@@ -129,7 +130,7 @@
                     document.getElementById("admin-menu-item-placeholder").innerHTML = `
                         <a href="${editConfigUrl}" class="nav-link py-2  rounded-0" title="Config file" data-bs-toggle="tooltip" data-bs-placement="right" onclick="openConfigFile()" style="margin:0">
                             <i class="fa-solid fa-cog icons" style="width: 1rem; height: 1rem;"></i><br>
-                            <span style="color:black; font-size: 9px;">Config File</span>
+                            <span style="color:black; font-size: 9px;">Settings</span>
                         </a>`;
                     document.getElementById("register_menu").innerHTML = `
                         <a href="${registerUrl}" class="nav-link py-2  rounded-0" title="Register" data-bs-toggle="tooltip" data-bs-placement="right" style="margin:0">
@@ -145,13 +146,13 @@
             fetch(editConfigUrl)
             .then(response => {
                 if (response.ok) {
-                    console.log('Config file opened successfully');
+                    console.log('Settings page opened successfully');
                 } else {
-                    throw new Error('Failed to open config file');
+                    throw new Error('Failed to open Settings page');
                 }
             })
             .catch(error => {
-                console.error('Error opening config file:', error);
+                console.error('Error opening Settings page:', error);
             });
         }
 

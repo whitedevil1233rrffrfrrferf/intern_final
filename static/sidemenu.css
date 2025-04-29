@@ -150,3 +150,11 @@ i{
     margin: auto;
   }
 }
+
+/* shwetha's changes */
+
+.nav-link.active {
+  background-color: #e0e0e0;  /* light grey or any highlight */
+  color: #000 !important;
+  font-weight: bold;
+}

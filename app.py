@@ -2484,6 +2484,12 @@ def profile():
         filename = user.photo_filename
         return render_template("profile.html",emailId=emailId,password=password,role=role,name=name,mobile=mobile,filename=filename,random=random)
 
+
+# shwetha's changes
+@app.context_processor
+def inject_request():
+    return dict(request=request)
+
 @app.route("/get_role")
 def get_role():
     email = session.get('email')

@@ -302,7 +302,7 @@ document.addEventListener("click", function (event) {
 });
 </script>
 
-
+<!-- shwetha's change -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         emailjs.init("Nce5bwHWE3-gXvm-9"); // EmailJS User ID
@@ -314,12 +314,20 @@ document.addEventListener("click", function (event) {
         document.querySelector("form").addEventListener("submit", function (event) {
             const status = document.getElementById("status").value;
             console.log("📝 Selected Status:", status);
-            
 
             if (!candidateName || !candidateEmail || candidateName === "N/A" || candidateEmail === "N/A") {
                 alert("⚠️ Candidate name and email are required!");
                 console.error("❌ Email not sent: Candidate name or email is missing.");
-                event.preventDefault();  // 🚨 Stops form submission
+                event.preventDefault(); // 🚨 Stops form submission
+                return;
+            }
+
+            // ✅ Validate if at least one panel member is selected
+            const selectedPanels = document.querySelectorAll(".panel-checkbox:checked");
+            if (status === "Move to Interview 2" && selectedPanels.length === 0) {
+                alert("⚠️ Please select a Panel Member before submitting.");
+                console.error("❌ Email not sent: No panel member selected.");
+                event.preventDefault(); // 🚨 Stops form submission
                 return;
             }
 
@@ -329,7 +337,7 @@ document.addEventListener("click", function (event) {
             if (status === "Move to Interview 2") {
                 event.preventDefault(); // Stop the default form submission
                 
-                sendEmail(candidateName, candidateEmail, status, function() {
+                sendEmail(candidateName, candidateEmail, status, function () {
                     console.log("📨 Email sent! Submitting form...");
                     document.querySelector("form").submit();  // ✅ Corrected form submission
                 });
@@ -369,7 +377,7 @@ document.addEventListener("click", function (event) {
         console.log("📤 Sending email with params:", templateParams);
 
         emailjs.send("service_q2j2eqc", "template_4vc45jq", templateParams)
-            .then(function(response) {
+            .then(function (response) {
                 console.log("✅ Email sent successfully!", response);
                 submitButton.disabled = false;
 
@@ -380,7 +388,7 @@ document.addEventListener("click", function (event) {
                     }
                 }, 2000);
             })
-            .catch(function(error) {
+            .catch(function (error) {
                 console.error("❌ Error sending email:", error);
                 alert("⚠️ Failed to send email. Please try again.");
                 console.log(error.message)
@@ -388,8 +396,6 @@ document.addEventListener("click", function (event) {
             });
     }
 </script>
-    
-
 
 
 

@@ -1017,7 +1017,7 @@ def map_role_based_on_experience(experience):
         elif 0.5 <= experience_in_years < 2:
             return "Jr. QA Engineer"
         else:
-            return "QA Intern"
+            return "Intern"
 
     return None
 
@@ -1420,7 +1420,8 @@ def dashBoard():
             if lead_total == 0:
                 continue
 
-            lead_label = f"{lead} ({round_labels[r]})"  # Keep the round name for parent-child relationship
+            lead_label = f"{lead}_{r}"   # Keep the round name for parent-child relationship
+
             round_label = round_labels[r]
 
             # Append the lead stats as child under the corresponding round label
@@ -1459,8 +1460,8 @@ def dashBoard():
     rounds = ['intro', 'interview1', 'interview2', 'hr']
     round_labels = {
         'intro': 'Intro Round',
-        'interview1': 'Interview 1',
-        'interview2': 'Interview 2',
+        'interview1': 'L1',
+        'interview2': 'L2',
         'hr': 'HR Round'
     }
     status_labels = {'selected': 'Selected', 'rejected': 'Rejected', 'hold': 'Hold'}
@@ -1974,43 +1975,42 @@ def resume():
 #                            selected_page_size=selected_page_size,
 #                            total_items=total_items, no_of_pages=no_of_pages,start_index=start_index)
 
+
+
+# shwetha's change
+
 @app.route("/employee_management", methods=["GET", "POST"])
 @login_required
 def employee():
-    role=None
-    email=session.get('email')
+    role = None
+    email = session.get('email')
+    
     if email:
-        user=Login.query.filter_by(email=email).first()
-        role=user.Role
-        
+        user = Login.query.filter_by(email=email).first()
+        role = user.Role
+
         if not user:
             return redirect(url_for('login'))
 
     file_link = session.pop('file_link', None)
-    public_key=os.environ.get('EMAILJS_PUBLIC_KEY')
-    EMAILJS_SERVICE_ID=os.environ.get('EMAILJS_SERVICE_ID')
-    EMAILJS_TEMPLATE_ID=os.environ.get('EMAILJS_TEMPLATE_ID_TABLE')
-    # Prepare the email template parameters
-    
-    
+    public_key = os.environ.get('EMAILJS_PUBLIC_KEY')
+    EMAILJS_SERVICE_ID = os.environ.get('EMAILJS_SERVICE_ID')
+    EMAILJS_TEMPLATE_ID = os.environ.get('EMAILJS_TEMPLATE_ID_TABLE')
     
     search_query = request.args.get("search", "").strip()
-    
-    # qa_lead_query = request.args.get('qa_lead', '').strip()
-    filter_role = request.args.get('role') 
-    filter_week=request.args.get('week')
+    filter_role = request.args.get('role')
+    filter_week = request.args.get('week')
     
     default_page_size = 10
     page_size_options = [10, 20, 30, 40, 50]
-    months=["January","February","March","April","May","June","July","August","September","October","November","December"]
+    months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    
     if request.method == "POST":
         selected_page_size = int(request.form.get("page_size", default_page_size))
         session['page_size'] = selected_page_size
-        # Redirect to the same page with updated page size to avoid form resubmission issues
         return redirect(url_for('employee', page=1))
     else:
         selected_page_size = session.get('page_size', default_page_size)
-    
     
     current_month = datetime.now().strftime("%B")
     selected_month = request.args.get("month", current_month)
@@ -2019,49 +2019,61 @@ def employee():
     if search_query:
         query = query.filter(
             or_(Resume.Name.ilike(f"%{search_query}%"), Resume.QA_Lead.ilike(f"%{search_query}%"))
-            )
+        )
     
     if filter_role:  # Filter by role if provided
         query = query.filter(Resume.Role == filter_role)
-    if filter_week:  # Filter by role if provided
-        query = query.filter(Resume.week == filter_week)       
-    if selected_month and not search_query :
-        query = query.filter(Resume.Month == selected_month)
-    page = request.args.get('page', 1, type=int)
-    total_items =query.count()
     
-       
+    if filter_week:  # Filter by week if provided
+        query = query.filter(Resume.week == filter_week)
+    
+    if selected_month and not search_query:
+        query = query.filter(Resume.Month == selected_month)
+    
+    page = request.args.get('page', 1, type=int)
+    total_items = query.count()
+    
     # Handle case where there are no items
     if total_items == 0:
-        data =query.paginate(page=1, per_page=selected_page_size)
+        data = query.paginate(page=1, per_page=selected_page_size)
         start_index = 0
-        end_index=0
+        end_index = 0
         total_pages = 1
     else:
-        # Handle pagination
         new_page_count = total_items // selected_page_size
         if total_items % selected_page_size > 0:
             new_page_count += 1
 
-        # Ensure the current page is within the valid range
         if page > new_page_count:
             page = new_page_count
 
         start_index = (page - 1) * selected_page_size
-        
         data = query.paginate(page=page, per_page=selected_page_size)
-        if start_index:
-            total_pages = 0
-            end_index = 0
-            
-        else:    
-            total_pages = data.pages
-            end_index = min(start_index + selected_page_size, total_items)
-    return render_template("employee.html", resumes=data,
-                           page_size_options=page_size_options,
-                           selected_page_size=selected_page_size,
-                           total_items=total_items, total_pages=total_pages,
-                           start_index=start_index,months=months,current_month=current_month,selected_month=selected_month,file_link=file_link,public_key=public_key,service_id=EMAILJS_SERVICE_ID,template_id=EMAILJS_TEMPLATE_ID,search_query=search_query,role=role,filter_role=filter_role,filter_week=filter_week,end_index=end_index)
+        
+        total_pages = data.pages
+        end_index = min(start_index + selected_page_size, total_items)
+    
+    return render_template(
+        "employee.html", 
+        resumes=data,
+        page_size_options=page_size_options,
+        selected_page_size=selected_page_size,
+        total_items=total_items,
+        total_pages=total_pages,
+        start_index=start_index,
+        months=months,
+        current_month=current_month,
+        selected_month=selected_month,
+        file_link=file_link,
+        public_key=public_key,
+        service_id=EMAILJS_SERVICE_ID,
+        template_id=EMAILJS_TEMPLATE_ID,
+        search_query=search_query,
+        role=role,
+        filter_role=filter_role,
+        filter_week=filter_week,
+        end_index=end_index
+    )
 
 
 @app.route("/view_resume/<filename>")
@@ -2242,6 +2254,8 @@ def resume_details(resume_id):
         if status == "Rejected" or "not conducted" in status:
             all_rounds_status = "Rejected"
             break
+
+        
     intro_call=Intro.query.filter_by(resumeId=resume_id).first()
     interview1=Interview1.query.filter_by(resumeId=resume_id).first()
     interview2=Interview2.query.filter_by(resumeId=resume_id).first()
@@ -3333,74 +3347,66 @@ def qareq():
         
     return render_template("qareq.html",public_key=public_key,service_id=service_id,template_id=template_id,email=email)
  
+# shwetha's changes
+
 @app.route("/excel_resume", methods=['GET', 'POST'])
 def excel_resume():
-    if request.method=="POST":
+    # Initialize counters before any try-except block
+    successful_uploads = 0
+    failed_uploads = 0
+
+    if request.method == "POST":
         current_month = datetime.now().strftime("%B")
-        month=request.form['month_excel']
+        month = request.form['month_excel']
         print(month)
+
         if 'file' not in request.files:
-            flash('No file part')
-            
+            flash('No file part', 'error')
             return redirect(request.url)
+        
         file = request.files['file']
-    
+
         if file.filename == '':
-            flash('No selected file')
-            
+            flash('No selected file', 'error')
             return redirect(request.url)
+
         if file:
             try:
-                wb=load_workbook(file)
-                
-                sheet=wb.active
+                wb = load_workbook(file)
+                sheet = wb.active
                 for i, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
-                
-                   if not all(cell is None for cell in row):
-                        email=row[1]
-                        name=row[2]
-                        qualification=row[3]
-                        phone=str(row[4])
-                        location=row[5]
-                        experience=row[6]
-                        
-                        lead=row[7]
-                        result=row[8]
-                        current_ctc=row[9]
-                        expecting_ctc=row[10]
-                        notice_period=row[11]
-                        suggestions=row[12]
-                        link=row[13]
+                    if not all(cell is None for cell in row):
+                        email = row[1]
+                        name = row[2]
+                        qualification = row[3]
+                        phone = str(row[4])
+                        location = row[5]
+                        experience = row[6]
+                        lead = row[7]
+                        result = row[8]
+                        current_ctc = row[9]
+                        expecting_ctc = row[10]
+                        notice_period = row[11]
+                        suggestions = row[12]
+                        link = row[13]
                         role = map_role_based_on_experience(experience)
-                        
-                        # print(result,current_ctc,expecting_ctc,notice_period,suggestions)
+
                         try:
-                            # Convert the experience to a string, strip spaces, and remove any non-numeric characters (like 'yrs')
+                            # Clean and convert experience field
                             experience = str(experience).strip() if experience else None
-                            
-                            
                             if experience:
-                                
-                                # Remove non-numeric characters like "yrs" using a regular expression
-                                # This keeps only digits and a decimal point
                                 numeric_experience = re.sub(r'[^\d.]', '', experience)
-                                
-                                # Try converting the cleaned value to a float
                                 if numeric_experience:
                                     float_experience = float(numeric_experience)
-                                    experience = str(float_experience)  # Convert back to string if successful
-                                    print("yrs experience",experience)  # Print for debugging
+                                    experience = str(float_experience)
                                 else:
-                                    experience = None  # If cleaning results in an empty string, set to None
-                            else:
-                                experience = None  # Set to None if empty
+                                    experience = None
                         except Exception as e:
-                            # Log error if needed, and set experience to None in case of failure
                             print(f"Error processing experience: {e}")
                             experience = None
-                        existing_employee =Resume.query.filter_by(Email=email).first()
+
+                        existing_employee = Resume.query.filter_by(Email=email).first()
                         if not existing_employee:
-                            
                             new_candidate = Resume(
                                 Email=email,
                                 filename=name,
@@ -3417,16 +3423,25 @@ def excel_resume():
                                 Notice_period=notice_period,
                                 Month=month
                             )
-                            
                             db.session.add(new_candidate)
-                            db.session.commit() 
-                            flash('Resume(s) uploaded successfully!', 'success')
+                            db.session.commit()
+                            successful_uploads += 1
                         else:
-                            flash('Resume(s) already exists', 'error') 
-                            
-            except:
-                pass    
-    return redirect(url_for('resume'))  
+                            failed_uploads += 1
+
+                # Flash success or error message based on uploads
+                if successful_uploads > 0:
+                    if failed_uploads > 0:
+                        flash(f"{successful_uploads} resume(s) uploaded successfully, {failed_uploads} failed. [View details]", 'error')
+                    else:
+                        flash(f"{successful_uploads} resume(s) uploaded successfully!", 'success')
+                else:
+                    flash("No resumes were uploaded. Please check the file and try again.", 'error')
+
+            except Exception as e:
+                flash(f"Error processing the file: {str(e)}", 'error')
+
+    return redirect(url_for('resume'))  # Redirect to the page displaying the resume details or list
 
 
 
@@ -3636,7 +3651,11 @@ def edit_employee_resume(employee_id):
         resume.Notice_period=request.form['notice_period']
         resume.Link=request.form["resume_link"]
         resume.Role=map_role_based_on_experience(resume.Experience)
-        resume.week = request.form['week']
+
+        # shwetha's change for week is not mandatory
+        # resume.week = request.form['week']
+        resume.week = request.form.get('week')
+
         
         db.session.commit()
         flash('Successfully updated!', 'success')

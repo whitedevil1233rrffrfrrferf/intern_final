@@ -163,7 +163,7 @@
             
             
             <div class="table-responsive my-4">
-                <table class="table" style="min-width:90%;width: auto;
+                <table class="table" style="min-width:90%; width: auto;
                         max-width: 95%; 
                         table-layout: auto;
                         margin-left:1%; 
@@ -385,8 +385,17 @@
                         </div>
                         
                     </div>
-                    <div >
+                    <!-- <div >
                         Showing {{ start_index + 1 }} to {{ end_index }} of {{ total_items }} resumes
+                    </div> -->
+
+                    <!-- shwetha's changes -->
+                    <div>
+                        {% if total_items == 0 %}
+                            Showing 0 to 0 of 0 resumes
+                        {% else %}
+                            Showing {{ start_index + 1 }} to {{ end_index }} of {{ total_items }} resumes
+                        {% endif %}
                     </div>
                     
                 </div>
@@ -667,6 +676,34 @@
       closeActionModal();
     }
   };
+</script>
+<!-- shwetha's changes for candidate kept on hold also that hyperlink should be disabled -->
+<script>
+// These variables are passed from Flask
+var resumeStatus = "{{ resume_status }}";  // Passed from Flask
+var isCandidateInNextRound = {{ is_in_next_round }};  // Passed from Flask
+
+function updateRoundButtons() {
+    // Enable/Disable the L2 button based on the L1 status and the next round status
+    if (resumeStatus === "On Hold" || !isCandidateInNextRound) {
+        $('#l2Link').prop('disabled', true);  // Disable L2 button if L1 is 'On Hold' or not moved to next round
+    } else {
+        $('#l2Link').prop('disabled', false);  // Enable L2 button if L1 is not 'On Hold' and moved to the next round
+    }
+
+    // Enable/Disable the Intro button (always enabled)
+    $('#introLink').prop('disabled', false);
+
+    // Enable/Disable the HR button based on the L1 status
+    if (resumeStatus === "Passed") {
+        $('#hrLink').prop('disabled', false);  // Enable HR if L1 is 'Passed'
+    } else {
+        $('#hrLink').prop('disabled', true);  // Disable HR if L1 is not 'Passed'
+    }
+}
+
+// Call the function to update button states when the page loads
+updateRoundButtons();
 </script>
 </body>
 </html>

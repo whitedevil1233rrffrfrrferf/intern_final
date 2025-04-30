@@ -90,13 +90,36 @@ function handleFilters(){
     const role = document.getElementById('role').value;
     const week=document.getElementById('week').value;
     const month=document.getElementById('month').value;
-    
+    const intro=document.getElementById('introFilter').value;
+    const interview1=document.getElementById('interview1Filter').value;
+    const interview2=document.getElementById('interview2Filter').value;
+    const hr=document.getElementById('allRoundsFilter').value;
     const urlParams = new URLSearchParams(window.location.search);
     const page = urlParams.get('page') || 1;
     if (role) {
         urlParams.set('role', role);
     } else {
         urlParams.delete('role');
+    }
+    if (intro) {
+        urlParams.set('intro', intro);
+    } else {
+        urlParams.delete('intro');
+    }
+    if (interview1) {
+        urlParams.set('interview1', interview1);
+    } else {
+        urlParams.delete('interview1');
+    }
+    if (interview2) {
+        urlParams.set('interview2', interview2);
+    } else {
+        urlParams.delete('interview2');
+    }
+    if (hr) {
+        urlParams.set('hr', hr);
+    } else {
+        urlParams.delete('hr');
     }
     if (week) {
         urlParams.set('week', week);
@@ -376,9 +399,11 @@ function populateSelectOptions(selectId, optionsArray) {
     });
 }
 
-populateSelectOptions("introFilter", config.resumeFilters.introCallStatus);
-populateSelectOptions("interview1Filter", config.resumeFilters.interview1Status);
-populateSelectOptions("interview2Filter", config.resumeFilters.interview2Status);
+
+
+// populateSelectOptions("introFilter", config.resumeFilters.introCallStatus);
+// populateSelectOptions("interview1Filter", config.resumeFilters.interview1Status);
+// populateSelectOptions("interview2Filter", config.resumeFilters.interview2Status);
 populateSelectOptions("allRoundsFilter", config.resumeFilters.allRoundsStatus);
 
 setTimeout(function(){
@@ -606,6 +631,17 @@ function toggleFilter(checkbox) {
     const container = document.getElementById(checkbox.value);
     container.style.display = checkbox.checked ? 'flex' : 'none';
 }
+document.addEventListener('click', function(event) {
+    var modal = document.getElementById('moreFiltersModal');
+    var button = document.querySelector('.more-filters-btn');
+    
+    if (modal.style.display === 'block') {
+        // If the click target is NOT inside the modal and NOT the button
+        if (!modal.contains(event.target) && event.target !== button) {
+            closeMoreFilters();
+        }
+    }
+});
 // const modal = document.getElementById("moreFiltersModal");
 
 // window.onclick = function(event) {
@@ -667,3 +703,53 @@ function toggleFilter(checkbox) {
     const newWidth = minWidth + (visibleColumns * 5);
     table.style.width = newWidth > maxWidth ? '100%' : newWidth + '%';
   }
+
+// ############################# Modal clear selection #############################
+
+function resetToDefaultColumns(){
+    const defaultColumns = [
+        'candidate_id',
+        'candidate_name',
+        'contact_number',
+        'experience',
+        'role',
+        'view',
+        'action'
+    ];
+    const checkboxes = document.querySelectorAll('.column-filters input[type="checkbox"], .round-filters input[type="checkbox"]');
+
+    // 3. Loop through each checkbox
+    checkboxes.forEach(cb => {
+        // Check if this checkbox's value is one of the default visible columns
+        const shouldBeChecked = defaultColumns.includes(cb.value);
+
+        // 4. Only make a change if current state doesn't match desired state
+        if (cb.checked !== shouldBeChecked) {
+            cb.checked = shouldBeChecked;    // Update the checkbox status
+            toggleColumn(cb);                // Call your existing logic to show/hide that column
+        }
+    });
+}  
+
+// ########################################## Checkbox display after reload #######################################
+
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.get('intro')) {
+        document.querySelector('input[value="introFilterContainer"]').checked = true;
+        document.getElementById('introFilterContainer').style.display = 'block';
+    }
+    if (urlParams.get('interview1')) {
+        document.querySelector('input[value="interview1FilterContainer"]').checked = true;
+        document.getElementById('interview1FilterContainer').style.display = 'block';
+    }
+    if (urlParams.get('interview2')) {
+        document.querySelector('input[value="interview2FilterContainer"]').checked = true;
+        document.getElementById('interview2FilterContainer').style.display = 'block';
+    }
+    if (urlParams.get('hr')) {
+        document.querySelector('input[value="allRoundsFilterContainer"]').checked = true;
+        document.getElementById('allRoundsFilterContainer').style.display = 'block';
+    }
+});

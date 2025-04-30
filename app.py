@@ -1017,6 +1017,16 @@ def map_role_based_on_experience(experience):
     return None
 
 
+######################################### Query corrections ###########################################
+
+def fix_rejected(query):
+    if query == 'rejected':
+        return 'Rejected'
+    elif query == 'Move to HR round':
+         return 'Move to HR Round'
+    else:
+        return query
+
 def dashboard_function():
     total_employees=Employee.query.count()
     active_employees = Employee.query.filter_by(employee_status='active').count()
@@ -1380,8 +1390,8 @@ def dashBoard():
     rounds = ['intro', 'interview1', 'interview2', 'hr']
     round_labels = {
         'intro': 'Intro Round',
-        'interview1': 'Interview 1',
-        'interview2': 'Interview 2',
+        'interview1': 'L1',
+        'interview2': 'L2',
         'hr': 'HR Round'
     }
     status_labels = {'selected': 'Selected', 'rejected': 'Rejected', 'hold': 'Hold'}
@@ -1440,8 +1450,8 @@ def dashBoard():
     rounds = ['intro', 'interview1', 'interview2', 'hr']
     round_labels = {
         'intro': 'Intro Round',
-        'interview1': 'Interview 1',
-        'interview2': 'Interview 2',
+        'interview1': 'L1',
+        'interview2': 'L2',
         'hr': 'HR Round'
     }
     status_labels = {'selected': 'Selected', 'rejected': 'Rejected', 'hold': 'Hold'}
@@ -1967,15 +1977,20 @@ def employee():
     EMAILJS_SERVICE_ID=os.environ.get('EMAILJS_SERVICE_ID')
     EMAILJS_TEMPLATE_ID=os.environ.get('EMAILJS_TEMPLATE_ID_TABLE')
     # Prepare the email template parameters
-    
-    
-    
+  
     search_query = request.args.get("search", "").strip()
     
     # qa_lead_query = request.args.get('qa_lead', '').strip()
     filter_role = request.args.get('role') 
     filter_week=request.args.get('week')
-    
+    intro_filter=request.args.get('intro', '')
+    interview1_filter=request.args.get('interview1', '')
+    interview2_filter=request.args.get('interview2', '')
+    hr_filter=request.args.get('hr', '')
+    intro_query = fix_rejected(intro_filter)
+    interview1_query = fix_rejected(interview1_filter)
+    interview2_query = fix_rejected(interview2_filter)
+    hr_query = fix_rejected(hr_filter)       
     default_page_size = 10
     page_size_options = [10, 20, 30, 40, 50]
     months=["January","February","March","April","May","June","July","August","September","October","November","December"]
@@ -2003,6 +2018,65 @@ def employee():
         query = query.filter(Resume.week == filter_week)       
     if selected_month and not search_query :
         query = query.filter(Resume.Month == selected_month)
+    if intro_query:
+        if intro_query == "Intro call not conducted":
+            # Get all resume IDs where Intro call *was conducted*
+            conducted_resume_ids = [i.resumeId for i in Intro.query.with_entities(Intro.resumeId).distinct()]
+            if conducted_resume_ids:
+                query = query.filter(~Resume.id.in_(conducted_resume_ids))  # Exclude those
+            else:
+                pass  # All are not conducted, so no filter
+        else:
+            # Normal filter case
+            matching_resume_ids = [i.resumeId for i in Intro.query.filter(Intro.Status == intro_query).all()]
+            if matching_resume_ids:
+                query = query.filter(Resume.id.in_(matching_resume_ids))
+            else:
+                query = query.filter(False)  # No matches
+    if interview1_query:
+        if interview1_query == "Interview 1 not conducted":
+            # Get all resumes that had Interview 1 conducted
+            conducted_resume_ids = [i.resumeId for i in Interview1.query.with_entities(Interview1.resumeId).distinct()]
+            if conducted_resume_ids:
+                query = query.filter(~Resume.id.in_(conducted_resume_ids))  # Exclude them
+            else:
+                pass  # No interview1 conducted for any, so no filter
+        else:
+            matching_resume_ids = [i.resumeId for i in Interview1.query.filter(Interview1.Status == interview1_query).all()]
+            if matching_resume_ids:
+                query = query.filter(Resume.id.in_(matching_resume_ids))
+            else:
+                query = query.filter(False)
+
+    # Handle Interview 2 filter
+    if interview2_query:
+        if interview2_query == "Interview 2 not conducted":
+            conducted_resume_ids = [i.resumeId for i in Interview2.query.with_entities(Interview2.resumeId).distinct()]
+            if conducted_resume_ids:
+                query = query.filter(~Resume.id.in_(conducted_resume_ids))
+            else:
+                pass  # No filter if nobody had Interview 2
+        else:
+            matching_resume_ids = [i.resumeId for i in Interview2.query.filter(Interview2.Status == interview2_query).all()]
+            if matching_resume_ids:
+                query = query.filter(Resume.id.in_(matching_resume_ids))
+            else:
+                query = query.filter(False)
+    if hr_query:
+        if hr_query == "cleared":
+            # Get resumes that passed each round
+            intro_ids = [i.resumeId for i in Intro.query.filter(Intro.Status == "Move to Interview 1").all()]
+            interview1_ids = [i.resumeId for i in Interview1.query.filter(Interview1.Status == "Move to Interview 2").all()]
+            interview2_ids = [i.resumeId for i in Interview2.query.filter(Interview2.Status == "Move to HR Round").all()]
+            hr_ids = [i.resumeId for i in Hr.query.filter(Hr.Status == "Move to HR Process").all()]
+            
+            # Only resumes that are present in all 4 lists
+            cleared_ids = set(intro_ids) & set(interview1_ids) & set(interview2_ids) & set(hr_ids)
+
+            if cleared_ids:
+                query = query.filter(Resume.id.in_(cleared_ids))
+            else:
+                query = query.filter(False)  # No resumes matched            
     page = request.args.get('page', 1, type=int)
     total_items =query.count()
     
@@ -2033,11 +2107,17 @@ def employee():
         else:    
             total_pages = data.pages
             end_index = min(start_index + selected_page_size, total_items)
+            
     return render_template("employee.html", resumes=data,
                            page_size_options=page_size_options,
                            selected_page_size=selected_page_size,
                            total_items=total_items, total_pages=total_pages,
-                           start_index=start_index,months=months,current_month=current_month,selected_month=selected_month,file_link=file_link,public_key=public_key,service_id=EMAILJS_SERVICE_ID,template_id=EMAILJS_TEMPLATE_ID,search_query=search_query,role=role,filter_role=filter_role,filter_week=filter_week,end_index=end_index)
+                           start_index=start_index,months=months,current_month=current_month,
+                           selected_month=selected_month,file_link=file_link,public_key=public_key,
+                           service_id=EMAILJS_SERVICE_ID,template_id=EMAILJS_TEMPLATE_ID,search_query=search_query,
+                           role=role,filter_role=filter_role,filter_week=filter_week,end_index=end_index,
+                           intro_filter=intro_filter,interview1_filter=interview1_filter,interview2_filter=interview2_filter,hr_filter=hr_query
+                           )
 
 
 @app.route("/view_resume/<filename>")
@@ -2558,7 +2638,7 @@ def get_intro_status(resume_id):
     all_rounds_status = "Cleared"
     
     for status in statuses:
-        if status == "Rejected" or "not conducted" in status:
+        if status == "Rejected" or status == "On Hold" or  "not conducted" in status:
             all_rounds_status = "Rejected"
             break
             

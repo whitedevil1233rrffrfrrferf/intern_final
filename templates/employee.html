@@ -89,29 +89,37 @@
                 <div class="flex" style="display: flex; justify-content: space-between; align-items: center;flex-wrap: wrap;">
                     <div style="margin-bottom: 10px; margin-top: 20px; display: none;" class="inner_filter" id="introFilterContainer">
                         <label for="introFilter" class="filter_label">Intro Call Status:</label>
-                        <select  id="introFilter" onchange="filterTableByIntroStatus()" >
+                        <select id="introFilter" onchange="handleFilters()">
                             <option value="">Select</option>
-                            
+                            <option value="Move to Interview 1" {% if intro_filter == "Move to Interview 1" %}selected{% endif %}>Accepted</option>
+                            <option value="rejected" {% if intro_filter == "rejected" %}selected{% endif %}>Rejected</option>
+                            <option value="Intro call not conducted" {% if intro_filter == "Intro call not conducted" %}selected{% endif %}>Not conducted</option>
                         </select>
                     </div>
                     <div style="margin-bottom: 10px; margin-top: 20px; display: none;" class="inner_filter" id="interview1FilterContainer">
                         <label for="interview1Filter" class="filter_label">L1 Status:</label>
-                        <select id="interview1Filter" onchange="filterTableByInterview1Status()" >
+                        <select id="interview1Filter" onchange="handleFilters()">
                             <option value="">Select</option>
-                            
+                            <option value="Move to Interview 2" {% if interview1_filter == "Move to Interview 2" %}selected{% endif %}>Accepted</option>
+                            <option value="rejected" {% if interview1_filter == "rejected" %}selected{% endif %}>Rejected</option>
+                            <option value="Interview 1 not conducted" {% if interview1_filter == "Interview 1 not conducted" %}selected{% endif %}>Not conducted</option>
                         </select>
                     </div>
                     <div style="margin-bottom:10px; margin-top: 20px;display: none;" class="inner_filter" id="interview2FilterContainer">
                         <label for="interview2Filter" class="filter_label">L2 Status:</label>
-                        <select id="interview2Filter" onchange="filterTableByInterview2Status()" >
+                        <select id="interview2Filter" onchange="handleFilters()">
                             <option value="">Select</option>
-                           
+                            <option value="Move to HR round" {% if interview2_filter == "Move to HR round" %}selected{% endif %}>Accepted</option>
+                            <option value="rejected" {% if interview2_filter == "rejected" %}selected{% endif %}>Rejected</option>
+                            <option value="Interview 2 not conducted" {% if interview2_filter == "Interview 2 not conducted" %}selected{% endif %}>Not conducted</option>
                         </select>
                     </div>
-                    <div style="margin-bottom: 10px; margin-top: 20px;display: none;" class="inner_filter" id="allRoundsFilterContainer">
+                    
+                    <div style="margin-bottom: 10px; margin-top: 20px; display: none;" class="inner_filter" id="allRoundsFilterContainer">
                         <label for="allRoundsFilter" class="filter_label">All rounds cleared:</label>
-                        <select id="allRoundsFilter" onchange="filterTableByAllRoundsStatus()" >
+                        <select id="allRoundsFilter" onchange="handleFilters()">
                             <option value="">Select</option>
+                            <option value="cleared" {% if hr_filter == "cleared" %}selected{% endif %}>Cleared</option>
                         </select>
                     </div>
                     <div class="inner_filter" style="margin-bottom: 10px; margin-top: 20px;">
@@ -155,7 +163,41 @@
                         </select>
                     </div>
                     
-                    <button onclick="openMoreFilters()" class="more-filters-btn" style="text-align: left; margin-top:30px !important;">More ..</button>
+                    <div style="position: relative; display: inline-block;">
+                        <button onclick="openMoreFilters()" class="more-filters-btn" style="text-align: left; margin-top:30px !important;">More ..</button>
+                        <div id="moreFiltersModal" class="filter-modal" style="display: none; ">
+                            <div class="filter-modal-content" >
+                            <h3 style="font-size: 0.9rem; font-weight: bold;">Filters</h3>
+                        
+                            <!-- ROUND FILTERS -->
+                            <div class="round-filters">
+                                <label><input type="checkbox" value="introFilterContainer" onchange="toggleFilter(this)"> Intro Call Status</label>
+                                <label><input type="checkbox" value="interview1FilterContainer" onchange="toggleFilter(this)"> L1 Status</label>
+                                <label><input type="checkbox" value="interview2FilterContainer" onchange="toggleFilter(this)"> L2 Status</label>
+                                <label><input type="checkbox" value="allRoundsFilterContainer" onchange="toggleFilter(this)">All Rounds Status</label>
+                            </div>
+                        
+                            <hr>
+                        
+                            <!-- COLUMN TOGGLES -->
+                            <h3 style="font-size: 0.9rem; font-weight: bold;">Table columns</h4>
+                            <div class="column-filters">
+                                <label><input type="checkbox" value="candidate_id" checked onchange="toggleColumn(this)"> ID</label>
+                                <label><input type="checkbox" value="candidate_name" checked onchange="toggleColumn(this)"> Name</label>
+                                <label><input type="checkbox" value="contact_number" checked onchange="toggleColumn(this)"> Contact Num</label>
+                                <label><input type="checkbox" value="experience" checked onchange="toggleColumn(this)"> Experience</label>
+                                <label><input type="checkbox" value="qa_lead" onchange="toggleColumn(this)"> QA Lead</label>
+                                <label><input type="checkbox" value="role" checked onchange="toggleColumn(this)"> Role</label>
+                                <label><input type="checkbox" value="month" onchange="toggleColumn(this)"> Month</label>
+                                <label><input type="checkbox" value="week" onchange="toggleColumn(this)"> Week</label>
+                                <label><input type="checkbox" value="view" checked onchange="toggleColumn(this)"> View</label>
+                                <label><input type="checkbox" value="action" checked onchange="toggleColumn(this)"> Action</label>
+                            </div>
+                        
+                            <button onclick="resetToDefaultColumns()" class="btn btn-danger mt-3" style="background-color: red;">Clear</button>
+                            </div>
+                      </div>
+                    </div>
                     
                 </div>
             </div>
@@ -163,7 +205,7 @@
             
             
             <div class="table-responsive my-4">
-                <table class="table" style="min-width:90%;width: auto;
+                <table class="table" style="min-width:95%;width: auto;
                         max-width: 95%; 
                         table-layout: auto;
                         margin-left:1%; 
@@ -326,7 +368,7 @@
                                 </td> -->
                                 <td class="wrap-text checkbox-column month" style="display: none;">{{resume.Month}}</td>
                                 <td class="wrap-text checkbox-column week" style="display: none;">{{resume.week}}</td>
-                                <!-- <td class="wrap-text checkbox-column int_details" >
+                                <td class="wrap-text checkbox-column int_details" style="display: none;">x
                                     <div>
                                         <a id="introButton{{ resume.id }}" href="{{ url_for('introCall', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2 " title="Intro call" data-url="{{ url_for('get_intro_status', resume_id=resume.id) }}">Intro</a>
                                         <a id="interview1Button{{ resume.id }}" href="{{ url_for('interview1v', resume_id=resume.id) }}" class="btn btn-primary mx-1 my-2" title="Interview 1"><i class="fa-solid fa-phone"></i> 1</a>
@@ -337,11 +379,12 @@
 
                                     </div>
                                     
-                                </td> -->
+                                </td>
                                <td class="wrap-text checkbox-column view" ><a href="{{url_for('resume_details',resume_id=resume.id)}}" class="btn btn-primary mx-1" title="view"><i class="fa-solid fa-eye mx-2" style="color:white;"></i></a></td>
                                <td class="wrap-text checkbox-column action">
                                 <!-- <button class="btn btn-primary" style=" display: block; margin-left: auto; margin-right: auto;" onclick="window.location.href='{{ url_for('edit_employee_resume', employee_id=resume.id) }}'"><i class="fa-solid fa-pencil mx-2" style="color:#fff;"></i></button> -->
                                 <!-- <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal{{ resume.id }}" style="margin-top: 1rem;">More Info</button> -->
+                                
                                 <button class="btn btn-primary" onclick="openActionModal({{ resume.id }}, '{{ role }}')">...</button>
                                 <div id="actionModal" class="custom-modal" style="display: none;">
                                     <div class="custom-modal-content">
@@ -413,38 +456,7 @@
     
                         
     </div>
-    <div id="moreFiltersModal" class="filter-modal" style="display: none;">
-        <div class="filter-modal-content">
-          <h3>More Filters</h3>
-      
-          <!-- ROUND FILTERS -->
-          <div class="round-filters">
-            <label><input type="checkbox" value="introFilterContainer" onchange="toggleFilter(this)"> Intro Call Status</label>
-            <label><input type="checkbox" value="interview1FilterContainer" onchange="toggleFilter(this)"> L1 Status</label>
-            <label><input type="checkbox" value="interview2FilterContainer" onchange="toggleFilter(this)"> L2 Status</label>
-            <label><input type="checkbox" value="allRoundsFilterContainer" onchange="toggleFilter(this)"> All Rounds Cleared</label>
-          </div>
-      
-          <hr>
-      
-          <!-- COLUMN TOGGLES -->
-          <h4 style="margin-top: 15px;">Columns to Display</h4>
-          <div class="column-filters">
-            <label><input type="checkbox" value="candidate_id" checked onchange="toggleColumn(this)"> ID</label>
-            <label><input type="checkbox" value="candidate_name" checked onchange="toggleColumn(this)"> Name</label>
-            <label><input type="checkbox" value="contact_number" checked onchange="toggleColumn(this)"> Contact Num</label>
-            <label><input type="checkbox" value="experience" checked onchange="toggleColumn(this)"> Experience</label>
-            <label><input type="checkbox" value="qa_lead" onchange="toggleColumn(this)"> QA Lead</label>
-            <label><input type="checkbox" value="role" checked onchange="toggleColumn(this)"> Role</label>
-            <label><input type="checkbox" value="month" onchange="toggleColumn(this)"> Month</label>
-            <label><input type="checkbox" value="week" onchange="toggleColumn(this)"> Week</label>
-            <label><input type="checkbox" value="view" checked onchange="toggleColumn(this)"> View</label>
-            <label><input type="checkbox" value="action" checked onchange="toggleColumn(this)"> Action</label>
-          </div>
-      
-          <button onclick="closeMoreFilters()" class="btn btn-danger mt-3">Done</button>
-        </div>
-      </div>
+    
     
     <script src="{{ url_for('static', filename='config.js') }}"></script>   
     <script src="{{ url_for('static', filename='employee.js') }}?v=1.6"></script>
@@ -668,6 +680,8 @@
     }
   };
 </script>
+ 
+
 </body>
 </html>
 

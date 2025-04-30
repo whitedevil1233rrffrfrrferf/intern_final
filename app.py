@@ -1017,7 +1017,11 @@ def map_role_based_on_experience(experience):
         elif 0.5 <= experience_in_years < 2:
             return "Jr. QA Engineer"
         else:
+<<<<<<< HEAD
             return "Intern"
+=======
+            return "QA Intern"
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
 
     return None
 
@@ -1274,12 +1278,20 @@ def dashBoard():
 
         role_statistics[role] = {
             'intro': {
+<<<<<<< HEAD
                 'selected': intro_stats.get("Move to L1", 0),
+=======
+                'selected': intro_stats.get("Move to Interview 1", 0),
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
                 'rejected': intro_stats.get("Rejected", 0),
                 'hold': intro_stats.get("On Hold", 0)
             },
             'interview1': {
+<<<<<<< HEAD
                 'selected': interview1_stats.get("Move to L2", 0),
+=======
+                'selected': interview1_stats.get("Move to Interview 2", 0),
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
                 'rejected': interview1_stats.get("Rejected", 0),
                 'hold': interview1_stats.get("On Hold", 0)
             },
@@ -1321,12 +1333,20 @@ def dashBoard():
 
         lead_statistics[lead] = {
             'intro': {
+<<<<<<< HEAD
                 'selected': intro_stats.get("Move to L1", 0),
+=======
+                'selected': intro_stats.get("Move to Interview 1", 0),
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
                 'rejected': intro_stats.get("Rejected", 0),
                 'hold': intro_stats.get("On Hold", 0)
             },
             'interview1': {
+<<<<<<< HEAD
                 'selected': interview1_stats.get("Move to L2", 0),
+=======
+                'selected': interview1_stats.get("Move to Interview 2", 0),
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
                 'rejected': interview1_stats.get("Rejected", 0),
                 'hold': interview1_stats.get("On Hold", 0)
             },
@@ -1343,10 +1363,17 @@ def dashBoard():
         }
      
     raw_data = {
+<<<<<<< HEAD
         "Intro Round Selected": intro_counts.get("Move to L1", 0),
         "Intro Round Rejected": intro_counts.get("Rejected", 0),
         "Intro Round Hold": intro_counts.get("On Hold", 0),
         "L1 Selected": interview1_counts.get("Move to L2", 0),
+=======
+        "Intro Round Selected": intro_counts.get("Move to Interview 1", 0),
+        "Intro Round Rejected": intro_counts.get("Rejected", 0),
+        "Intro Round Hold": intro_counts.get("On Hold", 0),
+        "L1 Selected": interview1_counts.get("Move to Interview 2", 0),
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
         "L1 Rejected": interview1_counts.get("Rejected", 0),
         "L1 Hold": interview1_counts.get("On Hold", 0),
         "L2 Selected": interview2_counts.get("Move to HR Round", 0),
@@ -1395,12 +1422,21 @@ def dashBoard():
     labels = ["Interview Results"]
     parents = [""]
     values = [0]  # we'll update this total at the end
+<<<<<<< HEAD
 # shwetha's changes
     rounds = ['intro', 'interview1', 'interview2', 'hr']
     round_labels = {
         'intro': 'Intro Round',
         'interview1': 'L1 Round',
         'interview2': 'L2 Round',
+=======
+
+    rounds = ['intro', 'interview1', 'interview2', 'hr']
+    round_labels = {
+        'intro': 'Intro Round',
+        'interview1': 'Interview 1',
+        'interview2': 'Interview 2',
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
         'hr': 'HR Round'
     }
     status_labels = {'selected': 'Selected', 'rejected': 'Rejected', 'hold': 'Hold'}
@@ -1420,8 +1456,12 @@ def dashBoard():
             if lead_total == 0:
                 continue
 
+<<<<<<< HEAD
             lead_label = f"{lead}_{r}"   # Keep the round name for parent-child relationship
 
+=======
+            lead_label = f"{lead} ({round_labels[r]})"  # Keep the round name for parent-child relationship
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
             round_label = round_labels[r]
 
             # Append the lead stats as child under the corresponding round label
@@ -1460,8 +1500,13 @@ def dashBoard():
     rounds = ['intro', 'interview1', 'interview2', 'hr']
     round_labels = {
         'intro': 'Intro Round',
+<<<<<<< HEAD
         'interview1': 'L1',
         'interview2': 'L2',
+=======
+        'interview1': 'Interview 1',
+        'interview2': 'Interview 2',
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
         'hr': 'HR Round'
     }
     status_labels = {'selected': 'Selected', 'rejected': 'Rejected', 'hold': 'Hold'}
@@ -1975,6 +2020,7 @@ def resume():
 #                            selected_page_size=selected_page_size,
 #                            total_items=total_items, no_of_pages=no_of_pages,start_index=start_index)
 
+<<<<<<< HEAD
 
 
 # shwetha's change
@@ -1989,10 +2035,22 @@ def employee():
         user = Login.query.filter_by(email=email).first()
         role = user.Role
 
+=======
+@app.route("/employee_management", methods=["GET", "POST"])
+@login_required
+def employee():
+    role=None
+    email=session.get('email')
+    if email:
+        user=Login.query.filter_by(email=email).first()
+        role=user.Role
+        
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
         if not user:
             return redirect(url_for('login'))
 
     file_link = session.pop('file_link', None)
+<<<<<<< HEAD
     public_key = os.environ.get('EMAILJS_PUBLIC_KEY')
     EMAILJS_SERVICE_ID = os.environ.get('EMAILJS_SERVICE_ID')
     EMAILJS_TEMPLATE_ID = os.environ.get('EMAILJS_TEMPLATE_ID_TABLE')
@@ -2008,10 +2066,36 @@ def employee():
     if request.method == "POST":
         selected_page_size = int(request.form.get("page_size", default_page_size))
         session['page_size'] = selected_page_size
+=======
+    public_key=os.environ.get('EMAILJS_PUBLIC_KEY')
+    EMAILJS_SERVICE_ID=os.environ.get('EMAILJS_SERVICE_ID')
+    EMAILJS_TEMPLATE_ID=os.environ.get('EMAILJS_TEMPLATE_ID_TABLE')
+    # Prepare the email template parameters
+    
+    
+    
+    search_query = request.args.get("search", "").strip()
+    
+    # qa_lead_query = request.args.get('qa_lead', '').strip()
+    filter_role = request.args.get('role') 
+    filter_week=request.args.get('week')
+    
+    default_page_size = 10
+    page_size_options = [10, 20, 30, 40, 50]
+    months=["January","February","March","April","May","June","July","August","September","October","November","December"]
+    if request.method == "POST":
+        selected_page_size = int(request.form.get("page_size", default_page_size))
+        session['page_size'] = selected_page_size
+        # Redirect to the same page with updated page size to avoid form resubmission issues
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
         return redirect(url_for('employee', page=1))
     else:
         selected_page_size = session.get('page_size', default_page_size)
     
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
     current_month = datetime.now().strftime("%B")
     selected_month = request.args.get("month", current_month)
     query = Resume.query
@@ -2019,6 +2103,7 @@ def employee():
     if search_query:
         query = query.filter(
             or_(Resume.Name.ilike(f"%{search_query}%"), Resume.QA_Lead.ilike(f"%{search_query}%"))
+<<<<<<< HEAD
         )
     
     if filter_role:  # Filter by role if provided
@@ -2040,14 +2125,41 @@ def employee():
         end_index = 0
         total_pages = 1
     else:
+=======
+            )
+    
+    if filter_role:  # Filter by role if provided
+        query = query.filter(Resume.Role == filter_role)
+    if filter_week:  # Filter by role if provided
+        query = query.filter(Resume.week == filter_week)       
+    if selected_month and not search_query :
+        query = query.filter(Resume.Month == selected_month)
+    page = request.args.get('page', 1, type=int)
+    total_items =query.count()
+    
+       
+    # Handle case where there are no items
+    if total_items == 0:
+        data =query.paginate(page=1, per_page=selected_page_size)
+        start_index = 0
+        end_index=0
+        total_pages = 1
+    else:
+        # Handle pagination
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
         new_page_count = total_items // selected_page_size
         if total_items % selected_page_size > 0:
             new_page_count += 1
 
+<<<<<<< HEAD
+=======
+        # Ensure the current page is within the valid range
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
         if page > new_page_count:
             page = new_page_count
 
         start_index = (page - 1) * selected_page_size
+<<<<<<< HEAD
         data = query.paginate(page=page, per_page=selected_page_size)
         
         total_pages = data.pages
@@ -2074,6 +2186,22 @@ def employee():
         filter_week=filter_week,
         end_index=end_index
     )
+=======
+        
+        data = query.paginate(page=page, per_page=selected_page_size)
+        if start_index:
+            total_pages = 0
+            end_index = 0
+            
+        else:    
+            total_pages = data.pages
+            end_index = min(start_index + selected_page_size, total_items)
+    return render_template("employee.html", resumes=data,
+                           page_size_options=page_size_options,
+                           selected_page_size=selected_page_size,
+                           total_items=total_items, total_pages=total_pages,
+                           start_index=start_index,months=months,current_month=current_month,selected_month=selected_month,file_link=file_link,public_key=public_key,service_id=EMAILJS_SERVICE_ID,template_id=EMAILJS_TEMPLATE_ID,search_query=search_query,role=role,filter_role=filter_role,filter_week=filter_week,end_index=end_index)
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
 
 
 @app.route("/view_resume/<filename>")
@@ -2254,8 +2382,11 @@ def resume_details(resume_id):
         if status == "Rejected" or "not conducted" in status:
             all_rounds_status = "Rejected"
             break
+<<<<<<< HEAD
 
         
+=======
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
     intro_call=Intro.query.filter_by(resumeId=resume_id).first()
     interview1=Interview1.query.filter_by(resumeId=resume_id).first()
     interview2=Interview2.query.filter_by(resumeId=resume_id).first()
@@ -3347,6 +3478,7 @@ def qareq():
         
     return render_template("qareq.html",public_key=public_key,service_id=service_id,template_id=template_id,email=email)
  
+<<<<<<< HEAD
 # shwetha's changes
 
 @app.route("/excel_resume", methods=['GET', 'POST'])
@@ -3407,6 +3539,76 @@ def excel_resume():
 
                         existing_employee = Resume.query.filter_by(Email=email).first()
                         if not existing_employee:
+=======
+@app.route("/excel_resume", methods=['GET', 'POST'])
+def excel_resume():
+    if request.method=="POST":
+        current_month = datetime.now().strftime("%B")
+        month=request.form['month_excel']
+        print(month)
+        if 'file' not in request.files:
+            flash('No file part')
+            
+            return redirect(request.url)
+        file = request.files['file']
+    
+        if file.filename == '':
+            flash('No selected file')
+            
+            return redirect(request.url)
+        if file:
+            try:
+                wb=load_workbook(file)
+                
+                sheet=wb.active
+                for i, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
+                
+                   if not all(cell is None for cell in row):
+                        email=row[1]
+                        name=row[2]
+                        qualification=row[3]
+                        phone=str(row[4])
+                        location=row[5]
+                        experience=row[6]
+                        
+                        lead=row[7]
+                        result=row[8]
+                        current_ctc=row[9]
+                        expecting_ctc=row[10]
+                        notice_period=row[11]
+                        suggestions=row[12]
+                        link=row[13]
+                        role = map_role_based_on_experience(experience)
+                        
+                        # print(result,current_ctc,expecting_ctc,notice_period,suggestions)
+                        try:
+                            # Convert the experience to a string, strip spaces, and remove any non-numeric characters (like 'yrs')
+                            experience = str(experience).strip() if experience else None
+                            
+                            
+                            if experience:
+                                
+                                # Remove non-numeric characters like "yrs" using a regular expression
+                                # This keeps only digits and a decimal point
+                                numeric_experience = re.sub(r'[^\d.]', '', experience)
+                                
+                                # Try converting the cleaned value to a float
+                                if numeric_experience:
+                                    float_experience = float(numeric_experience)
+                                    experience = str(float_experience)  # Convert back to string if successful
+                                    print("yrs experience",experience)  # Print for debugging
+                                else:
+                                    experience = None  # If cleaning results in an empty string, set to None
+                            else:
+                                experience = None  # Set to None if empty
+                        except Exception as e:
+                            # Log error if needed, and set experience to None in case of failure
+                            print(f"Error processing experience: {e}")
+                            experience = None
+                        existing_employee =Resume.query.filter_by(Email=email).first()
+                        if not existing_employee:
+                            
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
                             new_candidate = Resume(
                                 Email=email,
                                 filename=name,
@@ -3423,6 +3625,7 @@ def excel_resume():
                                 Notice_period=notice_period,
                                 Month=month
                             )
+<<<<<<< HEAD
                             db.session.add(new_candidate)
                             db.session.commit()
                             successful_uploads += 1
@@ -3442,6 +3645,18 @@ def excel_resume():
                 flash(f"Error processing the file: {str(e)}", 'error')
 
     return redirect(url_for('resume'))  # Redirect to the page displaying the resume details or list
+=======
+                            
+                            db.session.add(new_candidate)
+                            db.session.commit() 
+                            flash('Resume(s) uploaded successfully!', 'success')
+                        else:
+                            flash('Resume(s) already exists', 'error') 
+                            
+            except:
+                pass    
+    return redirect(url_for('resume'))  
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
 
 
 
@@ -3651,11 +3866,15 @@ def edit_employee_resume(employee_id):
         resume.Notice_period=request.form['notice_period']
         resume.Link=request.form["resume_link"]
         resume.Role=map_role_based_on_experience(resume.Experience)
+<<<<<<< HEAD
 
         # shwetha's change for week is not mandatory
         # resume.week = request.form['week']
         resume.week = request.form.get('week')
 
+=======
+        resume.week = request.form['week']
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
         
         db.session.commit()
         flash('Successfully updated!', 'success')

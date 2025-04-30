@@ -272,22 +272,65 @@ document.addEventListener("click", function (event) {
         }
     });
 </script>
+<<<<<<< HEAD
 
 <!-- shwetha's change -->
+=======
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".delete-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            let panelName = this.getAttribute("data-panel");
+
+            if (confirm(`Are you sure you want to delete ${panelName}?`)) {
+                fetch(deletePanelUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ panel: panelName })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove from UI
+                        this.parentElement.remove();
+                    } else {
+                        alert("Failed to delete panel.");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            }
+        });
+    });
+});
+</script>
+
+
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         emailjs.init("Nce5bwHWE3-gXvm-9"); // EmailJS User ID
 
+<<<<<<< HEAD
+=======
+        // Ensure candidate details are set from Jinja
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
         const candidateName = "{{ candidate_name or 'N/A' }}";
         const candidateEmail = "{{ candidate_email or 'N/A' }}";
 
         document.querySelector("form").addEventListener("submit", function (event) {
             const status = document.getElementById("status").value;
             console.log("📝 Selected Status:", status);
+<<<<<<< HEAD
+=======
+            
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
 
             if (!candidateName || !candidateEmail || candidateName === "N/A" || candidateEmail === "N/A") {
                 alert("⚠️ Candidate name and email are required!");
                 console.error("❌ Email not sent: Candidate name or email is missing.");
+<<<<<<< HEAD
                 event.preventDefault();
                 return;
             }
@@ -298,11 +341,15 @@ document.addEventListener("click", function (event) {
                 alert("⚠️ Please select a Panel Member before submitting.");
                 console.error("❌ Email not sent: No panel member selected.");
                 event.preventDefault();
+=======
+                event.preventDefault();  // 🚨 Stops form submission
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
                 return;
             }
 
             console.log("📝 Candidate Info:", { candidateName, candidateEmail, status });
 
+<<<<<<< HEAD
             if (status === "Move to HR Round") {
                 event.preventDefault();
 
@@ -310,6 +357,17 @@ document.addEventListener("click", function (event) {
                     console.log("📨 Email sent! Submitting form...");
                     document.querySelector("form").submit();
                 });
+=======
+            // ✅ Move this condition inside the event listener
+            if (status === "Move to HR Round") {
+                event.preventDefault(); // Stop the default form submission
+                
+                sendEmail(candidateName, candidateEmail, status, function() {
+                    console.log("📨 Email sent! Submitting form...");
+                    document.querySelector("form").submit();  // ✅ Corrected form submission
+                });
+                
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
             }
         });
     });
@@ -318,12 +376,21 @@ document.addEventListener("click", function (event) {
         const submitButton = document.querySelector("button[type='submit']");
         submitButton.disabled = true;
 
+<<<<<<< HEAD
         const toEmail = "varunrram2003@gmail.com"; // Change as needed
         const ccEmails = Array.from(document.querySelectorAll(".panel-checkbox:checked"))
             .map(cb => cb.getAttribute("data-email"));
 
         const templateParams = {
             to_email: toEmail,
+=======
+        const toEmail = "varunrram2003@gmail.com"; // Replace with actual recipient
+        let ccEmails = Array.from(document.querySelectorAll(".panel-checkbox:checked"))
+            .map(checkbox => checkbox.getAttribute("data-email"));
+
+        const templateParams = {
+            to_email: toEmail,  
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
             cc_email: ccEmails.join(", "),
             candidate_name: candidateName,
             interview_round: "HR",
@@ -346,13 +413,18 @@ document.addEventListener("click", function (event) {
         console.log("📤 Sending email with params:", templateParams);
 
         emailjs.send("service_q2j2eqc", "template_4vc45jq", templateParams)
+<<<<<<< HEAD
             .then(function (response) {
+=======
+            .then(function(response) {
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
                 console.log("✅ Email sent successfully!", response);
                 submitButton.disabled = false;
 
                 setTimeout(() => {
                     if (callback) {
                         console.log("➡️ Calling callback function...");
+<<<<<<< HEAD
                         callback();
                     }
                 }, 2000);
@@ -360,11 +432,25 @@ document.addEventListener("click", function (event) {
             .catch(function (error) {
                 console.error("❌ Error sending email:", error);
                 alert("⚠️ Failed to send email. Please try again.");
+=======
+                        callback(); // Proceed with form submission
+                    }
+                }, 2000);
+            })
+            .catch(function(error) {
+                console.error("❌ Error sending email:", error);
+                alert("⚠️ Failed to send email. Please try again.");
+                console.log(error.message)
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
                 submitButton.disabled = false;
             });
     }
 </script>
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
     
 
 

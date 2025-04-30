@@ -19,7 +19,11 @@
        
         <div>
           <form action="{{ url_for('resume') }}" enctype="multipart/form-data" method="POST" style="margin-left:6rem;">
+<<<<<<< HEAD
             <h4 style="color:#00A9FF!important; margin-left:6rem; margin-bottom: 2rem;">Upload Resume (PDF and Docx only):</h4>
+=======
+            <h3 style="color:#00A9FF!important; margin-left:6rem; margin-bottom: 2rem;">Upload a single pdf file</h3>
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
             <div class="filter" style="margin-bottom:2rem;">
               <label for="tag"   class="label">Select Role:</label>
               <select id="tag" name="tag">
@@ -45,7 +49,11 @@
           <hr>
           
           <form style="margin-left:6rem;" action="{{ url_for('excel_resume') }}" enctype="multipart/form-data" method="POST">
+<<<<<<< HEAD
             <h4 style="color:#00A9FF!important; margin-left:6rem;margin-bottom: 2rem;">Upload from Excel :</h4>
+=======
+            <h3 style="color:#00A9FF!important; margin-left:6rem;margin-bottom: 2rem;">Upload from excel</h3>
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
             <div style="display: flex; flex-direction: column; gap: 1.5rem;">
               <div style="display: block; ">
                 <label for="month_excel" class="label">Month:</label>
@@ -78,11 +86,19 @@
           {% if messages %}
             {% for category, message in messages %}
               {% if category == 'error' %}
+<<<<<<< HEAD
                 <div class="alert alert-danger add_flash_message" role="alert">
                   {{ message }}
                 </div>
               {% elif category == 'success' %}
                 <div class="alert alert-success add_flash_message" role="alert">
+=======
+                <div class="alert alert-danger add_flash_message" role="alert" >
+                  {{ message }}
+                </div>
+              {% elif category == 'success' %}
+                <div class="alert alert-success add_flash_message" role="alert" >
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
                   {{ message }}
                 </div>
               {% endif %}
@@ -90,7 +106,10 @@
           {% endif %}
         {% endwith %}
       </div>
+<<<<<<< HEAD
       
+=======
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
      </div>
    </div>
    <script src="{{ url_for('static', filename='config.js') }}"></script>

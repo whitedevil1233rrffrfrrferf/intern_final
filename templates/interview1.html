@@ -302,7 +302,11 @@ document.addEventListener("click", function (event) {
 });
 </script>
 
+<<<<<<< HEAD
 <!-- shwetha's change -->
+=======
+
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         emailjs.init("Nce5bwHWE3-gXvm-9"); // EmailJS User ID
@@ -314,10 +318,15 @@ document.addEventListener("click", function (event) {
         document.querySelector("form").addEventListener("submit", function (event) {
             const status = document.getElementById("status").value;
             console.log("📝 Selected Status:", status);
+<<<<<<< HEAD
+=======
+            
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
 
             if (!candidateName || !candidateEmail || candidateName === "N/A" || candidateEmail === "N/A") {
                 alert("⚠️ Candidate name and email are required!");
                 console.error("❌ Email not sent: Candidate name or email is missing.");
+<<<<<<< HEAD
                 event.preventDefault(); // 🚨 Stops form submission
                 return;
             }
@@ -328,6 +337,9 @@ document.addEventListener("click", function (event) {
                 alert("⚠️ Please select a Panel Member before submitting.");
                 console.error("❌ Email not sent: No panel member selected.");
                 event.preventDefault(); // 🚨 Stops form submission
+=======
+                event.preventDefault();  // 🚨 Stops form submission
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
                 return;
             }
 
@@ -337,7 +349,11 @@ document.addEventListener("click", function (event) {
             if (status === "Move to Interview 2") {
                 event.preventDefault(); // Stop the default form submission
                 
+<<<<<<< HEAD
                 sendEmail(candidateName, candidateEmail, status, function () {
+=======
+                sendEmail(candidateName, candidateEmail, status, function() {
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
                     console.log("📨 Email sent! Submitting form...");
                     document.querySelector("form").submit();  // ✅ Corrected form submission
                 });
@@ -377,7 +393,11 @@ document.addEventListener("click", function (event) {
         console.log("📤 Sending email with params:", templateParams);
 
         emailjs.send("service_q2j2eqc", "template_4vc45jq", templateParams)
+<<<<<<< HEAD
             .then(function (response) {
+=======
+            .then(function(response) {
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
                 console.log("✅ Email sent successfully!", response);
                 submitButton.disabled = false;
 
@@ -388,7 +408,11 @@ document.addEventListener("click", function (event) {
                     }
                 }, 2000);
             })
+<<<<<<< HEAD
             .catch(function (error) {
+=======
+            .catch(function(error) {
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
                 console.error("❌ Error sending email:", error);
                 alert("⚠️ Failed to send email. Please try again.");
                 console.log(error.message)
@@ -396,6 +420,11 @@ document.addEventListener("click", function (event) {
             });
     }
 </script>
+<<<<<<< HEAD
+=======
+    
+
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
 
 
 

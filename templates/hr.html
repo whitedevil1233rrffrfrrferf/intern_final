@@ -574,6 +574,7 @@
     </script>
 
 
+<<<<<<< HEAD
 <!-- shwetha's change -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -667,6 +668,200 @@
 </script>
 
 
+=======
+<!-- all the fields are filled then only click submit button -->
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("panelForm").addEventListener("submit", function (event) {
+            event.preventDefault(); // Stop form submission
+    
+            let isValid = true;
+            let errorMessage = [];
+    
+            // Get form fields
+            let panelMember = document.getElementById("selectedPanel");
+            let date = document.getElementById("date");
+            let status = document.getElementById("status");
+            let feedbacks = document.querySelectorAll("input[name^='comment_']"); // Select all feedback fields
+    
+            // Function to check and highlight empty fields
+            function validateField(field, fieldName) {
+                if (!field || field.value.trim() === "") {
+                    isValid = false;
+                    errorMessage.push(`${fieldName} is required.`);
+                }
+            }
+    
+            // Validate all fields
+            validateField(date, "Date");
+            validateField(status, "Status");
+    
+            // Validate at least one panel member is selected
+            if (!panelMember || panelMember.value.trim() === "") {
+                isValid = false;
+                errorMessage.push("Panel Member is required.");
+            }
+    
+            // Validate all feedback fields
+            feedbacks.forEach(function (feedback) {
+                validateField(feedback, feedback.getAttribute("name"));
+            });
+    
+            // Show error or submit form
+            if (!isValid) {
+                showFlashMessage(errorMessage.join("<br>"));
+            } else {
+                this.submit(); // Submit the form if all fields are filled
+            }
+        });
+    
+        function showFlashMessage(message) {
+            let flashDiv = document.createElement("div");
+            flashDiv.className = `flash-message`;
+            flashDiv.innerHTML = `${message}`;
+    
+            document.getElementById("flash-messages").appendChild(flashDiv);
+    
+            // Remove the message after 2 seconds
+            setTimeout(function () {
+                flashDiv.remove();
+            }, 2000);
+        }
+    });
+    </script>
+
+
+     <!-- validation to ensure candidateName and candidateEmail are not null, undefined, or empty 
+before sending the email. If either of them is missing, the script will show an alert and prevent email sending. -->
+
+
+// <script>
+//     document.addEventListener("DOMContentLoaded", function () {
+//       emailjs.init("qdP1EAfow-fwPes6j"); // EmailJS User ID
+
+
+//   });
+
+//   // Function to show a popup message
+//   function showPopup(message, type) {
+//       const popup = document.createElement("div");
+//       popup.innerText = message;
+//       popup.style.cssText = `
+//           position: fixed;
+//           top: 20px;
+//           left: 50%;
+//           transform: translateX(-50%);
+//           background: ${type === "success" ? "green" : "red"};
+//           color: white;
+//           padding: 12px 20px;
+//           border-radius: 5px;
+//           font-size: 16px;
+//           font-weight: bold;
+//           z-index: 9999;
+//           box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+//       `;
+//       document.body.appendChild(popup);
+
+//       setTimeout(() => popup.remove(), 3000); // Hide after 3 sec
+//   }
+
+
+
+//   function sendEmail(candidateName, candidateEmail, status, callback) {
+//   const submitButton = document.querySelector("button[type='submit']");
+//   submitButton.innerHTML = "Sending Email...";
+//   submitButton.disabled = true;
+
+//   if (!candidateName.trim() || !candidateEmail.trim()) {
+//       alert("⚠️ Candidate name and email are required!");
+//       console.error("❌ Email not sent: Candidate name or email is missing.");
+//       submitButton.innerHTML = "Submit";
+//       submitButton.disabled = false;
+//       return;
+//   }
+
+//   const requiredFields = document.querySelectorAll("input[required], select[required], textarea[required]");
+//   for (let field of requiredFields) {
+//       if (!field.value.trim()) {
+//           alert("⚠️ All fields must be filled before submitting!");
+//           console.error(`❌ Missing required field - ${field.name || field.id}`);
+//           submitButton.innerHTML = "Submit";
+//           submitButton.disabled = false;
+//           return;
+//       }
+//   }
+
+//   const toEmail = "varunrram2003@gmail.com";
+//   let ccEmails = Array.from(document.querySelectorAll(".panel-checkbox:checked"))
+//       .map(checkbox => checkbox.getAttribute("data-email"));
+
+//   const templateParams = {
+//       to_email: toEmail,
+//         cc_email: ccEmails.join(", "),  // Convert array to string
+//         candidate_name: "{{ candidate_name}}",
+//         interview_round: "HR",
+//         candidate_email:"{{ candidate_email}}",
+//         candidate_phone: "{{ candidate_phone or 'N/A' }}",
+//         candidate_role: "{{ candidate_role or 'N/A' }}",
+//         candidate_experience: "{{ candidate_experience or 'N/A' }} years",
+//         candidate_location: "{{ candidate_location or 'N/A' }}",
+//         candidate_notice_period: "{{ candidate_notice_period or 'N/A' }}",
+//         candidate_actc: "{{ candidate_actual_ctc or 'N/A' }}",
+//         candidate_ectc: "{{ candidate_expected_ctc or 'N/A' }}",
+//         status: status,
+//         panel_feedback: "{{ candidate_current_link or 'N/A' }}",
+//         next_interview_round: "HR Process",
+//         link:"{{ candidate_next_link or 'N/A' }}",
+//         message: `Candidate John Doe has been marked as '${status}'.``
+//   };
+
+//   console.log("📤 Sending email with params:", JSON.stringify(templateParams, null, 2));
+
+//   emailjs.send("service_qghdq8f", "template_1jyba8e", templateParams)
+//       .then(response => {
+//           console.log("📨 Email sent successfully", response);
+//           alert("✅ Email sent successfully!");
+//           if (callback) callback();
+//       })
+//       .catch(error => {
+//           console.error("❌ Error sending email", error);
+//           alert("⚠️ Failed to send email. Please try again.");
+//           submitButton.innerHTML = "Submit";
+//           submitButton.disabled = false;
+//       });
+// }
+
+// document.addEventListener("DOMContentLoaded", function () {
+//   document.querySelector("form").addEventListener("submit", function (event) {
+//       event.preventDefault();
+//       const status = document.getElementById("status").value;
+
+//       // 🔹 Dummy values for testing
+//       const candidateName = "John Doe";
+//       // const candidateName = "";    // Uncomment this line to test missing name
+//       const candidateEmail = "johndoe@example.com";
+//       // const candidateEmail = "";   // Uncomment this line to test missing email
+
+//       console.log("📝 Candidate Info:", { candidateName, candidateEmail, status });
+
+//       if (!candidateName || !candidateEmail) {
+//           alert("⚠️ Candidate name and email are required!");
+//           console.error("❌ Missing candidate details. Email not sent.");
+//           return;
+//       }
+      
+//       if (status !== "Rejected") {
+//           sendEmail(candidateName, candidateEmail, status, () => event.target.submit());
+//       } else {
+//           console.log("🚫 Status is 'Rejected', skipping email.");
+//           event.target.submit();
+//       }
+//   });
+// });
+
+// </script>  
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
 </body>
 
 </html>

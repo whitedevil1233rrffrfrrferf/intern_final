@@ -1274,12 +1274,12 @@ def dashBoard():
 
         role_statistics[role] = {
             'intro': {
-                'selected': intro_stats.get("Move to Interview 1", 0),
+                'selected': intro_stats.get("Move to L1", 0),
                 'rejected': intro_stats.get("Rejected", 0),
                 'hold': intro_stats.get("On Hold", 0)
             },
             'interview1': {
-                'selected': interview1_stats.get("Move to Interview 2", 0),
+                'selected': interview1_stats.get("Move to L2", 0),
                 'rejected': interview1_stats.get("Rejected", 0),
                 'hold': interview1_stats.get("On Hold", 0)
             },
@@ -1321,12 +1321,12 @@ def dashBoard():
 
         lead_statistics[lead] = {
             'intro': {
-                'selected': intro_stats.get("Move to Interview 1", 0),
+                'selected': intro_stats.get("Move to L1", 0),
                 'rejected': intro_stats.get("Rejected", 0),
                 'hold': intro_stats.get("On Hold", 0)
             },
             'interview1': {
-                'selected': interview1_stats.get("Move to Interview 2", 0),
+                'selected': interview1_stats.get("Move to L2", 0),
                 'rejected': interview1_stats.get("Rejected", 0),
                 'hold': interview1_stats.get("On Hold", 0)
             },
@@ -1343,10 +1343,10 @@ def dashBoard():
         }
      
     raw_data = {
-        "Intro Round Selected": intro_counts.get("Move to Interview 1", 0),
+        "Intro Round Selected": intro_counts.get("Move to L1", 0),
         "Intro Round Rejected": intro_counts.get("Rejected", 0),
         "Intro Round Hold": intro_counts.get("On Hold", 0),
-        "L1 Selected": interview1_counts.get("Move to Interview 2", 0),
+        "L1 Selected": interview1_counts.get("Move to L2", 0),
         "L1 Rejected": interview1_counts.get("Rejected", 0),
         "L1 Hold": interview1_counts.get("On Hold", 0),
         "L2 Selected": interview2_counts.get("Move to HR Round", 0),
@@ -1395,12 +1395,12 @@ def dashBoard():
     labels = ["Interview Results"]
     parents = [""]
     values = [0]  # we'll update this total at the end
-
+# shwetha's changes
     rounds = ['intro', 'interview1', 'interview2', 'hr']
     round_labels = {
         'intro': 'Intro Round',
-        'interview1': 'Interview 1',
-        'interview2': 'Interview 2',
+        'interview1': 'L1 Round',
+        'interview2': 'L2 Round',
         'hr': 'HR Round'
     }
     status_labels = {'selected': 'Selected', 'rejected': 'Rejected', 'hold': 'Hold'}

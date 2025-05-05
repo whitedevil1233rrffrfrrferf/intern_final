@@ -27,7 +27,7 @@
           <ul class="nav nav-pills nav-flush flex-column mb-auto text-center" style="height: 92vh; border-radius: 20px; margin-left: 0.25rem; border: 1px solid #ddd; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; gap: 0; width: 120px;">
             <li style="flex-grow: 0; margin-bottom: 0;"> <!-- Added for further gap control -->
             
-            {% if g.user_role == 'admin' %}
+            
               {% if g.user_role == 'admin' %}
   <li class="nav-item" style="padding: 0; margin: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;width: 100%;">
     <a href="{{ url_for('Home') }}" class="nav-link py-2 rounded-0  {% if request.path == url_for('Home') %}active{% endif %}" aria-current="page" title="Home" data-bs-toggle="tooltip" data-bs-placement="right" style="margin: 0; display: flex;
@@ -89,7 +89,7 @@
 
                 </a>
               </li>
-            {% endif %}  
+           
             {% if g.user_role == 'admin' %}
             <li style="padding: 0; margin: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; width:100%">
                 <a href="{{ url_for('employeeData') }}" class="nav-link py-2  rounded-0 {% if request.path == url_for('employeeData') %}active{% endif %}" title="Employee data" data-bs-toggle="tooltip" data-bs-placement="right" style="margin:0;

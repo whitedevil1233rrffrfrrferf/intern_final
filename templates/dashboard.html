@@ -207,7 +207,9 @@
       const commonMargin = { t: 30, l: 0, r: 0, b: 30 };
     
       // Lead-wise chart
-      var data = [{
+      const hasLeadData = {{ labels | length }} > 0 && {{ values | safe }}.some(v => v > 0);
+
+      const data = hasLeadData ? [{
         type: "sunburst",
         labels: {{ labels | safe }},
         parents: {{ parents | safe }},
@@ -216,24 +218,36 @@
         outsidetextfont: { size: 16, color: "#000" },
         leaf: { opacity: 0.6 },
         marker: { line: { width: 2 } },
-        hoverinfo: "label+value+percent parent"
+        hoverinfo: "label+value+percent parent",
+        maxdepth: 2
+      }] : [{
+        type: "sunburst",
+        labels: ["No Data"],
+        parents: [""],
+        values: [1],
+        marker: { colors: ["#d3d3d3"] },
+        outsidetextfont: { size: 16, color: "#888" },
+        hoverinfo: "label"
       }];
-      var layout = {
+
+      const layout = {
         margin: commonMargin,
         width: commonSize,
         height: commonSize,
         title: {
-          text: "Interview Summary - Lead Wise",
+          text: hasLeadData ? "Interview Summary - Lead Wise" : "Interview Summary - Lead Wise",
           font: commonTitleFont
         },
         sunburstcolorway: ["#636efa", "#ef553b", "#00cc96", "#ab63fa"],
         extendsunburstcolorway: true
       };
-      data[0].maxdepth = 2;
+
       Plotly.newPlot('sunburstChart', data, layout, { displayModeBar: false });
     
       // Role-wise chart
-      var roleData = [{
+      const hasRoleData = {{ role_labels | length }} > 0 && {{ role_values | safe }}.some(v => v > 0);
+
+      const roleData = hasRoleData ? [{
         type: "sunburst",
         labels: {{ role_labels | safe }},
         parents: {{ role_parents | safe }},
@@ -242,56 +256,82 @@
         outsidetextfont: { size: 16, color: "#000" },
         leaf: { opacity: 0.6 },
         marker: { line: { width: 2 } },
-        hoverinfo: "label+value+percent parent"
+        hoverinfo: "label+value+percent parent",
+        maxdepth: 2
+      }] : [{
+        type: "sunburst",
+        labels: ["No Data"],
+        parents: [""],
+        values: [1],
+        marker: { colors: ["#d3d3d3"] },
+        outsidetextfont: { size: 16, color: "#888" },
+        hoverinfo: "label"
       }];
-      var roleLayout = {
+
+      const roleLayout = {
         margin: commonMargin,
         width: commonSize,
         height: commonSize,
         title: {
-          text: "Interview Summary - Role Wise",
+          text: hasRoleData ? "Interview Summary - Role Wise" : "Interview Summary - Role Wise",
           font: commonTitleFont
         },
         sunburstcolorway: ["#19d3f3", "#ff6692", "#b6e880", "#ff97ff"],
         extendsunburstcolorway: true
       };
-      roleData[0].maxdepth = 2;
+
       Plotly.newPlot('roleSunburstChart', roleData, roleLayout, { displayModeBar: false });
-    
       // Pie chart
-      var pieData = [{
-          values: {{ chart_values | tojson }},
-          labels: {{ chart_labels | tojson }},
-          type: 'pie',
-          textinfo: 'label+value',
-          hoverinfo: 'label+value+percent',
-          textposition: 'inside',
-          insidetextorientation: 'radial',
-          hole: 0.4,  // This turns it into a doughnut chart
-          textfont: {
-            size: 15
-          },
-          marker: {
-            line: { width: 2 }
-          },
-          domain: {
-            x: [0, 1],
-            y: [0, 1]
-          }
-        }];
+      const hasPieData = {{ chart_values | length }} > 0 && {{ chart_values | tojson }}.some(v => v > 0);
 
-        var pieLayout = {
-          title: {
-            text: 'Interview Summary - Overall',
-            font: commonTitleFont
-          },
-          showlegend: false,
-          height: commonSize,
-          width: commonSize,
-          margin: commonMargin
-        };
+      const pieData = hasPieData ? [{
+        values: {{ chart_values | tojson }},
+        labels: {{ chart_labels | tojson }},
+        type: 'pie',
+        textinfo: 'label+value',
+        hoverinfo: 'label+value+percent',
+        textposition: 'inside',
+        insidetextorientation: 'radial',
+        hole: 0.4,
+        textfont: {
+          size: 15
+        },
+        marker: {
+          line: { width: 2 }
+        },
+        domain: {
+          x: [0, 1],
+          y: [0, 1]
+        }
+      }] : [{
+        values: [1],
+        labels: ["No Data"],
+        type: 'pie',
+        hole: 0.4,
+        textinfo: 'label',
+        textfont: {
+          size: 15,
+          color: '#888'
+        },
+        marker: {
+          colors: ['#e0e0e0'],
+          line: { width: 2 }
+        },
+        hoverinfo: 'label'
+      }];
 
-        Plotly.newPlot('divs', pieData, pieLayout, { displayModeBar: false });
+      const pieLayout = {
+        title: {
+          text: hasPieData ? 'Interview Summary - Overall' : 'No Interview Data Available',
+          font: commonTitleFont
+        },
+        showlegend: false,
+        height: commonSize,
+        width: commonSize,
+        margin: commonMargin
+      };
+
+      Plotly.newPlot('divs', pieData, pieLayout, { displayModeBar: false });
     </script>
     <!-- ############################ Bar graphs ############################## -->
     <script>

@@ -26,6 +26,7 @@ from dotenv import load_dotenv
 import time
 import io
 import re
+from urllib.parse import urlencode
 
 load_dotenv()
 app = Flask(__name__)
@@ -1108,13 +1109,16 @@ def dashBoard():
         "labels": list(data.keys()),
         "values": list(data.values())  # ✅ note the () after values
     }
+    current_month = datetime.now().strftime("%B")
     # status=Employee.query.with_entities(Employee.Employment_status).distinct()
     email=session.get('email')
     project_filter = request.args.get('project', '').strip()
     designation_filter= request.args.get('designation', '').strip()
     location_filter= request.args.get('location', '').strip()
     week_filter=request.args.get('week', '').strip()
-    month_filter=request.args.get('month', '').strip()
+    month_filter=request.args.get("month", current_month)
+    
+    
     months=["January","February","March","April","May","June","July","August","September","October","November","December"]
     if not email:
         return redirect(url_for('login'))
@@ -1905,6 +1909,7 @@ def resume():
         month=request.form['month']
         files=request.files.getlist('file')
         sucessfully_uploaded=False
+        duplicate_files = []
         for file in files:
             if file and allowed_files(file.filename):
                 filename=secure_filename(file.filename)
@@ -1918,10 +1923,12 @@ def resume():
                     db.session.commit()
                     sucessfully_uploaded=True
                 else:
-                     flash(f'{filename} already exists !', 'error')
+                    duplicate_files.append(filename)
                     
         if sucessfully_uploaded:
-            flash('Resume(s) uploaded successfully!', 'success')                
+            flash('Resume(s) uploaded successfully!', 'success') 
+        if duplicate_files:
+            flash(f"The following file(s) already exist: {', '.join(duplicate_files)}", 'error')                   
         return redirect(url_for('resume'))        
     return render_template("resume.html",months=months,current_month=current_month)
 
@@ -1994,6 +2001,11 @@ def employee():
     default_page_size = 10
     page_size_options = [10, 20, 30, 40, 50]
     months=["January","February","March","April","May","June","July","August","September","October","November","December"]
+    args_dict = request.args.to_dict()
+    
+    args_dict.pop('page', None)  # Remove 'page' if present
+    base_query_string = urlencode(args_dict)
+    print("base_query_string",base_query_string)
     if request.method == "POST":
         selected_page_size = int(request.form.get("page_size", default_page_size))
         session['page_size'] = selected_page_size
@@ -2116,7 +2128,8 @@ def employee():
                            selected_month=selected_month,file_link=file_link,public_key=public_key,
                            service_id=EMAILJS_SERVICE_ID,template_id=EMAILJS_TEMPLATE_ID,search_query=search_query,
                            role=role,filter_role=filter_role,filter_week=filter_week,end_index=end_index,
-                           intro_filter=intro_filter,interview1_filter=interview1_filter,interview2_filter=interview2_filter,hr_filter=hr_query
+                           intro_filter=intro_filter,interview1_filter=interview1_filter,interview2_filter=interview2_filter,
+                           hr_filter=hr_query,base_query_string=base_query_string
                            )
 
 
@@ -2756,6 +2769,7 @@ def get_role():
     return  jsonify({'error': 'Email not in session'}), 400       
 @app.route("/signout")
 def signout():
+    
     session.pop('email', None)   
     session.pop('picture',None) 
     return redirect(url_for('signPage'))

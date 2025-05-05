@@ -32,9 +32,9 @@ body{
 .form_div{
     margin-left:50px;
 }
-.sign_div:hover{
+/* .sign_div:hover{
     transform: scale(1.1);
-}
+} */
 .divider-wrapper {
     display: flex;
     align-items: center;

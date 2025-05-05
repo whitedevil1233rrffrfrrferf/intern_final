@@ -73,7 +73,7 @@
           <a type="button" class="btn btn-primary" href="{{ url_for('zip') }}" style="margin-top:50px; text-align: center;margin-left:35%;">Bulk add folders</a>
         
       </div>
-      <div style="margin-top: 4rem; margin-left: auto; margin-right: auto; width:70%;">
+      <div style="margin-top: 4rem; max-width:48rem;" class="mt-5">
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             {% for category, message in messages %}

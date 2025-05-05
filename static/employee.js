@@ -498,20 +498,20 @@ function filterTable() {
     }
 }
 
-document.getElementById("clearSearch").addEventListener("click", function() {
+document.getElementById("clearSearch").addEventListener("click", function () {
     // Clear the search input
     document.getElementById("search_bar").value = "";
 
-    // Remove the 'search' parameter from the URL
+    // Get current URL
     const url = new URL(window.location.href);
-    url.searchParams.delete('search');
-    
-    // Replace the current URL with one that doesn't have the 'search' parameter
-    window.history.pushState({}, '', url.pathname);
 
-    // Reload the page without search query
-    window.location.href = url.pathname;  // Reload the page without any search parameter
+    // Delete only the 'search' parameter
+    url.searchParams.delete('search');
+
+    // Reload the page with updated parameters
+    window.location.href = url.pathname + '?'+url.searchParams.toString();
 });
+
 
                                                         /* QA Search bar */
 function filterTable_qa(){
@@ -628,8 +628,16 @@ function closeMoreFilters() {
 }
 
 function toggleFilter(checkbox) {
-    const container = document.getElementById(checkbox.value);
-    container.style.display = checkbox.checked ? 'flex' : 'none';
+    const containerId = checkbox.value;
+    const container = document.getElementById(containerId);
+
+    if (checkbox.checked) {
+        container.style.display = 'block';
+        localStorage.setItem(containerId, 'visible');
+    } else {
+        container.style.display = 'none';
+        localStorage.removeItem(containerId);
+    }
 }
 document.addEventListener('click', function(event) {
     var modal = document.getElementById('moreFiltersModal');
@@ -678,13 +686,7 @@ document.addEventListener('click', function(event) {
 //     }
 //   };
 
-function toggleFilter(checkbox) {
-    const filterId = checkbox.value;
-    const filterContainer = document.getElementById(filterId);
-    if (filterContainer) {
-      filterContainer.style.display = checkbox.checked ? 'block' : 'none';
-    }
-  }
+
   
   function toggleColumn(checkbox) {
     const columnClass = checkbox.value;
@@ -735,21 +737,21 @@ function resetToDefaultColumns(){
 
 window.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
-    
-    if (urlParams.get('intro')) {
-        document.querySelector('input[value="introFilterContainer"]').checked = true;
-        document.getElementById('introFilterContainer').style.display = 'block';
-    }
-    if (urlParams.get('interview1')) {
-        document.querySelector('input[value="interview1FilterContainer"]').checked = true;
-        document.getElementById('interview1FilterContainer').style.display = 'block';
-    }
-    if (urlParams.get('interview2')) {
-        document.querySelector('input[value="interview2FilterContainer"]').checked = true;
-        document.getElementById('interview2FilterContainer').style.display = 'block';
-    }
-    if (urlParams.get('hr')) {
-        document.querySelector('input[value="allRoundsFilterContainer"]').checked = true;
-        document.getElementById('allRoundsFilterContainer').style.display = 'block';
-    }
+
+    const filterIds = [
+        { key: 'intro', container: 'introFilterContainer' },
+        { key: 'interview1', container: 'interview1FilterContainer' },
+        { key: 'interview2', container: 'interview2FilterContainer' },
+        { key: 'hr', container: 'allRoundsFilterContainer' }
+    ];
+
+    filterIds.forEach(({ key, container }) => {
+        const checkbox = document.querySelector(`input[value="${container}"]`);
+        const containerEl = document.getElementById(container);
+
+        if (urlParams.has(key) || localStorage.getItem(container) === 'visible') {
+            checkbox.checked = true;
+            containerEl.style.display = 'block';
+        }
+    });
 });

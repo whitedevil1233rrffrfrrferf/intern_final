@@ -70,7 +70,7 @@
               
               <div class="collapse navbar-collapse" id="navbarSupportedContent" style="display: flex; flex-direction: column;height: 4rem;">
                 
-                <form class="d-flex col-10 my-2" action="{{ url_for('employee') }}" role="search" method="GET">
+                <form class="d-flex col-10 my-2" id="searchForm" action="{{ url_for('employee') }}" role="search" method="GET">
                   <input class="form-control me-2" type="search" id="search_bar" placeholder="Search by Name / QA Lead" name="search" aria-label="Search" value="{{ search_query }}"  style="margin-right:2rem!important;">
                   <button class="btn btn-primary" type="submit" onclick="filterTable()">Search</button>
                   <button type="button" class="btn btn-danger" id="clearSearch" style="margin-left: 10px;">Clear</button>
@@ -412,21 +412,28 @@
                     <button class="btn btn-danger" id="delete-selected" disabled style="width: 7rem !important; margin-bottom: 3rem;">Delete </button>
                 </div>
                 <div style="display: flex; flex-direction: column;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; ">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
                         <div>
-                            {% for page_num in resumes.iter_pages(left_edge=1,right_edge=1,left_current=1,right_current=2) %}
-                            {% if page_num %}
-                            {% if resumes.page == page_num%}
-                                <a class="btn btn-info mb-4" href="{{url_for('employee',page=page_num,month=selected_month,search=search_query)}}" style="color: black;  ">{{page_num}}</a>
-                            {% else %}
-                                <a class="btn btn-outline-info mb-4" href="{{url_for('employee',page=page_num,month=selected_month,search=search_query)}}" style="color: black; ">{{page_num}}</a>
-                            {% endif %}
-                            {% else%}
-                            ...
-                            {% endif %}
+                            {% for page_num in resumes.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                                {% if page_num %}
+                                    {% if resumes.page == page_num %}
+                                        <a class="btn btn-info mb-4"
+                                           href="{{ url_for('employee') }}?{{ base_query_string }}&page={{ page_num }}"
+                                           style="color: black;">
+                                            {{ page_num }}
+                                        </a>
+                                    {% else %}
+                                        <a class="btn btn-outline-info mb-4"
+                                           href="{{ url_for('employee') }}?{{ base_query_string }}&page={{ page_num }}"
+                                           style="color: black;">
+                                            {{ page_num }}
+                                        </a>
+                                    {% endif %}
+                                {% else %}
+                                    ...
+                                {% endif %}
                             {% endfor %}
                         </div>
-                        
                     </div>
                     <div >
                         Showing {{ start_index + 1 }} to {{ end_index }} of {{ total_items }} resumes
@@ -557,36 +564,7 @@
     <script>
         var deleteSelectedResumesUrl = "{{ url_for('delete_selected_resumes') }}";
     </script>
-//     <script type="text/javascript">
-//     // Get the file link from the Flask session
-//     const fileLink = "{{ file_link or '' }}";
-        
-//     if (fileLink) {
-        
-//         // Prepare EmailJS configuration
-//         const confg = {
-//             service_id: '{{ service_id }}',
-//             template_id: '{{ template_id }}'
-//         };
 
-//         // Prepare the email parameters
-//         const templateParams = {
-//             file_link: fileLink,  // Attach the Google Drive file link
-            
-//             message: `Here is the link to the uploaded file: ${fileLink}`
-//         };
-
-//         // Send the email
-//         emailjs.send(confg.service_id, confg.template_id, templateParams)
-//             .then(function(response) {
-//                 console.log('SUCCESS!', response.status, response.text);
-//                 alert('Email sent successfully!');
-//             }, function(error) {
-//                 console.log('FAILED...', error);
-//                 alert('Failed to send email.');
-//             });
-//     }
-// </script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const urlParams = new URLSearchParams(window.location.search);
@@ -679,6 +657,12 @@
       closeActionModal();
     }
   };
+</script>
+<script>
+document.getElementById('searchForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Stop form from submitting
+    handleFilters(); // Call your custom function
+});
 </script>
  
 

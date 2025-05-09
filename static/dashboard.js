@@ -248,3 +248,58 @@ function filterByMonth(){
     }
 }
 
+// document.getElementById('readMoreBtn').addEventListener('click', function() {
+//     var col3 = document.getElementById('col3');
+//     var col4 = document.getElementById('col4');
+//     var button = this;
+    
+//     if (col3.classList.contains('d-none') && col4.classList.contains('d-none')) {
+//       col3.classList.remove('d-none');
+//       col4.classList.remove('d-none');
+//       button.innerHTML = '<i class="fa-solid fa-chevron-up"></i> Read Less';
+//     } else {
+//       col3.classList.add('d-none');
+//       col4.classList.add('d-none');
+//       button.innerHTML = '<i class="fa-solid fa-chevron-down"></i> Read More';
+//     }
+//   });
+
+function populateSelectOptions(selectId, optionsArray, currentValue) {
+    const selectElement = document.getElementById(selectId);
+    if (!selectElement) {
+        console.warn(`No select element with id '${selectId}' found`);
+        return;
+    }
+
+    if (!Array.isArray(optionsArray) || optionsArray.length === 0) {
+        console.warn(`No options to populate for '${selectId}'`);
+        return;
+    }
+
+    optionsArray.forEach(option => {
+        const optionElement = document.createElement("option");
+        optionElement.value = option;
+        optionElement.textContent = option;
+
+        // ✅ Set the selected option
+        if (option === currentValue) {
+            optionElement.selected = true;
+        }
+
+        selectElement.appendChild(optionElement);
+    });
+}
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOM loaded");
+    console.log("Config object:", config);
+
+    if (config && config.home && Array.isArray(config.home.projects)) {
+        populateSelectOptions("project", config.home.projects, project);
+    }
+    if (Array.isArray(config.home.designations)) {
+        populateSelectOptions("designation", config.home.designations, designation);
+    }
+    if (Array.isArray(config.home.locations)) {
+        populateSelectOptions("location", config.home.locations, locations);
+    }
+});

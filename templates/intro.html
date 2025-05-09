@@ -8,101 +8,452 @@
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='intro.css') }}">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        
+       
+           </style>
+    
   </head>
 <body>
   <script>
     var status1="{{status1}}"
     var comments1="{{comments1}}"
     var selected_panel="{{selected_panel}}"
-    
+    var date="{{date}}"
+    var addPanelUrl="{{ url_for('add_panel_member') }}"
+    var deletePanelUrl="{{ url_for('delete_panel') }}"
+    cand="{{candidate_role}}"
   </script>
   <div style="display: flex;">
     {% include 'sidemenu.html'%}
     <div class="container" style="width: 950px;">
         <h1 style="text-align: center; background-color:#4699F9; color: white;">Enter Intro call details</h1>
-        <div style="margin-top:50px;">
-            <form id="panelForm" action="/introcall/{{ resume.id }}" method="post" onsubmit="updateSelectedPanelInput(event)">
-                <div style="margin-bottom:40px;">
-                    <div class="mb-3 select-btn">
-                        <label for="calledBy" class="form-label btn-text">Select panel</label>
-                        <span class="arrow-dwn">
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </span>
-                    </div>
-                    <ul id="panelList" class="list-items">
-                        <li class="items">
-                            <span class="checkbox">
-                              <i class="fa-solid fa-check check-icon"></i>
-                            </span>
-                            <span class="item-text">
-                              HR
-                            </span>
-                            
-                          </li>
-                          <li class="items">
-                            <span class="checkbox">
-                              <i class="fa-solid fa-check check-icon"></i>
-                            </span>
-                            <span class="item-text">
-                              Business Head
-                            </span>
-                          </li>
-                          <li class="items">
-                            <span class="checkbox">
-                              <i class="fa-solid fa-check check-icon"></i>
-                            </span>
-                            <span class="item-text">
-                              Project Manager
-                            </span>
-                    </ul>
-                    <div>
-                        <input type="text" id="newPersonInput" placeholder="Add a new panel" style="margin-top:20px; width: 20rem; height:2rem; border: 1px solid black; border-radius:2px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); outline: none; color: black; padding: 10px; font-size: 1em;">
-                        <button id="addPersonBtn" class="btn btn-dark" type="button">Add</button>
-                    </div>
-                    <input type="hidden" id="selectedPanel" name="selectedPanel" value="{{selected_panel}}">
+        
+        <div style="margin-top:50px; width: 90%; margin-left:4%;">
+            <form id="panelForm" action="{{ url_for('introCall', resume_id=resume.id) }}" method="post" >
+              <div class="form-group">
+                    <label for="selectedPanel">Panel Member</label>
                     
+                    <!-- Fake select box -->
+                    <div class="custom-select-box form-control" id="panelSelectBox">
+                <span id="selectedPanelText">Add panel</span>
+                <span id="panelArrow" class="arrow">&#9660;</span> <!-- Default Down Arrow -->
+            </div>
+
+            <!-- Hidden Multi-Checkbox Dropdown -->
+            <div id="panelDropdown" class="dropdown-content">
+                {% for panel in all_panels %}
+                    <div class="panel-item">
+                        <input type="checkbox" class="panel-checkbox" id="panel_{{ panel.name }}" data-email="{{ panel.email }}" value="{{ panel.name }}"
+                            {% if panel.name in selected_panels %} checked {% endif %}>
+                        <label for="panel_{{ panel.name }}">{{ panel.name }} ({{ panel.email }})</label>
+                        <button type="button" class="btn btn-danger btn-sm delete-btn" data-panel="{{ panel.name }}">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+
+                                <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#panelModal">Add</button>  
+                                <input type="hidden" id="selectedPanel" name="selectedPanel">
+                    </div>
+                 
+                <div class="modal fade" id="panelModal" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h5 class="modal-title">Add Panel Member</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                          </div>
+                          <div class="modal-body">
+                              <input type="text" id="panelName" placeholder="Enter Name" class="form-control mb-2" value="">
+                              <input type="email" id="panelEmail" placeholder="Enter Email" class="form-control mb-2" value=" ">
+                          </div>
+                          <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                              <button type="button" class="btn btn-success" id="savePanel">Save</button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+                <div class="form-group">
+                    
+                      <label for="date" class="form-label" style="font-size:20px; color:#1AACAC;">Date</label>
+                      
+                    <input type="date" class="form-control" id="date" name="date" value="{{ date or '' }}" required>
                 </div>
-                <div class="mb-3">
-                    <label for="date" class="form-label" style="font-size:20px; color:#1AACAC;">Date</label>
-                    <i class="fa-solid fa-star" style="font-size:8px;position: relative;bottom:10px; color: red;"></i>
-                    <input type="date" class="form-control" id="date" name="date" required>
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <div class="status-container" onclick="toggleStatusDropdown()">
+                        <select id="status" name="status" class="form-control" required>
+                            <option value="Rejected" {{ 'selected' if status1 == 'Rejected' else '' }}>Rejected</option>
+                            <option value="Move to Interview 1" {{ 'selected' if status1 == 'Move to Interview 1' else '' }}>Move to  L1</option>
+                        </select>
+                        <span id="statusArrow" class="arrow">&#9660;</span> <!-- Default Down Arrow -->
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="status" style="font-size:20px; color:#1AACAC; margin-top: 20px;">Status</label>
-                    <i class="fa-solid fa-star" style="font-size:8px;position: relative;bottom:10px; color: red;"></i>
-                    <select id="status" name="status" required>
-                        <option value="">Select</option>
-                        <option value="Rejected" {{ 'selected' if status1 == 'Rejected' else '' }}>Rejected</option>
-                        <option value="Move to Interview 1" {{ 'selected' if status1 == 'Move to Interview 1' else '' }}>Move to Interview 1</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="comments" style="font-size:20px; color:#1AACAC; margin-top: 20px;">Comments</label>
-                    <i class="fa-solid fa-star" style="font-size:8px;position: relative;bottom:10px; color: red;"></i>
+                <div class="form-group" style="display: none;">
+                    <label for="comments" class="form-label" style="font-size:15px !important;">Comments</label>
                     <input class="form-control" type="text" name="comments" value="{{comments1}}" placeholder="Enter your comments" required>
                 </div>
-                <div style="display: flex; align-items: center;">
-                    <div class="mb-3">
-                        <a type="button" class="btn btn-primary" href="/interview1v/{{ resume.id }}" style="margin-bottom: 20px; margin-top: 20px; margin-right: 30px;">Interview 1</a>
-                    </div>
-                    <div class="mb-3">
-                        <a type="button" class="btn btn-primary" href="/interview2v/{{resume.id}}">Interview 2</a>
-                    </div>
+                <div id="commentsSection">
+                    {% for panel in selected_panels %}
+                        <div class="form-group">
+                            <label for="comment_{{ panel }}">{{ panel }} Feedback</label>
+                            <input 
+                            type="text" 
+                            id="comment_{{ panel }}" 
+                            name="comment_{{ panel }}" 
+                            class="form-control"
+                            value="{{ comments_dict.get(panel, '') }}">
+                        </div>
+                    {% endfor %}
+                </div>   
+                <div style="display: flex; align-items: center; justify-content:center;">
+                  <button type="submit" class="btn btn-primary" style="width:6rem; height:3rem; margin-right: 2rem;" {% if is_mandatory_missing %} disabled {% endif %}>Submit</button>
+                  <a class="btn btn-outline-secondary" href="{{url_for('employee')}}" style=" padding:10px;width:6rem; height:3rem;">
+                      <div style="display: flex; justify-content: space-between; padding:5px;">
+                          <div>
+                              <i class="fa-solid fa-backward" style="margin-right: 10px;"></i>
+                          </div>
+                          <div>Back</div>
+                      </div>
+                  </a>
                 </div>
-                <button type="submit" class="btn btn-primary" style="margin-top:10px;width:6rem; height:3rem;margin-left:40%;">Submit</button>
             </form>
         </div>
-        <a class="btn btn-outline-secondary" href="/employee_management" style=" padding:10px; margin-top:20px;width:6rem; height:3rem;margin-left:40%;">
-            <div style="display: flex; justify-content: space-between; padding:5px;">
-                <div>
-                    <i class="fa-solid fa-backward" style="margin-right: 10px;"></i>
-                </div>
-                <div>Back</div>
-            </div>
-        </a>
-    </div>
-</div>
-      <script src="{{ url_for('static', filename='intro.js') }}"></script> 
+        <div style="margin-top: 20px;text-align: center; width: 75%; margin-left:15%;">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              <div class="flash-messages">
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message|safe  }}
+                    
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+          </div>
+
+      </div>
+  </div>
+    <script src="{{ url_for('static', filename='intro.js') }}"></script> 
+    <script src="{{ url_for('static', filename='modal.js') }}"></script>
+    <script>
+        var candidateName = "{{ candidate_name }}";
+        var candidateEmail = "{{ candidate_email }}";
+    </script>
+    <script>
+    window.onload = function() {
+        {% if is_mandatory_missing %}
+            alert("Candidate name and email are mandatory to send mail.");
+        {% endif %}
+    }
+</script>
+    <script>
+document.getElementById("panelSelectBox").addEventListener("click", function () {
+    let dropdown = document.getElementById("panelDropdown");
+    let arrow = document.getElementById("panelArrow");
+
+    if (dropdown.style.display === "block") {
+        dropdown.style.display = "none";
+        arrow.classList.remove("arrow-up"); // Reset arrow direction
+    } else {
+        dropdown.style.display = "block";
+        arrow.classList.add("arrow-up"); // Rotate arrow
+    }
+});
+
+// Close dropdown when clicking outside
+document.addEventListener("click", function (event) {
+    let dropdown = document.getElementById("panelDropdown");
+    let selectBox = document.getElementById("panelSelectBox");
+    let arrow = document.getElementById("panelArrow");
+
+    if (!dropdown.contains(event.target) && !selectBox.contains(event.target)) {
+        dropdown.style.display = "none";
+        arrow.classList.remove("arrow-up"); // Reset arrow
+    }
+});
+
+
+
+
+// status toggle
+function toggleStatusDropdown() {
+    const statusSelect = document.getElementById("status");
+    const statusArrow = document.getElementById("statusArrow");
+
+    if (statusSelect.classList.contains("open")) {
+        statusSelect.classList.remove("open");
+        statusArrow.classList.remove("arrow-up");
+    } else {
+        statusSelect.classList.add("open");
+        statusArrow.classList.add("arrow-up");
+    }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener("click", function (event) {
+    const statusContainer = document.querySelector(".status-container");
+    if (!statusContainer.contains(event.target)) {
+        document.getElementById("status").classList.remove("open");
+        document.getElementById("statusArrow").classList.remove("arrow-up");
+    }
+});
+
+</script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const checkboxes = document.querySelectorAll(".panel-checkbox");
+        const hiddenInput = document.getElementById("selectedPanel");
+        const selectedPanelText = document.getElementById("selectedPanelText");
+        const commentsSection = document.getElementById("commentsSection");
+        const commentsDict = {{ comments_dict | tojson }};
+
+        function updateSelectedPanels() {
+            let selectedValues = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+
+            hiddenInput.value = selectedValues.join(",");
+            selectedPanelText.textContent = selectedValues.length > 0 ? selectedValues.join(", ") : "Select Panel";
+
+            // Clear existing comment boxes
+            let existingComments = {};
+        document.querySelectorAll("#commentsSection input").forEach(input => {
+            existingComments[input.id] = input.value;
+        });
+
+        // Clear previous comment fields
+        commentsSection.innerHTML = "";
+
+        // Add new comment fields dynamically with preserved values
+        selectedValues.forEach(panel => {
+            let commentBox = document.createElement("div");
+            commentBox.classList.add("form-group");
+            commentBox.innerHTML = `
+                <label for="comment_${panel}">${panel} Feedback</label>
+                <input 
+                  type="text" 
+                  id="comment_${panel}" 
+                  name="comment_${panel}" 
+                  class="form-control"
+                  value="${existingComments[`comment_${panel}`] || ''}">
+            `;
+            commentsSection.appendChild(commentBox);
+        });
+    }
+
+        // Attach event listeners to checkboxes
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", updateSelectedPanels);
+        });
+
+        // Initialize with already selected values (if any)
+        updateSelectedPanels();
+    });
+
+    // Toggle dropdown visibility
+    function togglePanelDropdown() {
+        let dropdown = document.getElementById("panelDropdown");
+        dropdown.style.display = (dropdown.style.display === "block") ? "none" : "block";
+    }
+
+    // Close dropdown if clicking outside
+    document.addEventListener("click", function (event) {
+        let dropdown = document.getElementById("panelDropdown");
+        let selectBox = document.querySelector(".custom-select-box");
+        if (!dropdown.contains(event.target) && !selectBox.contains(event.target)) {
+            dropdown.style.display = "none";
+        }
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".delete-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            let panelName = this.getAttribute("data-panel");
+
+            if (confirm(`Are you sure you want to delete ${panelName}?`)) {
+                fetch(deletePanelUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ panel: panelName })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove from UI
+                        this.parentElement.remove();
+                    } else {
+                        alert("Failed to delete panel.");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            }
+        });
+    });
+});
+</script>
+<<<<<<< HEAD
+<!-- shwetha's change -->
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        emailjs.init("Nce5bwHWE3-gXvm-9"); // EmailJS User ID
+
+=======
+
+
+<script>
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        emailjs.init("Nce5bwHWE3-gXvm-9"); // EmailJS User ID
+
+        // Ensure candidate details are set from Jinja
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
+        const candidateName = "{{ candidate_name or 'N/A' }}";
+        const candidateEmail = "{{ candidate_email or 'N/A' }}";
+
+        document.querySelector("form").addEventListener("submit", function (event) {
+            const status = document.getElementById("status").value;
+            console.log("📝 Selected Status:", status);
+<<<<<<< HEAD
+
+            // Check for candidate name/email presence
+            if (!candidateName || !candidateEmail || candidateName === "N/A" || candidateEmail === "N/A") {
+                alert("⚠️ Candidate name and email are required!");
+                console.error("❌ Email not sent: Candidate name or email is missing.");
+                event.preventDefault();
+                return;
+            }
+
+            // If status is "Move to Interview 1"
+            if (status === "Move to Interview 1") {
+                event.preventDefault();
+
+                // Check if at least one panel checkbox is selected
+                const selectedPanels = document.querySelectorAll(".panel-checkbox:checked");
+                if (selectedPanels.length === 0) {
+                    alert("⚠️ Please select a Panel Member before submitting.");
+                    console.warn("❌ Submission blocked: No panel member selected.");
+                    return;
+                }
+
+                sendEmail(candidateName, candidateEmail, status, function () {
+                    console.log("📨 Email sent! Submitting form...");
+                    document.querySelector("form").submit();
+=======
+            
+
+            if (!candidateName || !candidateEmail || candidateName === "N/A" || candidateEmail === "N/A") {
+                alert("⚠️ Candidate name and email are required!");
+                console.error("❌ Email not sent: Candidate name or email is missing.");
+                event.preventDefault();  // 🚨 Stops form submission
+                return;
+            }
+
+            console.log("📝 Candidate Info:", { candidateName, candidateEmail, status });
+
+            // ✅ Move this condition inside the event listener
+            if (status === "Move to Interview 1") {
+                event.preventDefault(); // Stop the default form submission
+                
+                sendEmail(candidateName, candidateEmail, status, function() {
+                    console.log("📨 Email sent! Submitting form...");
+                    document.querySelector("form").submit();  // ✅ Corrected form submission
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
+                });
+            }
+        });
+    });
+
+    function sendEmail(candidateName, candidateEmail, status, callback) {
+        const submitButton = document.querySelector("button[type='submit']");
+        submitButton.disabled = true;
+
+<<<<<<< HEAD
+        const toEmail = "varunrram2003@gmail.com";
+        let ccEmails = Array.from(document.querySelectorAll(".panel-checkbox:checked"))
+            .map(checkbox => checkbox.getAttribute("data-email"));
+
+=======
+        const toEmail = "varunrram2003@gmail.com"; // Replace with actual recipient
+        let ccEmails = Array.from(document.querySelectorAll(".panel-checkbox:checked"))
+            .map(checkbox => checkbox.getAttribute("data-email"));
+        
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
+        const templateParams = {
+            to_email: toEmail,
+            cc_email: ccEmails.join(", "),
+            candidate_name: candidateName,
+            interview_round: "L1",
+            Panel_feedback: "Positive",
+            candidate_email: candidateEmail,
+            candidate_phone: "{{ candidate_phone or 'N/A' }}",
+            candidate_role: "{{ candidate_role or 'N/A' }}",
+            candidate_experience: "{{ candidate_experience or 'N/A' }} years",
+            candidate_location: "{{ candidate_location or 'N/A' }}",
+            candidate_notice_period: "{{ candidate_notice_period or 'N/A' }}",
+            candidate_actc: "{{ candidate_actual_ctc or 'N/A' }}",
+            candidate_ectc: "{{ candidate_expected_ctc or 'N/A' }}",
+            status: status,
+            panel_feedback: "{{ candidate_current_link or 'N/A' }}",
+            next_interview_round: "L1",
+            link: "{{ candidate_next_link or 'N/A' }}",
+            message: `Candidate ${candidateName} has been marked as '${status}'.`
+        };
+
+        console.log("📤 Sending email with params:", templateParams);
+
+        emailjs.send("service_q2j2eqc", "template_4vc45jq", templateParams)
+<<<<<<< HEAD
+            .then(function (response) {
+=======
+            .then(function(response) {
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
+                console.log("✅ Email sent successfully!", response);
+                submitButton.disabled = false;
+
+                setTimeout(() => {
+                    if (callback) {
+                        console.log("➡️ Calling callback function...");
+<<<<<<< HEAD
+                        callback();
+                    }
+                }, 2000);
+            })
+            .catch(function (error) {
+=======
+                        callback(); // Proceed with form submission
+                    }
+                }, 2000);
+            })
+            .catch(function(error) {
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
+                console.error("❌ Error sending email:", error);
+                alert("⚠️ Failed to send email. Please try again.");
+                submitButton.disabled = false;
+            });
+    }
+</script>
+<<<<<<< HEAD
+
+=======
+>>>>>>> 891a353798b72fe408dfe0751638a484b5ce257c
+    
+
+
+
+
+    
 </body>
 </html> 
+
 

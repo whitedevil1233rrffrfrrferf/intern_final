@@ -1,135 +1,46 @@
-const selectBtn = document.querySelector(".select-btn");
-let items = document.querySelectorAll(".items");
-let selectedPanel = [];
+document.getElementById("savePanel").addEventListener("click", function () {
+    let name = document.getElementById("panelName").value.trim();
+    let email = document.getElementById("panelEmail").value.trim();
 
-selectBtn.addEventListener("click", () => {
-    selectBtn.classList.toggle("open");
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-    loadSavedItems();
-    highlightSelectedPanels();
-});
-
-items.forEach((item) => {
-    item.addEventListener("click", (event) => {
-        event.preventDefault();
-        item.classList.toggle("checked");
-        updateSelectedPanel();
-        saveItemsToStorage();
-    });
-});
-
-function updateSelectedPanel() {
-    const checked = document.querySelectorAll(".checked");
-    const btnText = document.querySelector(".btn-text");
-    selectedPanel = Array.from(checked).map((item) => item.innerText);
-
-    if (checked && checked.length > 0) {
-        btnText.innerText = `${checked.length}`;
-    } else {
-        btnText.innerText = "Select panel";
+    if (name === "" || email === "") {
+        alert("Please enter both name and email!");
+        return;
     }
 
-    const selectedPanelInput = document.getElementById("selectedPanel");
-    selectedPanelInput.value = selectedPanel.join(", ");
-}
+    // Get the correct Flask route using data attribute
+    
 
-const addPersonBtn = document.getElementById("addPersonBtn");
-addPersonBtn.addEventListener("click", () => {
-    const newPersonInput = document.getElementById("newPersonInput");
-    const newPersonName = newPersonInput.value.trim();
+    fetch(addPanelUrl, {  // Now using dynamic URL
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name, email: email })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
 
-    if (newPersonName) {
-        const newListElement = document.createElement("li");
-        newListElement.className = "items";
-        newListElement.innerHTML = `
-            <span class="checkbox">
-                <i class="fa-solid fa-check check-icon"></i>
-            </span>
-            <span class="item-text">${newPersonName}</span>
+        // Add new checkbox dynamically if saved successfully
+        let panelDropdown = document.getElementById("panelDropdown");
+        let newLabel = document.createElement("label");
+        newLabel.innerHTML = `
+            <input type="checkbox" name="selectedPanel" value="${name}" data-email="${email}"> ${name}
         `;
+        panelDropdown.appendChild(newLabel);
 
-        const panelList = document.getElementById("panelList");
-        panelList.appendChild(newListElement);
-        newPersonInput.value = "";
+        // Clear inputs after adding
+        document.getElementById("panelName").value = "";
+        document.getElementById("panelEmail").value = "";
 
-        updateSelectedPanel();
-        saveItemsToStorage();
+        // Close the modal
+        let modalElement = document.getElementById("panelModal");
+        let modalInstance = bootstrap.Modal.getInstance(modalElement);
+        modalInstance.hide();
+
+        alert("Panel member added successfully!");
         window.location.reload();
-
-        newListElement.addEventListener("click", (event) => {
-            newListElement.classList.toggle("checked");
-            updateSelectedPanel();
-            saveItemsToStorage();
-        });
-    }
+    })
+    .catch(error => console.error("Error:", error));
 });
-
-document.getElementById("newPersonInput").addEventListener("keypress", function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault();
-    }
-});
-
-function saveItemsToStorage() {
-    const panelList = document.getElementById("panelList");
-    const items = panelList.querySelectorAll(".items");
-    const savedItems = [];
-    items.forEach((item) => {
-        savedItems.push(item.querySelector(".item-text").innerText);
-    });
-    localStorage.setItem("panelItem", JSON.stringify(savedItems));
-    
-}
-
-function loadSavedItems() {
-    const savedItemsJson = localStorage.getItem("panelItem");
-    if (savedItemsJson) {
-        const savedItems = JSON.parse(savedItemsJson);
-        const panelList = document.getElementById("panelList");
-        panelList.innerHTML = "";
-        savedItems.forEach((itemText) => {
-            const newListElement = document.createElement("li");
-            newListElement.className = "items";
-            newListElement.innerHTML = `
-            <div class="item-container">
-                <span class="checkbox">
-                    <i class="fa-solid fa-check check-icon"></i>
-                </span>
-                <span class="item-text">${itemText}</span>
-                <button class="btn btn-danger delete-btn" onclick="deletePerson(this)"><i class="fa-solid fa-trash"></i></button>
-            </div>`;
-            panelList.appendChild(newListElement);
-            newListElement.addEventListener("click", (event) => {
-                newListElement.classList.toggle("checked");
-                updateSelectedPanel();
-                saveItemsToStorage();
-            });
-        });
-    }
-}
-
-function deletePerson(button){
-    const listItem=button.closest(".items");
-    listItem.remove();
-    updateSelectedPanel();
-    saveItemsToStorage();
-}
-
-function highlightSelectedPanels() {
-    var selectedPanelInput = document.getElementById("selectedPanel").value;
-    
-    if (selectedPanelInput) {
-        const selectedPanels = selectedPanelInput.split(",").map(panel => panel.trim());
-        
-        const items = document.querySelectorAll(".items");
-
-        items.forEach((item) => {
-            const itemText = item.querySelector(".item-text").innerText.trim();
-            if (selectedPanels.includes(itemText)) {
-                item.classList.add("checked");
-            }
-        });
-    }
-}

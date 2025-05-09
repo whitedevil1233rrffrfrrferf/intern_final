@@ -9,9 +9,3 @@ function populateSelectOptions(selectId, optionsArray){
 }
 populateSelectOptions("tag",config.upload_resume.select_role)
 
-setTimeout(function(){
-    var flashMessages =document.querySelectorAll(".add_flash_message")
-    flashMessages.forEach(function(flashMessage) {
-        flashMessage.style.display = 'none';
-      });
-    }, 2000);

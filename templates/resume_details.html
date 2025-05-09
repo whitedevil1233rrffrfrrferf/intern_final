@@ -1,126 +1,354 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link rel="stylesheet" href="{{ url_for('static', filename='resume_details.css') }}">
-    <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
-    <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
-  </head>
-<body>
-  <div>
-    {% include 'sidemenu.html'%}
-    <div style="width: 950px; text-align: center; margin-left: 300px;">
-      <h1 class="heading" style="color: black; margin-bottom:60px;">Interview details</h1>
-    <div class="container">
-        {% if intro_call %}
-        <h1 class="heading">Intro call details</h1>
-        <table class="table table-striped" style="margin-bottom:40px;">
-            <thead class="thead-dark">
-              <tr>
-                <th scope="col">Date</th>
-                <th scope="col">Status</th>
-                <th scope="col">Comments</th>
-                <th scope="col">Panel</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{{intro_call.Date}}</td>
-                <td>{{intro_call.Status}}</td>
-                <td>{{intro_call.Comments}}</td>
-                <td>{{intro_call.SelectedPanel}}</td>
-                
-              </tr>
-            </tbody>
-          </table>
-        {% endif %}
-    </div>
-    <div class="container">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interview Details</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel="stylesheet" href="{{ url_for('static', filename='resume_details.css') }}">
+  <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
+  <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
+  <style>
+      /* Custom styles for the layout */
+      .container {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          background: linear-gradient(to right, #eef2f3, #dfe9f3);
+          border-radius: 15px;
+          padding: 30px;
+          width: 95%;
+          margin: 0 auto;
+      }
+
+      /* .stage-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          border-bottom: 2px solid #ddd;
+          padding-bottom: 20px;
+          margin-bottom: 20px;
+      }
+
+      .stage-container {
+          background: #007bff;
+          color: white;
+          padding: 10px 20px;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: 0.3s;
+          width: 5rem;
+      } */
+
+
+      .stage-wrapper {
+    display: flex;
+    align-items: stretch; /* Makes both children equal in height */
+    gap: 1rem;
+}
+
+.stage-container {
+    background: #4699F9;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 20rem; 
+}
+
+
+      /* .stage-container:hover {
+          background: #0056b3;
+          transform: scale(1.05);
+      } */
+
+      .details-container {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          padding: 20px;
+          width: 100%;
+      }
+
+      .stage-details {
+          display: block;
+          background: white;
+          padding: 20px;
+          border-radius: 10px;
+          box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.15);
+          width: 100%;
+          
+          height: 20rem;
+          overflow-y: scroll;
+          text-align: left;
+          transition: 0.3s;
+      }
+
+      .stage-header {
+          font-weight: bold;
+          margin-bottom: 15px;
+      }
+
+      .details-row {
+          display: flex;
+          
+          align-items: center;
+          margin-bottom: 10px;
+          gap: 7rem;
+          
+          
+      }
+
+      .details-column {
+          display: flex;
+          flex-direction: column;
+          width: 50%;
+      }
+
+      .label {
+          font-weight: bold;
+          width: 10rem;
+      }
+
       
-      {% if interview1 %}
-      <h1 class="heading">Interview 1 details</h1>
-      <table class="table table-striped" style="margin-bottom:40px;">
-          <thead class="thead-dark">
-            <tr>
-              <th scope="col">Date</th>
-              <th scope="col">Status</th>
-              <th scope="col">Comments</th>
-              <th scope="col">Panel</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{{interview1.Date}}</td>
-              <td>{{interview1.Status}}</td>
-              <td>{{interview1.Comments}}</td>
-              <td>{{interview1.SelectedPanel}}</td>
-              
-            </tr>
-          </tbody>
-        </table>
-      {% endif %}
-    </div>
-    <div class="container">
-      {% if interview2 %}
-      <h1 class="heading">Interview 2 details</h1>
-      <table class="table table-striped" style="margin-bottom:40px;">
-          <thead class="thead-dark">
-            <tr>
-              <th scope="col">Date</th>
-              <th scope="col">Status</th>
-              <th scope="col">Comments</th>
-              <th scope="col">Panel</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{{interview2.Date}}</td>
-              <td>{{interview2.Status}}</td>
-              <td>{{interview2.Comments}}</td>
-              <td>{{interview2.SelectedPanel}}</td>
-              
-            </tr>
-          </tbody>
-        </table>
-      {% endif %}
-    </div>
-    <div class="container">
-      {% if hr %}
-      <h1 class="heading">HR details</h1>
-      <table class="table table-striped">
-          <thead class="thead-dark">
-            <tr>
-              <th scope="col">Date</th>
-              <th scope="col">Status</th>
-              <th scope="col">Comments</th>
-              <th scope="col">Panel</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{{hr.Date}}</td>
-              <td>{{hr.Status}}</td>
-              <td>{{hr.Comments}}</td>
-              <td>{{hr.SelectedPanel}}</td>
-              
-            </tr>
-          </tbody>
-        </table>
-      {% endif %}
-    </div>
-    <a class="btn btn-primary" href="/employee_management" style="color:white; padding:10px"><div style="display: flex; justify-content: space-between; padding:5px;">
-      <div>
-        <i class="fa-solid fa-backward" style="margin-right: 10px;"></i>
+
+       /* For centering the button */
+       .center-button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            /* height: 100vh; Optional: Adjust the height as needed */
+        }
+        .value {
+            min-width: 300px; /* Ensures values start from the same point */
+            text-align: left;
+            word-wrap: break-word; /* Prevents text overflow */
+        }
+        
+  </style>
+</head>
+<body>
+    {% include 'sidemenu.html'%}
+    <div style="width: 70%; text-align: center; margin-left:17%;">
+      <h1 style="text-align: center;  background-color:#4699F9;color: white;">Interview Details</h1>
+      <div class="container">
+          <!-- Stage 1: Intro Call -->
+          <div class="stage-wrapper">
+              <div class="stage-container">
+                <b>Intro</b>
+                  
+              </div>
+              <div class="stage-details">
+                  <div class="stage-header">Intro Call Details</div>
+                  <div class="details-container">
+                      <!-- <div class="details-row">
+                          <div class="details-column">
+                              <div class="label">Date:</div>
+                              <div class="label">Status:</div>
+                              <div class="label">Panel Member1 Feedback:</div>
+                              <div class="label">Panel Member2 Feedback:</div>
+                              <div class="label">Panel Names:</div>
+                          </div>
+                          <div class="details-column">
+                              <div class="value">{{ intro_call.Date }}</div>
+                              <div class="value">{{ intro_call.Status }}</div>
+                              <div class="value">{{ intro_call.PanelMember1Feedback }}</div>
+                              <div class="value">{{ intro_call.PanelMember2Feedback }}</div>
+                              <div class="value">{{ intro_call.SelectedPanel }}</div>
+                          </div>
+                      </div> -->
+                      <div class="details-row">
+                        <span class="label">Date:</span>
+                        <span class="value">{{ intro_call.Date }}</span>
+                    </div>
+                    <div class="details-row">
+                        <span class="label">Status:</span>
+                        <span class="value">{{ intro_call.Status }}</span>
+                    </div>
+                    {% if intro_panel_feedback %}
+                        {% for panel_member, feedback in intro_panel_feedback.items() %}
+                            <div class="details-row">
+                                <span class="label">{{panel_member}} Feedback:</span>
+                                <span class="value">{{ feedback }}</span>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <div class="details-row">
+                        <span class="label">Panel Names:</span>
+                        <span class="value">{{ intro_call.SelectedPanel }}</span>
+                    </div>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Stage 2: L1 Interview -->
+          <div class="stage-wrapper">
+              <div class="stage-container">
+                  <b>L1</b>
+              </div>
+              <div class="stage-details">
+                  <div class="stage-header">L1 Interview Details</div>
+                  <div class="details-container">
+                      <!-- <div class="details-row">
+                          <div class="details-column">
+                              <div class="label">Date:</div>
+                              <div class="label">Status:</div>
+                              <div class="label">Panel Member1 Feedback:</div>
+                              <div class="label">Panel Member2 Feedback:</div>
+                              <div class="label">Panel Names:</div>
+                          </div>
+                          <div class="details-column">
+                              <div class="value">{{ interview1.Date }}</div>
+                              <div class="value">{{ interview1.Status }}</div>
+                              <div class="value">{{ interview1.PanelMember1Feedback }}</div>
+                              <div class="value">{{ interview1.PanelMember2Feedback }}</div>
+                              <div class="value">{{ interview1.SelectedPanel }}</div>
+                          </div>
+                      </div> -->
+                      <div class="details-row">
+                        <span class="label">Date:</span>
+                        <span class="value">{{ interview1.Date }}</span>
+                      </div>
+                      <div class="details-row">
+                          <span class="label">Status:</span>
+                          <span class="value">{{ interview1.Status }}</span>
+                      </div>
+                      {% if interview1_panel_feedback %}
+                        {% for panel_member, feedback in interview1_panel_feedback.items() %}
+                            <div class="details-row">
+                                <span class="label">{{panel_member}} Feedback:</span>
+                                <span class="value">{{ feedback }}</span>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                      <div class="details-row">
+                          <span class="label">Panel Names:</span>
+                          <span class="value">{{ interview1.SelectedPanel }}</span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          {% if g.user_role == 'admin' %}
+              <!-- Stage 3: L2 Interview -->
+              <div class="stage-wrapper">
+                  <div class="stage-container">
+                      <b>L2</b> 
+                  </div>
+                  <div class="stage-details">
+                      <div class="stage-header">L2 Interview Details</div>
+                      <div class="details-container">
+                          <!-- <div class="details-row">
+                              <div class="details-column">
+                                  <div class="label">Date:</div>
+                                  <div class="label">Status:</div>
+                                  <div class="label">Panel Member1 Feedback:</div>
+                                  <div class="label">Panel Member2 Feedback:</div>
+                                  <div class="label">Panel Names:</div>
+                              </div>
+                              <div class="details-column">
+                                  <div class="value">{{ interview2.Date }}</div>
+                                  <div class="value">{{ interview2.Status }}</div>
+                                  <div class="value">{{ interview2.PanelMember1Feedback }}</div>
+                                  <div class="value">{{ interview2.PanelMember2Feedback }}</div>
+                                  <div class="value">{{ interview2.SelectedPanel }}</div>
+                              </div>
+                          </div> -->
+                          <div class="details-row">
+                            <span class="label">Date:</span>
+                            <span class="value">{{ interview2.Date }}</span>
+                          </div>
+                          <div class="details-row">
+                              <span class="label">Status:</span>
+                              <span class="value">{{ interview2.Status }}</span>
+                          </div>
+                          {% if interview2_panel_feedback %}
+                            {% for panel_member, feedback in interview2_panel_feedback.items() %}
+                                <div class="details-row">
+                                    <span class="label">{{panel_member}} Feedback:</span>
+                                    <span class="value">{{ feedback }}</span>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                          <div class="details-row">
+                              <span class="label">Panel Names:</span>
+                              <span class="value">{{ interview2.SelectedPanel }}</span>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Stage 4: HR Interview -->
+              <div class="stage-wrapper">
+                  <div class="stage-container">
+                      <b>HR</b> 
+                  </div>
+                  <div class="stage-details">
+                      <div class="stage-header">HR Interview Details</div>
+                      <div class="details-container">
+                          <!-- <div class="details-row">
+                              <div class="details-column">
+                                  <div class="label">Date:</div>
+                                  <div class="label">Status:</div>
+                                  <div class="label">Panel Member1 Feedback:</div>
+                                  <div class="label">Panel Member2 Feedback:</div>
+                                  <div class="label">Panel Names:</div>
+                              </div>
+                              <div class="details-column">
+                                  <div class="value">{{ hr.Date }}</div>
+                                  <div class="value">{{ hr.Status }}</div>
+                                  <div class="value">{{ hr.PanelMember1Feedback }}</div>
+                                  <div class="value">{{ hr.PanelMember2Feedback }}</div>
+                                  <div class="value">{{ hr.SelectedPanel }}</div>
+                              </div> -->
+                              <div class="details-row">
+                                <span class="label">Date:</span>
+                                <span class="value">{{ hr.Date }}</span>
+                              </div>
+                              <div class="details-row">
+                                  <span class="label">Status:</span>
+                                  <span class="value">{{ hr.Status }}</span>
+                              </div>
+                              {% if hr_panel_feedback %}
+                                  {% for panel_member, feedback in hr_panel_feedback.items() %}
+                                      <div class="details-row">
+                                          <span class="label">{{panel_member}} Feedback:</span>
+                                          <span class="value">{{ feedback }}</span>
+                                      </div>
+                                  {% endfor %}
+                              {% endif %}
+                              <div class="details-row">
+                                  <span class="label">Panel Names:</span>
+                                  <span class="value">{{ hr.SelectedPanel }}</span>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              {% endif %}
+          </div>
+
       </div>
-      <div>
-        Back
-      </div>
-    </div></a>
-    </div>
+  </div>  
+
+  <div class="center-button-container">
+    <a class="btn btn-primary" href="{{ url_for('employee') }}" style="color:white; padding:10px; text-decoration: none;">
+        <div style="display: flex; justify-content: space-between; padding:5px;">
+            <div>
+                <i class="fa-solid fa-backward" style="margin-right: 10px;"></i>
+            </div>
+            <div>
+                Back
+            </div>
+        </div>
+    </a>
   </div>
-    
 </body>
 </html>

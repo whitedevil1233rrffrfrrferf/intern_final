@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function(){
+            emailjs.init("{{ public_key }}");
+        })();
+      </script>
+      
+</head>
+<body>
+    <h1>Send Email Test</h1>
+    <form id="email-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <button type="submit">Send Email</button>
+    </form>
+    <script type="text/javascript">
+        const config = {
+            service_id: '{{ service_id }}',
+            template_id: '{{ template_id }}'
+        };
+        
+        document.getElementById("email-form").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const templateParams = {
+                name: document.getElementById("name").value,
+                email: document.getElementById("email").value
+            };
+            
+
+            // Send email
+            emailjs.send(config.service_id, config.template_id, templateParams) // Replace with your service ID and template ID
+                .then(function(response) {
+                    alert("Email sent successfully!");
+                    console.log('SUCCESS!', response.status, response.text);
+                }, function(error) {
+                    alert("Failed to send email.");
+                    console.log('FAILED...', error);
+                });
+        });
+    </script>
+</body>
+</html>

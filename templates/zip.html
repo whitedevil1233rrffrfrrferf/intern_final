@@ -5,18 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload zip folders</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/9fe3d1bfff.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='font.css') }}">
+    
 </head>
 <body style="background-color:white;">
   <div style="display: flex;">
     {% include 'sidemenu.html'%}
     <div class="container">
-      <center><h1 style="text-align: center; background-color: #00A9FF; color: white; width:48rem; ">Upload multiple zip folders</h1></center>
+      <center><h1 style="text-align: center; width:50rem; " class="headline">Upload multiple zip folders</h1></center>
       <div class="container" style="padding:10px; width:51rem; margin-top:15%;">
-          <form action="/zip" method="POST" enctype="multipart/form-data" style=" border: 1px solid black; padding:10px;">
+          <form action="{{ url_for('zip') }}" method="POST" enctype="multipart/form-data" style=" border: 1px solid black; padding:10px;">
               <div class="filter" style="margin-bottom:40px; margin-left:20%;">
-                  <label for="tag"  style="font-size:25px;">Select Role:</label>
+                  <label for="tag"  >Select Role:</label>
                   <select id="tag" name="tag" >
                     <option value="">Select</option>
                     <option value="Interns">Interns</option>
@@ -25,7 +28,7 @@
                     <option value="Performance Tester">Performance Tester</option> 
                   </select>
               </div>
-              <label for="zipFilesInput" style="font-size: 25px;margin-left:20%;">Select zip folders :</label>
+              <label for="zipFilesInput" style="margin-left:20%;">Select zip folders :</label>
               <input type="file" id="zipFilesInput" name="zipFiles" accept=".zip" multiple>
               <button type="submit" class="btn btn-primary">Upload</button>
               <div style="display: flex;">
@@ -36,7 +39,7 @@
               </div> 
           </form>
           <div>
-              <a class="btn btn-outline-secondary" href="/resume" style=" padding:10px ;margin-top:50px;margin-left:40%;"><div style="display: flex; justify-content: space-between; padding:5px;">
+              <a class="btn btn-outline-secondary" href="{{url_for('resume')}}" style=" padding:10px ;margin-top:50px;margin-left:40%;"><div style="display: flex; justify-content: space-between; padding:5px;">
                   <div>
                     <i class="fa-solid fa-backward" style="margin-right: 10px;"></i>
                     
@@ -51,7 +54,24 @@
           
       </div>
     </div>
-  </div>
     
+  </div>
+  <div style="width:50%; margin-left: auto; margin-right: auto; margin-top: 3rem;" >
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          {% if category == 'error' %}
+            <div class="alert alert-danger add_flash_message" role="alert" >
+              {{ message }}
+            </div>
+          {% elif category == 'success' %}
+            <div class="alert alert-success add_flash_message" role="alert" >
+              {{ message }}
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div> 
 </body>
 </html>

@@ -113,9 +113,10 @@ drive_flow = Flow.from_client_config(
 location_corrections = {
     "Kollu": "Kollumangudi",
     "TN palayam":"TN Palayam",
-    "WDC": "Whitefield DC",
+    
     # add more mappings as needed
 }
+
 
 
 class Employee(db.Model):
@@ -1017,6 +1018,14 @@ def map_role_based_on_experience(experience):
 
     return None
 
+def correct_location(loc):
+    if not loc:
+        return None
+    location = loc.strip().lower()
+    if "kollu" in location:
+        return "Kollu"
+    else:
+        return loc
 
 ######################################### Query corrections ###########################################
 
@@ -1155,10 +1164,24 @@ def dashBoard():
     ## for loop for storing the column counts
 
     for loc_tuple in trimmed_locations:
-        loc = loc_tuple[0]
-        count = base_query.filter(func.trim(Employee.Location) == loc).count()
-        location_counts[loc] = count
+        original_loc = loc_tuple[0]
 
+        if not original_loc:
+            continue
+
+        # Use ilike for case-insensitive matching
+        count = base_query.filter(
+            func.trim(Employee.Location).ilike(f"%{original_loc.strip()}%")
+        ).count()
+
+        # Add to the dictionary (simple counting)
+        if original_loc in location_counts:
+            location_counts[original_loc] += count
+        else:
+            location_counts[original_loc] = count
+    for loc in list(location_counts.keys()):
+        if "kollumangudi" in loc.lower():
+            del location_counts[loc]
     for proj_tuple in projects:
         proj= proj_tuple[0]
         count=base_query.filter(func.trim(Employee.Project)==proj).count()
@@ -1565,10 +1588,8 @@ def Home():
     status = request.args.get('status')
     
     loc = request.args.get('location')
-    if loc=="TN palayam":
-        loc="TN Palayam"
-    if loc=="Kollu":
-        loc="Kollumangudi"  
+    
+      
     month=request.args.get('month') 
         
     search_query = request.args.get('search', '')
@@ -1611,7 +1632,7 @@ def Home():
         data = data.filter(Employee.employee_status == status)
 
     if loc:
-        data = data.filter(Employee.Location == loc)  
+        data = data.filter(Employee.Location.ilike(f"%{loc}%"))
     if month:
         
         # Extract the month part of the date
@@ -1986,7 +2007,7 @@ def employee():
     # Prepare the email template parameters
   
     search_query = request.args.get("search", "").strip()
-    
+    print("search_query",search_query)
     # qa_lead_query = request.args.get('qa_lead', '').strip()
     filter_role = request.args.get('role') 
     filter_week=request.args.get('week')
@@ -2772,6 +2793,7 @@ def signout():
     
     session.pop('email', None)   
     session.pop('picture',None) 
+    
     return redirect(url_for('signPage'))
     
 

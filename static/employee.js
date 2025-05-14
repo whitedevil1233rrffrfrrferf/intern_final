@@ -88,6 +88,8 @@ function filterTableByIntroStatus() {
 }
 function handleFilters(){
     const role = document.getElementById('role').value;
+    const search = document.getElementById('search_bar').value;
+    
     const week=document.getElementById('week').value;
     const month=document.getElementById('month').value;
     const intro=document.getElementById('introFilter').value;
@@ -101,6 +103,12 @@ function handleFilters(){
     } else {
         urlParams.delete('role');
     }
+    if (search){
+        urlParams.set('search', search);
+    }
+    else {
+        urlParams.delete('search');
+    }
     if (intro) {
         urlParams.set('intro', intro);
     } else {
@@ -111,6 +119,7 @@ function handleFilters(){
     } else {
         urlParams.delete('interview1');
     }
+    
     if (interview2) {
         urlParams.set('interview2', interview2);
     } else {
@@ -131,6 +140,7 @@ function handleFilters(){
     } else {
         urlParams.delete('month');
     }
+    
     window.location.href = `${homeUrl}?page=${page}&${urlParams.toString()}`;
     
 }
@@ -471,6 +481,7 @@ function editLocation(resumeId) {
 
 function filterTable() {
     const searchQuery = document.getElementById("search_bar").value.toLowerCase();
+    
     const rows = document.querySelectorAll("tbody tr");
     let foundMatch = false;
 
@@ -688,15 +699,20 @@ document.addEventListener('click', function(event) {
 
 
   
-  function toggleColumn(checkbox) {
+function toggleColumn(checkbox) {
     const columnClass = checkbox.value;
     const isChecked = checkbox.checked;
-  
+
     // Toggle both <th> and <td> with that class
     document.querySelectorAll('.' + columnClass).forEach(cell => {
       cell.style.display = isChecked ? '' : 'none';
     });
-  
+
+    // Save the state to localStorage
+    let columnStates = JSON.parse(localStorage.getItem('columnStates')) || {};
+    columnStates[columnClass] = isChecked;
+    localStorage.setItem('columnStates', JSON.stringify(columnStates));
+
     // Update table width dynamically
     const visibleColumns = document.querySelectorAll('th:not([style*="display: none"])').length;
     const table = document.querySelector('.table');
@@ -704,11 +720,11 @@ document.addEventListener('click', function(event) {
     const maxWidth = 100;
     const newWidth = minWidth + (visibleColumns * 5);
     table.style.width = newWidth > maxWidth ? '100%' : newWidth + '%';
-  }
+}
 
 // ############################# Modal clear selection #############################
 
-function resetToDefaultColumns(){
+function resetToDefaultColumns() {
     const defaultColumns = [
         'candidate_id',
         'candidate_name',
@@ -720,18 +736,16 @@ function resetToDefaultColumns(){
     ];
     const checkboxes = document.querySelectorAll('.column-filters input[type="checkbox"], .round-filters input[type="checkbox"]');
 
-    // 3. Loop through each checkbox
+    // Save default state to localStorage
+    let columnStates = {};
     checkboxes.forEach(cb => {
-        // Check if this checkbox's value is one of the default visible columns
         const shouldBeChecked = defaultColumns.includes(cb.value);
-
-        // 4. Only make a change if current state doesn't match desired state
-        if (cb.checked !== shouldBeChecked) {
-            cb.checked = shouldBeChecked;    // Update the checkbox status
-            toggleColumn(cb);                // Call your existing logic to show/hide that column
-        }
+        columnStates[cb.value] = shouldBeChecked;
+        cb.checked = shouldBeChecked; // Set checkbox state
+        toggleColumn(cb); // Apply the state change
     });
-}  
+    localStorage.setItem('columnStates', JSON.stringify(columnStates));
+}
 
 // ########################################## Checkbox display after reload #######################################
 
@@ -754,4 +768,26 @@ window.addEventListener('DOMContentLoaded', () => {
             containerEl.style.display = 'block';
         }
     });
+});
+window.addEventListener('load', () => {
+    // Load saved column states
+    const savedStates = JSON.parse(localStorage.getItem('columnStates')) || {};
+
+    // Apply saved states to checkboxes
+    document.querySelectorAll('.column-filters input[type="checkbox"], .round-filters input[type="checkbox"]').forEach(cb => {
+        const columnClass = cb.value;
+        if (savedStates[columnClass] !== undefined) {
+            cb.checked = savedStates[columnClass];
+            toggleColumn(cb); // Apply the column visibility
+        }
+    });
+
+    // Load saved filters
+    const savedFilters = JSON.parse(localStorage.getItem('filters')) || {};
+    for (let key in savedFilters) {
+        const filterElement = document.getElementById(key);
+        if (filterElement) {
+            filterElement.value = savedFilters[key];
+        }
+    }
 });

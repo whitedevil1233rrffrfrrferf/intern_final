@@ -70,10 +70,20 @@
               
               <div class="collapse navbar-collapse" id="navbarSupportedContent" style="display: flex; flex-direction: column;height: 4rem;">
                 
-                <form class="d-flex col-10 my-2" id="searchForm" action="{{ url_for('employee') }}" role="search" method="GET">
-                  <input class="form-control me-2" type="search" id="search_bar" placeholder="Search by Name / QA Lead" name="search" aria-label="Search" value="{{ search_query }}"  style="margin-right:2rem!important;">
-                  <button class="btn btn-primary" type="submit" onclick="filterTable()">Search</button>
-                  <button type="button" class="btn btn-danger" id="clearSearch" style="margin-left: 10px;">Clear</button>
+                <form class="d-flex col-10 my-2" id="searchForm" action="{{ url_for('employee') }}" method="GET" role="search" onsubmit="handleFilters()">
+                    <input class="form-control me-2" 
+                            type="search" 
+                            id="search_bar" 
+                            name="search" 
+                            placeholder="Search by Name / QA Lead"
+                            value="{{ search_query }}"
+                            aria-label="Search" 
+                            
+                            style="margin-right:2rem!important;">
+                    
+                    <button class="btn btn-primary" type="submit">Search</button>
+                    
+                    <button type="button" class="btn btn-danger" id="clearSearch" style="margin-left: 10px;">Clear</button>
                 </form>
                 <form class="d-flex col-10 my-2" action="{{ url_for('employee') }}" role="search" method="GET" style="visibility: hidden;">
                   <input class="form-control me-2" type="search" id="search_bar_qa" placeholder="Search by QA Lead" name="qa_lead" aria-label="Search" value="{{qa_lead_query}}" style="margin-right:2rem!important;">

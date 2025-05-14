@@ -388,6 +388,24 @@ document.addEventListener("click", function (event) {
             });
     }
 </script>
+<script>
+    const panelForm = document.getElementById("panelForm");
+
+    // Add submit event listener to form
+    panelForm.addEventListener("submit", function(event) {
+        // Get all checked panel checkboxes
+        const checkedPanels = document.querySelectorAll('.panel-checkbox:checked');
+        
+        // If no panels are selected, prevent form submission and show alert
+        if (checkedPanels.length === 0) {
+            event.preventDefault();
+            alert("Please select at least one panel member before submitting.");
+            return false;
+        }
+       
+        return true;
+    });
+</script>    
     
 
 

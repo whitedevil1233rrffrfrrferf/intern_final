@@ -3719,7 +3719,7 @@ def edit_employee_resume(employee_id):
         resume.Notice_period=request.form['notice_period']
         resume.Link=request.form["resume_link"]
         resume.Role=map_role_based_on_experience(resume.Experience)
-        resume.week = request.form['week']
+        resume.week = request.form.get('week')
         
         db.session.commit()
         flash('Successfully updated!', 'success')

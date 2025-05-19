@@ -136,12 +136,16 @@
                         <label for="role" class="label " class="filter_label">Role:</label>
                         <select name="role" id="role" onchange="handleFilters()" >
                             <option value="">Select</option>
-                            <!-- Populate dynamically or add static options -->
-                            <option value="QA Engineer" {% if filter_role == 'QA Engineer' %}selected{% endif %}>QA Engineer</option>
+                            <option value="Intern" {% if filter_role == 'Intern' %}selected{% endif %}>Intern</option>
                             <option value="Jr. QA Engineer" {% if filter_role == 'Jr. QA Engineer' %}selected{% endif %}>Jr. QA Engineer</option>
+                            <option value="QA Engineer" {% if filter_role == 'QA Engineer' %}selected{% endif %}>QA Engineer</option>
                             <option value="Sr. QA Engineer" {% if filter_role == 'Sr. QA Engineer' %}selected{% endif %}>Sr. QA Engineer</option>
                             <option value="QA Lead" {% if filter_role == 'QA Lead' %}selected{% endif %}>QA Lead</option>
-                            <option value="Intern" {% if filter_role == 'Intern' %}selected{% endif %}>Intern</option>
+                            <!-- Populate dynamically or add static options -->
+                            
+                            
+                            
+                            
                         </select>
                     </div>
                     <div class="inner_filter" style="margin-bottom: 10px; margin-top: 20px;">

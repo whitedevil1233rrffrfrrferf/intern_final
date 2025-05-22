@@ -414,7 +414,7 @@ function populateSelectOptions(selectId, optionsArray) {
 // populateSelectOptions("introFilter", config.resumeFilters.introCallStatus);
 // populateSelectOptions("interview1Filter", config.resumeFilters.interview1Status);
 // populateSelectOptions("interview2Filter", config.resumeFilters.interview2Status);
-populateSelectOptions("allRoundsFilter", config.resumeFilters.allRoundsStatus);
+// populateSelectOptions("allRoundsFilter", config.resumeFilters.allRoundsStatus);
 
 setTimeout(function(){
     var flashMessages =document.querySelectorAll(".add_flash_message")
@@ -569,62 +569,127 @@ document.getElementById("clearSearch_qa").addEventListener("click", function() {
     window.location.href = url.pathname;  // Reload the page without any search parameter
 });
 
-document.addEventListener("DOMContentLoaded", () => {
+// document.addEventListener("DOMContentLoaded", () => {
     
+//     const deleteSelectedButton = document.getElementById("delete-selected");
+//     const selectAllCheckbox = document.getElementById("select-all");
+//     const checkboxes = document.querySelectorAll(".resume-checkbox");
+//     const checkboxColumns = document.querySelectorAll(".checkbox-column");
+
+//     // Show checkboxes when "Delete All" is clicked
+//     selectAllCheckbox.addEventListener("click", () => {
+//         checkboxColumns.forEach(col => col.style.display = "");
+//     });
+//     selectAllCheckbox.addEventListener("change", () => {
+//         checkboxes.forEach(checkbox => {
+//             checkbox.checked = selectAllCheckbox.checked;
+//         });
+//         toggleDeleteButton();
+//     });
+//     checkboxes.forEach(checkbox => {
+//         checkbox.addEventListener("change", () => {
+//             toggleDeleteButton(); // Call toggleDeleteButton when an individual checkbox is clicked
+//         });
+//     });
+//     function toggleDeleteButton() {
+//         const anySelected = Array.from(checkboxes).some(checkbox => checkbox.checked);
+//         deleteSelectedButton.disabled = !anySelected;
+//     }
+//     deleteSelectedButton.addEventListener("click", () => {
+//         const selectedIds = Array.from(checkboxes)
+//             .filter(checkbox => checkbox.checked)  // Filter only the checked checkboxes
+//             .map(checkbox => checkbox.value);      // Get the value (ID) of each selected checkbox
+    
+//             if (selectedIds.length > 0) {
+//                 if (confirm(`Are you sure you want to delete ${selectedIds.length} resumes?`)) {
+                    
+//                     // Send selected IDs to the server
+                    
+//                     fetch(deleteSelectedResumesUrl, {
+//                         method: "POST",
+//                         headers: {
+//                             "Content-Type": "application/json",
+                            
+//                         },
+//                         body: JSON.stringify({ resume_ids: selectedIds })
+//                     })
+//                     .then(response => {
+//                         if (response.ok) {
+//                             window.location.reload();
+//                         } else {
+//                             alert("Failed to delete resumes.");
+//                         }
+//                     });
+//                 }
+//             }
+//     });
+// }
+// )
+document.addEventListener("DOMContentLoaded", () => {
     const deleteSelectedButton = document.getElementById("delete-selected");
     const selectAllCheckbox = document.getElementById("select-all");
-    const checkboxes = document.querySelectorAll(".resume-checkbox");
-    const checkboxColumns = document.querySelectorAll(".checkbox-column");
 
-    // Show checkboxes when "Delete All" is clicked
-    selectAllCheckbox.addEventListener("click", () => {
-        checkboxColumns.forEach(col => col.style.display = "");
-    });
+    // Toggle all visible checkboxes when "Select All" is changed
     selectAllCheckbox.addEventListener("change", () => {
+        const checkboxes = document.querySelectorAll(".resume-checkbox");
+
         checkboxes.forEach(checkbox => {
-            checkbox.checked = selectAllCheckbox.checked;
+            if (checkbox.offsetParent !== null) { // only visible checkboxes
+                checkbox.checked = selectAllCheckbox.checked;
+            }
         });
+
         toggleDeleteButton();
     });
-    checkboxes.forEach(checkbox => {
+
+    // Add change listener to each checkbox to update delete button and "select all" state
+    document.querySelectorAll(".resume-checkbox").forEach(checkbox => {
         checkbox.addEventListener("change", () => {
-            toggleDeleteButton(); // Call toggleDeleteButton when an individual checkbox is clicked
+            toggleDeleteButton();
+            syncSelectAllCheckbox();
         });
     });
+
     function toggleDeleteButton() {
-        const anySelected = Array.from(checkboxes).some(checkbox => checkbox.checked);
+        const visibleCheckboxes = Array.from(document.querySelectorAll(".resume-checkbox"))
+            .filter(cb => cb.offsetParent !== null);
+        const anySelected = visibleCheckboxes.some(cb => cb.checked);
         deleteSelectedButton.disabled = !anySelected;
     }
+
+    function syncSelectAllCheckbox() {
+        const visibleCheckboxes = Array.from(document.querySelectorAll(".resume-checkbox"))
+            .filter(cb => cb.offsetParent !== null);
+        const allChecked = visibleCheckboxes.length > 0 && visibleCheckboxes.every(cb => cb.checked);
+        selectAllCheckbox.checked = allChecked;
+    }
+
     deleteSelectedButton.addEventListener("click", () => {
-        const selectedIds = Array.from(checkboxes)
-            .filter(checkbox => checkbox.checked)  // Filter only the checked checkboxes
-            .map(checkbox => checkbox.value);      // Get the value (ID) of each selected checkbox
-    
-            if (selectedIds.length > 0) {
-                if (confirm(`Are you sure you want to delete ${selectedIds.length} resumes?`)) {
-                    
-                    // Send selected IDs to the server
-                    
-                    fetch(deleteSelectedResumesUrl, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            
-                        },
-                        body: JSON.stringify({ resume_ids: selectedIds })
-                    })
-                    .then(response => {
-                        if (response.ok) {
-                            window.location.reload();
-                        } else {
-                            alert("Failed to delete resumes.");
-                        }
-                    });
-                }
+        const selectedIds = Array.from(document.querySelectorAll(".resume-checkbox"))
+            .filter(cb => cb.checked && cb.offsetParent !== null)
+            .map(cb => cb.value);
+
+        if (selectedIds.length > 0) {
+            if (confirm(`Are you sure you want to delete ${selectedIds.length} resumes?`)) {
+                fetch(deleteSelectedResumesUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ resume_ids: selectedIds })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert("Failed to delete resumes.");
+                    }
+                });
             }
+        }
     });
-}
-)
+});
+
 
 
 

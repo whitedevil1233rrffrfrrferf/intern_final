@@ -1596,6 +1596,8 @@ def Home():
     page = request.args.get('page', 1, type=int)
     sort_by = request.args.get('sort_by', 'Name')
     sort_order = request.args.get('sort_order', None)
+    active_month = request.args.get('activeMonth', None)
+    resigned_month = request.args.get('resignedMonth', None)
     # Apply search filtering
     # if search_query:
     #     total_items = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%")).count()
@@ -1633,6 +1635,7 @@ def Home():
 
     if loc:
         data = data.filter(Employee.Location.ilike(f"%{loc}%"))
+        
     if month:
         
         # Extract the month part of the date
@@ -2007,9 +2010,15 @@ def employee():
     # Prepare the email template parameters
   
     search_query = request.args.get("search", "").strip()
-    print("search_query",search_query)
+    
     # qa_lead_query = request.args.get('qa_lead', '').strip()
     filter_role = request.args.get('role') 
+    if filter_role:
+        if filter_role == "Intern":
+            updated_filter_role = "QA Intern"
+        else:
+            updated_filter_role = filter_role    
+    print("role",filter_role)
     filter_week=request.args.get('week')
     intro_filter=request.args.get('intro', '')
     interview1_filter=request.args.get('interview1', '')
@@ -2046,7 +2055,7 @@ def employee():
             )
     
     if filter_role:  # Filter by role if provided
-        query = query.filter(Resume.Role == filter_role)
+        query = query.filter(Resume.Role == updated_filter_role)
     if filter_week:  # Filter by role if provided
         query = query.filter(Resume.week == filter_week)       
     if selected_month and not search_query :

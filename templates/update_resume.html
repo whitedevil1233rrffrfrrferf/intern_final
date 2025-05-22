@@ -30,7 +30,7 @@
             </div>
             <div class="mb-3 label">
                 <label for="name" class="form-label">Name:<i class="fa-solid fa-star" style="color: red;font-size:10px;bottom: 10px; position: relative;"></i></label>
-                <input type="text" class="form-control" id="name" name="name" value="{{resume.Name or ''}}" aria-describedby="emailHelp" required  maxlength="20" oninvalid="this.setCustomValidity('Please enter your name')">
+                <input type="text" class="form-control" id="name" name="name" value="{{resume.Name or ''}}" aria-describedby="emailHelp" required  maxlength="20" >
                 
             </div>
             
@@ -43,7 +43,7 @@
               <label for="phone" class="form-label" style="display: block;">
                 Phone:<i class="fa-solid fa-star" style="color: red; font-size: 10px; bottom: 10px; position: relative;"></i>
               </label>
-              <input type="tel" class="form-control" id="phone" name="phone" value="{{resume.Phone or ''}}" required maxlength="10" style="width:55.6rem;">
+              <input type="tel" class="form-control" id="phone" name="phone" value="{{resume.Phone or ''}}" required maxlength="10" minlength="10" style="width:55.6rem;">
                 
             </div>
             

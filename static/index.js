@@ -207,6 +207,9 @@ function handleFilters() {
     const status=document.getElementById('status').value;
     const location = document.getElementById('location').value;
     const month = document.getElementById('month').value;
+    const activeMonth = document.getElementById('month_active_datepicker').value;
+    const resignedMonth = document.getElementById('month_resigned_datepicker').value;
+    
     
     // Get existing URL parameters to preserve page, sort_by, and sort_order
     const urlParams = new URLSearchParams(window.location.search);
@@ -251,6 +254,17 @@ function handleFilters() {
     } else {
       urlParams.delete('month');
     }
+    if (activeMonth) {
+      urlParams.set('activeMonth', activeMonth);
+    } else {
+      urlParams.delete('activeMonth');
+    }
+    if (resignedMonth) {
+      urlParams.set('resignedMonth', resignedMonth);
+    } else {
+      urlParams.delete('resignedMonth');
+    }
+    
   
     // Update the window location, including page, sort_by, and sort_order
     window.location.href = `${homeUrl}?page=${page}&sort_by=${sortBy}&sort_order=${sortOrder}&${urlParams.toString()}`;
@@ -306,34 +320,34 @@ tableRows.forEach(function(row) {
     })
 }
 
-function filter(status){
-    const selectedDate=new Date(document.getElementById("month_active_datepicker").value);
+// function filter(status){
+//     const selectedDate=new Date(document.getElementById("month_active_datepicker").value);
     
-    tableRows.forEach(function(row){
-        const joinDateStr=row.querySelector("#joining_date").textContent;
-        const employeeStatusCell = row.querySelector("#employee_status");
-        if (joinDateStr.toLowerCase()=="none"){
-            row.style.display="none";
-            return;
-        }
+//     tableRows.forEach(function(row){
+//         const joinDateStr=row.querySelector("#joining_date").textContent;
+//         const employeeStatusCell = row.querySelector("#employee_status");
+//         if (joinDateStr.toLowerCase()=="none"){
+//             row.style.display="none";
+//             return;
+//         }
         
-        const joinDate = parseCustomDateString(joinDateStr);
-        console.log(joinDate)
-        if (isNaN(joinDate.getTime())) {
-            // Handle the case where joinDateStr is not a valid date
-            row.style.display = "none";
-            return;
-        }
+//         const joinDate = parseCustomDateString(joinDateStr);
+//         console.log(joinDate)
+//         if (isNaN(joinDate.getTime())) {
+//             // Handle the case where joinDateStr is not a valid date
+//             row.style.display = "none";
+//             return;
+//         }
         
-        if (joinDate < selectedDate){
-            row.style.display = employeeStatusCell.textContent.toLowerCase() === status ? "" : "none";
-        }    
-        else{
-            row.style.display = "none";
-        }
-        row.style.display = joinDate < selectedDate && employeeStatusCell.textContent.toLowerCase() === status ? "" : "none";
-    })
-}
+//         if (joinDate < selectedDate){
+//             row.style.display = employeeStatusCell.textContent.toLowerCase() === status ? "" : "none";
+//         }    
+//         else{
+//             row.style.display = "none";
+//         }
+//         row.style.display = joinDate < selectedDate && employeeStatusCell.textContent.toLowerCase() === status ? "" : "none";
+//     })
+// }
 
 // function month_active_resigned(status){
 //     alert("hello")
@@ -398,34 +412,40 @@ function parseCustomDateString(dateString) {
     return new Date(year, month-1 , day);
 }
 
-function filters(status) {
-    const selectedDate = new Date(document.getElementById("month_resigned_datepicker").value);
-    console.log(selectedDate)
-    tableRows.forEach(function(row) {
-        const joinDateStr = row.querySelector("#joining_date").textContent;
-        const employeeStatusCell = row.querySelector("#employee_status");
-        
-        if (joinDateStr.toLowerCase() === "none") {
-            row.style.display = "none";
-            return;
-        }
+// function filters(status) {
+//     const selectedDateInput = document.getElementById("month_resigned_datepicker").value;
+//     const selectedDate = new Date(selectedDateInput);
 
-        const joinDate = parseCustomDateString(joinDateStr);
-        
-        if (isNaN(joinDate.getTime())) {
-            // Handle the case where joinDateStr is not a valid date
-            row.style.display = "none";
-            return;
-        }
+//     // Check if the date input is valid
+//     if (!selectedDateInput || isNaN(selectedDate.getTime())) {
+//         console.error("Invalid or missing date input");
+//         return;
+//     }
 
-        // Corrected logic to consider employee status
-        if (joinDate < selectedDate) {
-            row.style.display = employeeStatusCell.textContent.toLowerCase() === status ? "" : "none";
-        } else {
-            row.style.display = "none";
-        }
-    });
-}
+//     tableRows.forEach(function(row) {
+//         const joinDateStr = row.querySelector(".joining_date").textContent.trim();
+//         const employeeStatusCell = row.querySelector(".employee_status");
+
+//         if (joinDateStr.toLowerCase() === "none") {
+//             row.style.display = "none";
+//             return;
+//         }
+
+//         const joinDate = parseCustomDateString(joinDateStr);
+
+//         if (isNaN(joinDate.getTime())) {
+//             row.style.display = "none";
+//             return;
+//         }
+
+//         // Filter rows based on status and date
+//         if (joinDate < selectedDate) {
+//             row.style.display = employeeStatusCell.textContent.trim().toLowerCase() === status.toLowerCase() ? "" : "none";
+//         } else {
+//             row.style.display = "none";
+//         }
+//     });
+// }
 var locationMapping = {
     "Kollu": "Kollumangudi",
     "TN Palyam": "TN Palyam"

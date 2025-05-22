@@ -159,12 +159,12 @@ td.truncate:hover::after {
             
             <div>
               <label for="month_active" class="label" >Monthly active employees</label>
-              <input type="date" id="month_active_datepicker" oninput="filter('active')">
+              <input type="date" id="month_active_datepicker" oninput="handleFilters()">
             </div>
       
             <div>
               <label for="month_resigned"   class="label">Monthly resigned employees</label>
-              <input type="date" id="month_resigned_datepicker" oninput="filters('resigned')">
+              <input type="date" id="month_resigned_datepicker" oninput="handleFilters()">
             </div>
           </div>
           

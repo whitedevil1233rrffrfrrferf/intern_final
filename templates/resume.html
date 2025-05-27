@@ -27,7 +27,7 @@
                  
               </select>
             </div>
-            <div style="display: block; margin-bottom: 1rem;">
+            <div style="display: block; margin-bottom: 2rem;">
               <label for="month" class="label">Month:</label>
               <select name="month" id="month" required>
                 <option value="" disabled>Select a month</option>
@@ -36,6 +36,16 @@
                 {% endfor %}
               </select>
               
+            </div>
+            <div style="display: block; margin-top: 1rem;margin-bottom: 2rem;">
+                <label for="year_excel" class="label">Year:</label>
+                <select name="year" id="year" required>
+                  <option value="" disabled>Select a year</option>
+                  {% for year in years %}
+                      <option value="{{ year}}" {% if year == current_year %}selected{% endif %}>{{ year }}</option>
+                  {% endfor %}
+                </select>
+                
             </div>
             <label for="file" class="label">Upload a File:</label>
             <input type="file" id="file" name="file" class="file-input" accept=".pdf,.docx" required multiple style="width:40%;">
@@ -57,6 +67,17 @@
                 </select>
                 
               </div>
+              <div style="display: block; ">
+                <label for="year_excel" class="label">Year:</label>
+                <select name="year_excel" id="year_excel" required>
+                  <option value="" disabled>Select a Year</option>
+                  {% for year in years %}
+                      <option value="{{ year }}" {% if year== current_year %}selected{% endif %}>{{ year }}</option>
+                  {% endfor %}
+                </select>
+                
+              </div>
+              
               <div>
                 <label for="file" class="label">Upload a File:</label>
                 <input type="file" id="file" name="file" class="file-input" accept=".xlsx" required multiple style="width:40%;">

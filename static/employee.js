@@ -89,7 +89,7 @@ function filterTableByIntroStatus() {
 function handleFilters(){
     const role = document.getElementById('role').value;
     const search = document.getElementById('search_bar').value;
-    
+    const year=document.getElementById('year').value;
     const week=document.getElementById('week').value;
     const month=document.getElementById('month').value;
     const intro=document.getElementById('introFilter').value;
@@ -139,6 +139,11 @@ function handleFilters(){
         urlParams.set('month', month);
     } else {
         urlParams.delete('month');
+    }
+    if (year) {
+        urlParams.set('year', year);
+    } else {
+        urlParams.delete('year');
     }
     
     window.location.href = `${homeUrl}?page=${page}&${urlParams.toString()}`;
@@ -799,19 +804,42 @@ function resetToDefaultColumns() {
         'view',
         'action'
     ];
-    const checkboxes = document.querySelectorAll('.column-filters input[type="checkbox"], .round-filters input[type="checkbox"]');
 
-    // Save default state to localStorage
+    // ========== Handle column checkboxes ==========
+    const columnCheckboxes = document.querySelectorAll('.column-filters input[type="checkbox"]');
     let columnStates = {};
-    checkboxes.forEach(cb => {
-        const shouldBeChecked = defaultColumns.includes(cb.value);
-        columnStates[cb.value] = shouldBeChecked;
-        cb.checked = shouldBeChecked; // Set checkbox state
-        toggleColumn(cb); // Apply the state change
-    });
-    localStorage.setItem('columnStates', JSON.stringify(columnStates));
-}
 
+    columnCheckboxes.forEach(cb => {
+        const columnClass = cb.value;
+        const shouldBeChecked = defaultColumns.includes(columnClass);
+        cb.checked = shouldBeChecked;
+        toggleColumn(cb); // Show/hide columns
+
+        if (shouldBeChecked) {
+            columnStates[columnClass] = true;
+        }
+    });
+
+    // Save only default column states
+    localStorage.setItem('columnStates', JSON.stringify(columnStates));
+
+    // ========== Handle round filter checkboxes ==========
+    const roundCheckboxes = document.querySelectorAll('.round-filters input[type="checkbox"]');
+
+    roundCheckboxes.forEach(cb => {
+        cb.checked = false; // Uncheck all filters
+
+        // Hide their containers
+        const containerId = cb.value;
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.style.display = 'none';
+        }
+
+        // Remove from localStorage
+        localStorage.removeItem(containerId);
+    });
+}
 // ########################################## Checkbox display after reload #######################################
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -821,7 +849,8 @@ window.addEventListener('DOMContentLoaded', () => {
         { key: 'intro', container: 'introFilterContainer' },
         { key: 'interview1', container: 'interview1FilterContainer' },
         { key: 'interview2', container: 'interview2FilterContainer' },
-        { key: 'hr', container: 'allRoundsFilterContainer' }
+        { key: 'hr', container: 'allRoundsFilterContainer' },
+        { key: 'hr', container: 'yearFilterContainer' }
     ];
 
     filterIds.forEach(({ key, container }) => {

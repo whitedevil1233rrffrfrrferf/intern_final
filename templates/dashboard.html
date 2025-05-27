@@ -126,6 +126,15 @@
                   </select>  
                 </div>
                 <div>
+                  <label for="year" class="label">Year:</label>
+                  <select name="year" id="year" class="select_project" onchange="handleFilters()">
+                    <option value=" ">Select</option>
+                    {% for year in years %}
+                        <option value="{{ year }}" {% if year== year_filter %}selected{% endif %}>{{ year }}</option>
+                    {% endfor %}
+                  </select>  
+                </div>
+                <div>
                   <label for="week" class="label">Week:</label>
                   <select name="week" id="week" class="select_project" onchange="handleFilters()">
                     <option value=" ">Select</option>
@@ -197,6 +206,7 @@
         handleSelect("location", "location");
         handleSelect("week", "week");
         handleSelect("month", "month");
+        handleSelect("year", "year");
 
         window.location.href = url.toString();
             }

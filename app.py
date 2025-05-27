@@ -27,6 +27,7 @@ import time
 import io
 import re
 from urllib.parse import urlencode
+from flask_login import LoginManager,UserMixin,login_user,login_required, logout_user
 
 load_dotenv()
 app = Flask(__name__)
@@ -62,6 +63,14 @@ app.config['UPLOAD_FOLDER']=general_upload_folder
 app.config['PROFILE_IMAGE_UPLOAD_FOLDER'] = 'static/profile_images'
 app.secret_key = os.environ.get('SECRET_KEY')
 db = SQLAlchemy(app)
+
+############################################# Configure Flask-Login #############################################
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'signPage'
+
+
 migrate=Migrate(app,db)
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
@@ -137,7 +146,7 @@ class Employee(db.Model):
       
 
 
-class Login(db.Model):
+class Login(db.Model,UserMixin):
     __bind_key__="login"
     id=db.Column(db.Integer,primary_key=True)
     email=db.Column(db.String(500))
@@ -146,6 +155,9 @@ class Login(db.Model):
     Name = db.Column(db.String(200))
     MobileNumber = db.Column(db.String(20))
     photo_filename = db.Column(db.String(255))
+
+    def get_id(self):
+        return str(self.id)
     
 class Delete_user(db.Model):
     __bind_key__="delete_user"
@@ -172,6 +184,7 @@ class Resume(db.Model):
     Notice_period=db.Column(db.String(255))
     Month=db.Column(db.String(255))
     week=db.Column(db.String(255))
+    year = db.Column(db.String(4))
     
 
         
@@ -975,7 +988,7 @@ def process_and_insert_data(row, designation):
 
     
 
-
+current_year = datetime.now().year
 
 
 def allowed_file(filename):
@@ -1026,6 +1039,10 @@ def correct_location(loc):
         return "Kollu"
     else:
         return loc
+    
+def get_year_filter_range():
+    current_year = datetime.now().year
+    return [str(year) for year in range(current_year - 5, current_year + 2)]    
 
 ######################################### Query corrections ###########################################
 
@@ -1071,6 +1088,11 @@ def inject_total_employees():
     statistics,statistics_leads,overall_counts,weekly_statistics=get_distinct_statistics()
     return dict(total_employees=total_employees,active_employees=active_employees,resigned_employees=resigned_employees,total_resumes=total_resumes,hr_selected=hr_selected,current_year_count=current_year_count, last_year_count=last_year_count,Chennai_employees_count=Chennai_employees_count,kollu_employees_count=kollu_employees_count,kaup_employees_count=kaup_employees_count,tn_palyam_count=tn_palyam_count,employment_status_counts=employment_status_counts,
                 project_status_counts=project_status_counts,statistics=statistics,statistics_leads=statistics_leads,overall_counts=overall_counts,weekly_statistics=weekly_statistics)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Login.query.get(int(user_id))
+
 @app.before_request
 def load_user():
     
@@ -1088,8 +1110,10 @@ def load_user():
             print("No user found")    
     
 
+
 @app.route("/",methods=["GET","POST"])
 def signPage():
+    logout_user() 
     correct_user=None
     error_message=None
     if request.method=="POST":
@@ -1099,6 +1123,7 @@ def signPage():
         correct_user=Login.query.filter_by(email=email).first()
         if correct_user:
             if correct_user.password==password:
+                login_user(correct_user)
                 session['email'] = email 
                 if correct_user.Role=="admin":
                     
@@ -1107,18 +1132,22 @@ def signPage():
                     return redirect(url_for("employee"))        
             else:
                 correct_user=None
-                error_message="invalid login credentials"
+                flash("Invalid login credentials","danger")
         if correct_user == None:
-                error_message="invalid login credentials"      
+                pass    
     return render_template("sign.html",error_message=error_message)   
 @app.route("/dashboard")
+@login_required
 def dashBoard():
     data = {"Intro Selected": 10, "Intro Rejected": 5}
     chart_data = {
         "labels": list(data.keys()),
         "values": list(data.values())  # ✅ note the () after values
     }
+    years = get_year_filter_range()
     current_month = datetime.now().strftime("%B")
+    current_year = datetime.now().year
+    current_year=str(current_year)
     # status=Employee.query.with_entities(Employee.Employment_status).distinct()
     email=session.get('email')
     project_filter = request.args.get('project', '').strip()
@@ -1126,11 +1155,12 @@ def dashBoard():
     location_filter= request.args.get('location', '').strip()
     week_filter=request.args.get('week', '').strip()
     month_filter=request.args.get("month", current_month)
+    year_filter=request.args.get("year", current_year)
     
     
     months=["January","February","March","April","May","June","July","August","September","October","November","December"]
     if not email:
-        return redirect(url_for('login'))
+        return redirect(url_for('signPage'))
     
     user=Login.query.filter_by(email=email).first()
     
@@ -1217,7 +1247,11 @@ def dashBoard():
     if month_filter:
         base_query_resume = base_query_resume.filter(
             func.lower(func.trim(Resume.Month)) == month_filter.lower()
-        )         
+        )   
+    if year_filter:
+        base_query_resume = base_query_resume.filter(
+            Resume.year == year_filter
+        )           
     ## Overall counts
 
     # Get all resume IDs
@@ -1526,7 +1560,7 @@ def dashBoard():
     # Step 4: Update top-level total
     role_values[0] = sum(role_totals.values())
     return render_template("dashboard.html",user_role=user_role,location_counts=location_counts,projects_counts=projects_counts,Employment_status_counts=Employment_status_counts,employee_status_counts=employee_status_counts,intro_counts=intro_counts,interview1_counts=interview1_counts,interview2_counts=interview2_counts,hr_counts=hr_counts,role_statistics=role_statistics,project=project_filter,designation=designation_filter,location=location_filter,months=months,week_filter=week_filter,month_filter=month_filter,lead_statistics=lead_statistics,overall_counts=overall_counts,chart_labels=chart_labels,chart_values=chart_values,hover_texts=hover_texts,total_selected=total_selected,total_rejected=total_rejected,total_hold=total_hold,lead_breakdowns=lead_breakdowns,labels=json.dumps(labels), parents=json.dumps(parents), values=json.dumps(values),role_labels=json.dumps(role_labels),
-        role_parents=json.dumps(role_parents),
+        role_parents=json.dumps(role_parents),years=years,year_filter=year_filter,
         role_values=json.dumps(role_values)) 
 # @app.route("/home",methods=["GET","POST"])
 # def Home():
@@ -1789,6 +1823,9 @@ def Delete(sno):
 with app.app_context():
         db.create_all()
         roles,leads,overall_counts,weekly_statistics = get_distinct_statistics()
+        
+        
+        
         # print("leads",leads)
         # print("Distinct Roles:", roles)
         # data=extract_data_from_excel()
@@ -1927,22 +1964,26 @@ def resume():
     flash_message=None
     months=["January","February","March","April","May","June","July","August","September","October","November","December"]
     current_month = datetime.now().strftime("%B")
-    
+    years=get_year_filter_range()
+    current_year = datetime.now().year
+    current_year=str(current_year)
     if request.method=="POST":
-        selected_tag=request.form['tag']
+        selected_tag = request.form['tag'].strip()
+        safe_tag = selected_tag.replace(" ", "_").replace(".", "").lower()
         month=request.form['month']
+        year=request.form['year']
         files=request.files.getlist('file')
         sucessfully_uploaded=False
         duplicate_files = []
         for file in files:
             if file and allowed_files(file.filename):
                 filename=secure_filename(file.filename)
-                new_filename=f"{selected_tag}_{filename}"
+                new_filename=f"{safe_tag}_{filename}"
                 target_path=os.path.join(app.config['UPLOAD_FOLDER'],new_filename)
                 if not os.path.exists(target_path):
                     file.save(target_path)
                     
-                    resume=Resume(filename=new_filename,Month=month)
+                    resume=Resume(filename=new_filename,Month=month,year=year)
                     db.session.add(resume)
                     db.session.commit()
                     sucessfully_uploaded=True
@@ -1954,7 +1995,7 @@ def resume():
         if duplicate_files:
             flash(f"The following file(s) already exist: {', '.join(duplicate_files)}", 'error')                   
         return redirect(url_for('resume'))        
-    return render_template("resume.html",months=months,current_month=current_month)
+    return render_template("resume.html",months=months,current_month=current_month,years=years,current_year=current_year)
 
 # @app.route("/employee_management", methods=["GET", "POST"])
 # def employee():
@@ -2024,6 +2065,8 @@ def employee():
     interview1_filter=request.args.get('interview1', '')
     interview2_filter=request.args.get('interview2', '')
     hr_filter=request.args.get('hr', '')
+    selected_year=request.args.get('year',str(current_year))
+    print("selected_year",selected_year)
     intro_query = fix_rejected(intro_filter)
     interview1_query = fix_rejected(interview1_filter)
     interview2_query = fix_rejected(interview2_filter)
@@ -2033,6 +2076,7 @@ def employee():
     months=["January","February","March","April","May","June","July","August","September","October","November","December"]
     args_dict = request.args.to_dict()
     
+    years=get_year_filter_range()
     args_dict.pop('page', None)  # Remove 'page' if present
     base_query_string = urlencode(args_dict)
     print("base_query_string",base_query_string)
@@ -2060,6 +2104,8 @@ def employee():
         query = query.filter(Resume.week == filter_week)       
     if selected_month and not search_query :
         query = query.filter(Resume.Month == selected_month)
+    if selected_year and not search_query:
+        query = query.filter(Resume.year == selected_year)    
     if intro_query:
         if intro_query == "Intro call not conducted":
             # Get all resume IDs where Intro call *was conducted*
@@ -2159,7 +2205,7 @@ def employee():
                            service_id=EMAILJS_SERVICE_ID,template_id=EMAILJS_TEMPLATE_ID,search_query=search_query,
                            role=role,filter_role=filter_role,filter_week=filter_week,end_index=end_index,
                            intro_filter=intro_filter,interview1_filter=interview1_filter,interview2_filter=interview2_filter,
-                           hr_filter=hr_query,base_query_string=base_query_string
+                           hr_filter=hr_query,base_query_string=base_query_string,years=years,selected_year=selected_year
                            )
 
 
@@ -2799,7 +2845,7 @@ def get_role():
     return  jsonify({'error': 'Email not in session'}), 400       
 @app.route("/signout")
 def signout():
-    
+    logout_user()
     session.pop('email', None)   
     session.pop('picture',None) 
     
@@ -2939,7 +2985,7 @@ def google_signin():
         if not user:
             flash('Account does not exist. Please sign up first.', 'warning')
             return redirect(url_for('signPage'))
-        
+    login_user(user)    
     session['email']=email
     session['name']=name
     session['picture']=picture
@@ -3430,13 +3476,14 @@ def excel_resume():
     if request.method=="POST":
         current_month = datetime.now().strftime("%B")
         month=request.form['month_excel']
+        year=request.form['year_excel']
         print(month)
         if 'file' not in request.files:
             flash('No file part')
             
             return redirect(request.url)
         file = request.files['file']
-    
+
         if file.filename == '':
             flash('No selected file')
             
@@ -3507,7 +3554,8 @@ def excel_resume():
                                 Actual_CTC=current_ctc,
                                 Expected_CTC=expecting_ctc,
                                 Notice_period=notice_period,
-                                Month=month
+                                Month=month,
+                                year=year
                             )
                             
                             db.session.add(new_candidate)

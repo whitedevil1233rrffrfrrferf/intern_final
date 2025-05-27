@@ -19,8 +19,8 @@ body{
 .sign_div{
     border: 1px solid white;
     width:40%;
-    margin-left:450px;
-    margin-top:150px;
+    margin-left:30%;
+    margin-top:6rem;
     box-shadow: 5px 15px 25px rgba(0,0,0,1.5);
     padding:10px;
 }

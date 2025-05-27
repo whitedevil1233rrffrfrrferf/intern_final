@@ -176,6 +176,15 @@
                             <option value="Week 5" {% if filter_week == "Week 5" %}selected{% endif %}>Week 5</option>
                         </select>
                     </div>
+                    <div class="inner_filter" style="margin-bottom: 10px; margin-top: 20px;display: none;" id="yearFilterContainer">
+                        <label for="year"  class="filter_label">Year:</label>
+                        <select id="year" name="year"  required onchange="handleFilters()">
+                            <option value="">Select Year</option>
+                            {% for year in years %}
+                                <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                     
                     <div style="position: relative; display: inline-block;">
                         <button onclick="openMoreFilters()" class="more-filters-btn" style="text-align: left; margin-top:30px !important;">More ..</button>
@@ -189,6 +198,7 @@
                                 <label><input type="checkbox" value="interview1FilterContainer" onchange="toggleFilter(this)"> L1 Status</label>
                                 <label><input type="checkbox" value="interview2FilterContainer" onchange="toggleFilter(this)"> L2 Status</label>
                                 <label><input type="checkbox" value="allRoundsFilterContainer" onchange="toggleFilter(this)">All Rounds Status</label>
+                                <label><input type="checkbox" value="yearFilterContainer" onchange="toggleFilter(this)">Year</label>
                             </div>
                         
                             <hr>
@@ -204,6 +214,7 @@
                                 <label><input type="checkbox" value="role" checked onchange="toggleColumn(this)"> Role</label>
                                 <label><input type="checkbox" value="month" onchange="toggleColumn(this)"> Month</label>
                                 <label><input type="checkbox" value="week" onchange="toggleColumn(this)"> Week</label>
+                                <label><input type="checkbox" value="year" onchange="toggleColumn(this)"> year</label>
                                 <label><input type="checkbox" value="view" checked onchange="toggleColumn(this)"> View</label>
                                 <label><input type="checkbox" value="action" checked onchange="toggleColumn(this)"> Action</label>
                             </div>
@@ -239,7 +250,9 @@
                             <th scope="col" class="role">Role</th>
                             <!-- <th scope="col" class="others">Others</th> -->
                             <th scope="col" class="month" style="display: none;">Month</th>
+                            <th scope="col" class="year" style="display: none;">Year</th>
                             <th scope="col" class="week" style="display: none;">Week</th>
+                            
                             <!-- <th scope="col" class="int_details" >Interview Details</th> -->
                             <th scope="col" class="view" >View</th>
                             <th scope="col" class="action">Action</th>
@@ -257,28 +270,19 @@
                                 <td class="checkbox-column candidate_id" >{{ start_index + loop.index }}</td>
                                 <td class="wrap-text checkbox-column candidate_name" id="name-{{ resume.id }}">
                                     {% if resume.Link %}
-                                        <a href="{{ resume.Link }}" class="long-filename text-break" target="_blank" href="javascript:void(0);" onclick="return false">
+                                        <a href="{{ resume.Link }}" class="long-filename text-break" target="_blank">
                                             <span id="short-name-{{ resume.id }}">
                                                 {{ resume.Name[:20] }}{% if resume.Name|length > 20 %}...{% endif %}
                                             </span>
                                         </a>
-                                        {% if resume.Name|length > 20 %}
-                                            <br>
-                                            <!-- <a href="#" class="more-info" id="more-info-{{ resume.id }}" 
-                                               onclick="toggleFullName('{{ resume.id }}', '{{ resume.Name }}', event)">More...</a> -->
-                                        {% endif %}
+                                        
                                     {% else %}
                                         <a href="{{ url_for('view_resume', filename=resume.filename) }}" class="long-filename text-break" target="_blank">
                                             <span id="short-name-{{ resume.id }}">
                                                 {{ resume.filename[:20] }}{% if resume.filename|length > 20 %}...{% endif %}
                                             </span>
                                         </a>
-                                        {% if resume.filename|length > 20 %}
-                                            <br>
-                                            <!-- <a href="#" class="more-info" id="more-info-{{ resume.id }}" 
-                                               onclick="toggleFullName('{{ resume.id }}', '{{ resume.filename }}', event)">More...</a> -->
-                                               
-                                        {% endif %}
+                                        
                                     {% endif %}
                                     
                                     <a href="{{ url_for('get_intro_status', resume_id=resume.id) }}"  style="margin-left: 20px; color: red;display: none;" onclick="getInterviewStatus(event,{{resume.id}})"><i class="fa-solid fa-info" ></i></a>
@@ -381,6 +385,7 @@
                                     </div>
                                 </td> -->
                                 <td class="wrap-text checkbox-column month" style="display: none;">{{resume.Month}}</td>
+                                <td class="wrap-text checkbox-column year" style="display: none;">{{resume.year}}</td>
                                 <td class="wrap-text checkbox-column week" style="display: none;">{{resume.week}}</td>
                                 <td class="wrap-text checkbox-column int_details" style="display: none;">x
                                     <div>

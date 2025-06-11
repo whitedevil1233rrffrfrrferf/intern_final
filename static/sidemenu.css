@@ -1,6 +1,10 @@
 .icons{
     color:black;
   }
+  
+  /* Active link styling */
+
+  
   .dropdown {
     position: relative;
     display: inline-block;
@@ -136,6 +140,11 @@
     opacity: 1;
     visibility: visible;
   }
+  .active{
+    background-color: #007bff !important; /* Bootstrap primary blue */
+    color: white !important;
+    border-radius: 0.25rem;
+  }  
   
   /* Prevent going off screen on very small screens or zoomed views */
   @media screen and (max-width: 600px) {

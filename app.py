@@ -1601,6 +1601,7 @@ def dashBoard():
 #                                    page_size_options=page_size_options,
 #                                    selected_page_size=selected_page_size,total_items=total_items,total_pages=total_pages,start_index=start_index,search_query=search_query)
 @app.route("/home", methods=["GET", "POST"])
+@login_required
 def Home():
     default_page_size = 20
     page_size_options = [20, 30, 40,'All']
@@ -1611,8 +1612,13 @@ def Home():
         if selected_page_size != 'All':
             selected_page_size = int(selected_page_size)
         session['page_size'] = selected_page_size
+        query_params = request.args.to_dict()
+        print("query_params",query_params)
+        query_params['page'] = 1  # Reset to first page after changing page size
+
+        return redirect(url_for('Home', **query_params))
         # Redirect to the same page with updated page size to avoid form resubmission issues
-        return redirect(url_for('Home', page=1, search=request.args.get('search', '')))
+        
     else:
         selected_page_size = session.get('page_size', default_page_size)
 
@@ -1630,8 +1636,8 @@ def Home():
     page = request.args.get('page', 1, type=int)
     sort_by = request.args.get('sort_by', 'Name')
     sort_order = request.args.get('sort_order', None)
-    active_month = request.args.get('activeMonth', None)
-    resigned_month = request.args.get('resignedMonth', None)
+    active_date = request.args.get('activeMonth', None)
+    resigned_date = request.args.get('resignedMonth', None)
     # Apply search filtering
     # if search_query:
     #     total_items = Employee.query.filter(Employee.Name.ilike(f"%{search_query}%")).count()
@@ -1674,7 +1680,24 @@ def Home():
         
         # Extract the month part of the date
         data = data.filter(Employee.Joining_date != None )
-        data = data.filter(func.substr(Employee.Joining_date, 4, 2) == month)
+        data = data.filter(func.substr(Employee.Joining_date, 4, 2) == month)    
+    if active_date:
+        day, sel_month, year = active_date.split("-")[2], active_date.split("-")[1], active_date.split("-")[0]
+        reformatted_date = f"{day}-{sel_month}-{year}"
+        print(reformatted_date, type(reformatted_date))
+        
+        data = data.filter(Employee.Joining_date == reformatted_date,
+                            Employee.employee_status == 'active'
+                           )
+    if resigned_date:
+        day, sel_month, year = resigned_date.split("-")[2], resigned_date.split("-")[1], resigned_date.split("-")[0]
+        reformatted_date = f"{day}-{sel_month}-{year}"
+        print(reformatted_date, type(reformatted_date))
+        
+        data = data.filter(Employee.Joining_date == reformatted_date,
+                            Employee.employee_status == 'resigned'
+                           )    
+        
         
     if sort_order:
         if sort_order == 'asc':
@@ -1705,8 +1728,9 @@ def Home():
                            page_size_options=page_size_options,
                            selected_page_size=selected_page_size,
                            total_items=total_items, total_pages=total_pages,
-                           start_index=start_index, search_query=search_query,page=page,project=project,designation=designation,employment_status=employment_status,status=status,loc=loc,month=month)
+                           start_index=start_index, search_query=search_query,page=page,project=project,designation=designation,employment_status=employment_status,status=status,loc=loc,month=month,active_month=active_date,resigned_date=resigned_date)
 @app.route("/add", methods=["GET", "POST"])
+@login_required
 def Add():
     if request.method == "POST":
         emp_id = request.form.get("emp_id")
@@ -1761,6 +1785,7 @@ def Add():
     return render_template("add.html")
 
 @app.route("/update/<int:sno>",methods=["GET","POST"])
+@login_required
 def Update(sno):
     selected_date = request.args.get("date")
     if request.method == "POST":
@@ -1833,6 +1858,7 @@ with app.app_context():
         
 
 @app.route("/bulk",methods=["GET","POST"])
+@login_required
 def bulk():
     if request.method=="POST":
         file = request.files['file']
@@ -1922,10 +1948,12 @@ def bulk():
     return render_template("bulk.html")
     
 @app.route("/view/<int:sno>")
+@login_required
 def view(sno):
     data=Employee.query.filter_by(Sno=sno).first()
     return render_template("view.html",data=data)    
 @app.route("/register",methods=["GET","POST"])
+@login_required
 def register():
     if request.method=="POST":
         email=request.form["email"]
@@ -1953,6 +1981,7 @@ def register():
 
     return render_template("register.html")
 @app.route("/get_employees_list/<employment_status>")
+@login_required
 def get_employees_list(employment_status):
     employees=Employee.query.filter_by(Employment_status=employment_status).all()
     return render_template('employee_list.html', employees=employees,employment_status=employment_status)
@@ -1960,6 +1989,7 @@ def get_employees_list(employment_status):
     # return jsonify({'employeeList': employee_names})
 
 @app.route("/resume",methods=["GET","POST"])
+@login_required
 def resume():
     flash_message=None
     months=["January","February","March","April","May","June","July","August","September","October","November","December"]
@@ -2034,6 +2064,7 @@ def resume():
 #                            total_items=total_items, no_of_pages=no_of_pages,start_index=start_index)
 
 @app.route("/employee_management", methods=["GET", "POST"])
+@login_required
 def employee():
     role=None
     email=session.get('email')
@@ -2083,8 +2114,13 @@ def employee():
     if request.method == "POST":
         selected_page_size = int(request.form.get("page_size", default_page_size))
         session['page_size'] = selected_page_size
-        # Redirect to the same page with updated page size to avoid form resubmission issues
-        return redirect(url_for('employee', page=1))
+
+        # Preserve existing query params like month, year, role, etc.
+        query_params = request.args.to_dict()
+        print("query_params",query_params)
+        query_params['page'] = 1  # Reset to first page after changing page size
+
+        return redirect(url_for('employee', **query_params))
     else:
         selected_page_size = session.get('page_size', default_page_size)
     
@@ -2164,7 +2200,26 @@ def employee():
             if cleared_ids:
                 query = query.filter(Resume.id.in_(cleared_ids))
             else:
-                query = query.filter(False)  # No resumes matched            
+                query = query.filter(False)  # No resumes matched     
+    resume_ids = [r.id for r in query.all()]   
+    intro_statuses = {
+        intro.resumeId: intro.Status 
+        for intro in Intro.query.filter(Intro.resumeId.in_(resume_ids)).all()
+    }    
+    l1_statuses = {
+        interview1.resumeId: interview1.Status
+        for interview1 in Interview1.query.filter(Interview1.resumeId.in_(resume_ids)).all()
+    }
+
+    l2_statuses = {
+        interview2.resumeId: interview2.Status
+        for interview2 in Interview2.query.filter(Interview2.resumeId.in_(resume_ids)).all()
+    }
+
+    hr_statuses = {
+        hr.resumeId: hr.Status
+        for hr in Hr.query.filter(Hr.resumeId.in_(resume_ids)).all()
+    }         
     page = request.args.get('page', 1, type=int)
     total_items =query.count()
     
@@ -2195,7 +2250,11 @@ def employee():
         else:    
             total_pages = data.pages
             end_index = min(start_index + selected_page_size, total_items)
-            
+    for resume in data.items:
+        resume.intro_status = intro_statuses.get(resume.id, "Intro call not conducted")  
+        resume.l1_status = l1_statuses.get(resume.id, "Interview 1 not done")
+        resume.l2_status = l2_statuses.get(resume.id, "Interview 2 not done")
+        resume.hr_status = hr_statuses.get(resume.id, "HR round not done")
     return render_template("employee.html", resumes=data,
                            page_size_options=page_size_options,
                            selected_page_size=selected_page_size,
@@ -2205,11 +2264,13 @@ def employee():
                            service_id=EMAILJS_SERVICE_ID,template_id=EMAILJS_TEMPLATE_ID,search_query=search_query,
                            role=role,filter_role=filter_role,filter_week=filter_week,end_index=end_index,
                            intro_filter=intro_filter,interview1_filter=interview1_filter,interview2_filter=interview2_filter,
-                           hr_filter=hr_query,base_query_string=base_query_string,years=years,selected_year=selected_year
+                           hr_filter=hr_query,base_query_string=base_query_string,years=years,selected_year=selected_year,
+                           
                            )
 
 
 @app.route("/view_resume/<filename>")
+@login_required
 def view_resume(filename):
     resume_folder='static/files'
     file_path=os.path.join(resume_folder, filename)
@@ -2232,6 +2293,7 @@ def view_resume(filename):
 
 
 @app.route("/zip",methods=["GET","POST"])
+@login_required
 def zip():
     current_month = datetime.now().strftime("%B")
     sucessful_message=None
@@ -2740,6 +2802,7 @@ def get_intro_status(resume_id):
     })
 
 @app.route("/employee_data", methods=["GET", "POST"])
+@login_required
 def employeeData():
     default_page_size = 20
     page_size_options = [20, 30, 40,'All']
@@ -2815,6 +2878,7 @@ def employeeData():
 
 
 @app.route("/profile")
+@login_required
 def profile():
     email = session.get('email')
     
@@ -2827,9 +2891,10 @@ def profile():
         role=user.Role
         mobile=user.MobileNumber
         name=user.Name
-        pic=session.get('picture')
-        
-        picture=pic if pic else ""
+        if user.photo_filename:
+            picture = url_for('static', filename=f'profile_images/{user.photo_filename}')
+        else:
+            picture = session.get('picture', '')
         # print(picture)
 
         filename = user.photo_filename
@@ -2848,7 +2913,7 @@ def signout():
     logout_user()
     session.pop('email', None)   
     session.pop('picture',None) 
-    
+
     return redirect(url_for('signPage'))
     
 
@@ -2869,9 +2934,13 @@ def update_profile():
         
         changes=[]
         new_name=request.form["name"]
+        new_password=request.form["password"]
         if user.Name !=new_name:
             user.Name=new_name
             changes.append("Name")
+        if user.password !=new_password:
+            user.password=new_password
+            changes.append("Password")    
         new_mobile = request.form["mobile"]    
         if user.MobileNumber !=new_mobile:
             user.MobileNumber=new_mobile
@@ -3826,6 +3895,22 @@ def add_panel_member():
 
     # return jsonify({"message": "Panel member added successfully!", "name": name, "email": email}), 201
 
+
+@app.route('/add_panel_member_update', methods=['POST'])
+def add_panel_member_update():
+    data = request.json
+    name = data.get('name')
+    email = data.get('email')
+
+    existing_member = Panel.query.filter((Panel.name == name) | (Panel.email == email)).first()
+    if existing_member:
+        return jsonify({"error": "Panel member already exists!"}), 409
+
+    new_member = Panel(name=name, email=email)
+    db.session.add(new_member)
+    db.session.commit()
+
+    return jsonify({"message": "Panel member added successfully!", "name": name, "email": email}), 201
 
 @app.route("/delete_panel", methods=["POST"])
 def delete_panel():

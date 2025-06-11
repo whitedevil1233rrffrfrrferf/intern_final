@@ -159,12 +159,12 @@ td.truncate:hover::after {
             
             <div>
               <label for="month_active" class="label" >Monthly active employees</label>
-              <input type="date" id="month_active_datepicker" oninput="handleFilters()">
+              <input type="date" id="month_active_datepicker" oninput="handleFilters()" value="{{ request.args.get('activeMonth', '') }}">
             </div>
       
             <div>
               <label for="month_resigned"   class="label">Monthly resigned employees</label>
-              <input type="date" id="month_resigned_datepicker" oninput="handleFilters()">
+              <input type="date" id="month_resigned_datepicker" oninput="handleFilters()" value="{{ request.args.get('resignedMonth', '') }}">
             </div>
           </div>
           
@@ -339,14 +339,14 @@ td.truncate:hover::after {
                 
               </div>
               <div>
-                <form method="POST" style="margin-bottom: 1rem;" id="pageSizeForm">
+                <form method="POST" style="margin-bottom: 1rem;" id="pageSizeForm" action="{{ request.path }}?{{ request.query_string.decode() }}">
                   Select Page Size:
                   <select name="page_size" onchange="document.getElementById('pageSizeForm').submit();">
                     {% for option in page_size_options %}
                       <option value="{{ option }}" {% if option == selected_page_size %}selected{% endif %}>{{ option }}</option>
                     {% endfor %}
                   </select>
-                  <button type="submit" class="btn btn-primary" style="margin-left:1rem;">Change Page Size</button>
+                 
                 </form>
               </div>
               

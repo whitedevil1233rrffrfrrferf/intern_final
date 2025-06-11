@@ -404,13 +404,22 @@
                                 <!-- <button class="btn btn-primary" style=" display: block; margin-left: auto; margin-right: auto;" onclick="window.location.href='{{ url_for('edit_employee_resume', employee_id=resume.id) }}'"><i class="fa-solid fa-pencil mx-2" style="color:#fff;"></i></button> -->
                                 <!-- <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal{{ resume.id }}" style="margin-top: 1rem;">More Info</button> -->
                                 
-                                <button class="btn btn-primary" onclick="openActionModal({{ resume.id }}, '{{ role }}')">...</button>
+                                <button class="btn btn-primary" onclick="openActionModal({{ resume.id }}, '{{ role }}', '{{ resume.intro_status }}','{{ resume.l1_status }}', '{{ resume.l2_status }}', '{{ resume.hr_status }}')">
+                                ...</button>
                                 <div id="actionModal" class="custom-modal" style="display: none;">
                                     <div class="custom-modal-content">
                                       <ul class="modal-link-list">
-                                        <li class="modal_li"><a id="introLink" href="{{ url_for('introCall', resume_id=resume.id) }}" class="link-item">Intro</a></li>
-                                        <li class="modal_li"><a id="l1Link"  class="link-item">L1</a></li>
-                                        <li class="modal_li"><a id="l2Link" class="link-item"> L2</a></li>
+                                        <li class="modal_li"><a id="introLink" href="{{ url_for('introCall', resume_id=resume.id), '{{ resume.interview1_status }}', '{{ resume.hr_status }}' }}" class="link-item">Intro</a></li>
+                                        {% if resume.intro_status == "Move to Interview 1" %}
+                                            <li class="modal_li"><a id="l1Link"  class="link-item">L1</a></li>
+                                        {% else %}    
+                                            <li class="modal_li"><a id="l1Link"  class="link-item">L1</a></li>
+                                        {% endif %}
+                                        {% if resume.interview1_status == "Move to Interview 2" %}
+                                            <li class="modal_li"><a id="l2Link" class="link-item"> L2</a></li>
+                                        {% else %} 
+                                            <li class="modal_li"><a id="l2Link" class="link-item"> L2</a></li>
+                                        {% endif %}    
                                         <li class="modal_li"><a id="hrLink" class="link-item">HR</a></li>
                                         <li class="modal_li"><a id="editLink" class="link-item">Edit Resume</a></li>
                                         <li class="modal_li" style="cursor: pointer;"><a id="moreInfoLink" class="link-item" data-bs-toggle="modal">More Info</a></li>
@@ -460,7 +469,7 @@
                     
                 </div>
                 <div style="margin-bottom: 1rem;">
-                    <form method="POST" action="{{ url_for('employee',month=selected_month) }}" id="pageSizeForm">
+                    <form method="POST" action="{{ request.path }}?{{ request.query_string.decode() }}" id="pageSizeForm">
                     Results per page:
                     <select name="page_size" class="option" style="width: 7rem !important; margin-bottom: 2rem;" onchange="document.getElementById('pageSizeForm').submit();">
                         {% for option in page_size_options %}
@@ -640,7 +649,7 @@
     });
 </script>
 <script>
-  function openActionModal(resumeId, role) {
+  function openActionModal(resumeId, role, introStatus, interview1Status,interview2Status, hrStatus) {
     const introBaseUrl = "{{ url_for('introCall', resume_id=0) }}".replace("0", resumeId);
     const l1BaseUrl = "{{ url_for('interview1v', resume_id=0) }}".replace("0", resumeId);
     const l2BaseUrl = "{{ url_for('interview2v', resume_id=0) }}".replace("0", resumeId);
@@ -649,19 +658,52 @@
     const viewModalTarget = "#viewModal" + resumeId;
 
     document.getElementById("introLink").href = introBaseUrl;
-    document.getElementById("l1Link").href = l1BaseUrl;
+    
     document.getElementById("editLink").href = editUrl;
     document.getElementById("moreInfoLink").setAttribute("data-bs-target", viewModalTarget);
-
-    if (role === 'admin') {
-      document.getElementById("l2Link").style.display = 'inline-block';
-      document.getElementById("hrLink").style.display = 'inline-block';
-      document.getElementById("l2Link").href = l2BaseUrl;
-      document.getElementById("hrLink").href = hrBaseUrl;
+    const l1Link = document.getElementById("l1Link");
+    const l2Link = document.getElementById("l2Link");
+    const hrLink = document.getElementById("hrLink");
+    if (introStatus === "Move to Interview 1") {
+        l1Link.style.display = "inline-block";
+        l1Link.href = l1BaseUrl;
+        l1Link.classList.remove("disabled-link");
     } else {
-      document.getElementById("l2Link").style.display = 'none';
-      document.getElementById("hrLink").style.display = 'none';
+        l1Link.style.display = "none";  // or just hide it
+        l1Link.removeAttribute("href");
     }
+    
+    if (role === 'admin') {
+        const l2Link = document.getElementById("l2Link");
+        const hrLink = document.getElementById("hrLink");
+
+        // Always show links
+        l2Link.style.display = 'inline-block';
+        hrLink.style.display = 'inline-block';
+
+        // Enable L2 only if interview1_status is "Move to Interview 2"
+        if (interview1Status === "Move to Interview 2") {
+            l2Link.href = l2BaseUrl;
+            l2Link.classList.remove("disabled-link");
+        } else {
+            l2Link.style.display = "none";
+            l2Link.removeAttribute("href");
+            l2Link.classList.add("disabled-link");
+        }
+        if (interview2Status === "Move to HR Round") {
+            hrLink.href = hrBaseUrl;
+            hrLink.classList.remove("disabled-link");
+        } else {
+            hrLink.style.display = "none";
+            hrLink.removeAttribute("href");
+            hrLink.classList.add("disabled-link");
+        }
+        // You can enable HR based on similar condition (optional)
+        
+        } else {
+        document.getElementById("l2Link").style.display = 'none';
+        document.getElementById("hrLink").style.display = 'none';
+        }
 
     document.getElementById("actionModal").style.display = "block";
   }

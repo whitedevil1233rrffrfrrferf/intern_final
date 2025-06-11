@@ -17,3 +17,4 @@ populateSelectOptions("project", config.update.projects,employeeProject);
 populateSelectOptions("employment_status", config.update.employmentStatus,employeeStatus);
 populateSelectOptions("location", config.update.locations,employeeLocation);
 populateSelectOptions("status", config.update.statuses,employeestatus);
+
